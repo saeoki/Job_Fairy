@@ -30,6 +30,43 @@ function Home() {
           </div>
         </div>
       </div>
+      <div className="body">
+        <div className="btn_interview">
+          <Link to="/AIinterview">
+            <Button variant="primary" 
+              style={{width:"30vw", height:"17vh", fontSize:"1.7rem", float:"right", marginTop:"10vh", marginRight:"5vw"}}>
+                AI 면접
+              </Button>
+          </Link>
+        </div>
+        <div className="btn_report">
+          <Link to="/CVletter">
+            <Button variant="primary" 
+              style={{width:"30vw", height:"17vh", fontSize:"1.7rem", float:"left", marginTop:"10vh", marginLeft:"5vw"}}>
+              리포트
+            </Button>
+          </Link>
+        </div>
+        <div className="btn_resume">
+          <Link to="/Epinformation">
+            <Button variant="primary" 
+              style={{width:"30vw", height:"17vh", fontSize:"1.7rem", float:"right", marginRight:"5vw"}}>
+              자기소개서 작성
+            </Button>
+          </Link>
+        </div>
+        <div className="btn_recruitment">
+          <Link to="/Report">
+            <Button variant="primary"
+              style={{width:"30vw", height:"17vh", fontSize:"1.7rem", float:"left", marginLeft:"5vw"}}>
+              채용 정보
+            </Button>
+          </Link>
+        </div>
+      </div>
+      <div className="footer">
+
+      </div>
     </div>
   );
 }
