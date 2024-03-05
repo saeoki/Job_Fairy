@@ -5,10 +5,11 @@
   display: grid;
   width: 100vw;
   height: 100vh;
-  border: 1px solid darkorange;
+  /* border: 1px solid darkorange; */
   grid-template-areas: 
   "header header header header"
-  ". body body ."
+  "body body body body"
+  "body body body body"
   "footer footer footer footer";
 }
 @media only screen and (max-width: 500px){
@@ -18,17 +19,39 @@
 .container_box > .header {
   grid-area: header;
   display: flex;
-  justify-content: start;
+  /* justify-content: start; */
   /* border: 1px solid blue; */
   width: auto;
   height: 17vh;
-  border-bottom: 3px solid blue;
+  border-bottom: 7px solid rgba(52,147,215,0.694);
 }
+
+.container_box > .body {
+  grid-area: body;
+  display: grid;
+  width: auto;
+  height: 75vh;
+  /* border: 1px solid blue; */
+  grid-template-areas: 
+  "AI report"
+  "resume recruitment";
+}
+
+.container_box > .footer {
+  grid-area: footer;
+  /* display: flex; */
+  width: auto;
+  height: 7vh;
+  border: 1px solid deeppink;
+  margin: 0;
+  padding: 0;
+}
+
   /* 왼쪽 열 스타일 */
 .header > .left {
-  flex-basis: 15%;
+  /* flex-basis: 15%; */
   /* border: 1px solid red; */
-  /* width: 10vw; */
+  width: 15vw;
 }
   
   /* 이미지 스타일 */
@@ -38,15 +61,16 @@
   justify-content: center;
   align-items: center;
   margin-left: 1vw;
+  margin-top: 1vh;
 }
   
   /* 가운데 열 스타일 */
 .header > .center {
-  flex-basis: 70%;
-  /* width: 70vw; */
+  /* flex-basis: 70%; */
+  width: 70vw;
   /* border: 1px solid purple; */
   text-align: center;
-  /* margin-top: 2vh; */
+  margin-bottom: 1vh;
 }
 
 .header > .center > * {
@@ -69,16 +93,34 @@
   justify-content: center;
   align-items: flex-end;
   margin-bottom: 2vh;
-  margin-right: 1vw;
+  margin-right: 2vw;
 }
-
-.header > .right > .btn_box {
-  
-}
-
   
   /* 버튼 그룹 스타일 */
-.body > .button-group {
+.body > .btn_interview {
+  /* border: 1px solid olive; */
+  width: 50vw;
+  height: 37.5vh;
+  grid-area: AI;
 }
 
-  
+.body > .btn_report {
+  /* border: 1px solid olive; */
+  width: 50vw;
+  height: 37.5vh;
+  grid-area: report;
+}
+
+.body > .btn_resume {
+  /* border: 1px solid olive; */
+  width: 50vw;
+  height: 37.5vh;
+  grid-area: resume;
+}
+
+.body > .btn_recruitment {
+  /* border: 1px solid olive; */
+  width: 50vw;
+  height: 37.5vh;
+  grid-area: recruitment;
+}
