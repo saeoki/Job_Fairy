@@ -1,0 +1,79 @@
+/* Homepage.css */
+
+/* 전체 컨테이너 스타일 */
+.container-box {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  /* border: 1px solid darkorange; */
+  justify-content: start;
+  align-self: flex-start;
+}
+  
+.container-box > .Header {
+  display: flex;
+  justify-content: start;
+  /* border: 1px solid blue; */
+  width: auto;
+  height: 17vh;
+  border-bottom: 3px solid blue;
+}
+  /* 왼쪽 열 스타일 */
+.Header > .left {
+  flex-basis: 15%;
+  /* border: 1px solid red; */
+  /* width: 10vw; */
+}
+  
+  /* 이미지 스타일 */
+.Header > .left > img {
+  width: 100px; /* 이미지 너비 조정 */
+  height: auto; /* 이미지의 가로 세로 비율 유지 */
+  justify-content: center;
+  align-items: center;
+  margin-left: 1vw;
+}
+  
+  /* 가운데 열 스타일 */
+.Header > .center {
+  flex-basis: 70%;
+  /* width: 70vw; */
+  /* border: 1px solid purple; */
+  text-align: center;
+  /* margin-top: 2vh; */
+}
+
+.Header > .center > * {
+  margin-top: 3vh;
+
+}
+  /* 제목 스타일 */
+.Header > .center > h1 {
+  
+}
+  
+  /* 부제목 스타일 */
+.Header > .center > p {
+  
+}
+  /* 오른쪽 열 스타일 */
+.Header > .right {
+  flex-basis: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 2vh;
+  margin-right: 1vw;
+}
+
+.Header > .right > .btn_box {
+  
+}
+
+  
+  /* 버튼 그룹 스타일 */
+.Header > .button-group {
+}
+
+  
