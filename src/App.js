@@ -2,13 +2,13 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import Home from './js/Home2';
-import Mypage from './js/Mypage';
-import LoginPage from './js/LoginPage';
-import CVletter from './js/CVletter';
-import Report from './js/Report';
-import AIinterview from './js/AIinterview';
-import Epinformation from './js/Epinformation';
+import Home from './page/Home/js/Home';
+import Mypage from './page/Mypage/js/Mypage';
+import LoginPage from './page/Login/js/LoginPage';
+import CVletter from './CVletter';
+import Report from './page/Report/js/Report';
+import AIinterview from './page/AI/js/AIinterview';
+import Epinformation from './Epinformation';
 
 function App() {
   return (
