@@ -1,0 +1,47 @@
+#RegisterBox {
+    width: 500px;
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+    padding: 15px;
+  }
+  .input-form-box {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .input-form-box > span {
+    display: block;
+    text-align: left;
+    padding-top: 5px;
+    min-width: 90px;
+  }
+  .input-form-box > input {
+    max-width: 250px;
+    margin-left: 10px;
+  }
+  .button-login-box {
+    margin: 10px 0;
+  }
+  #inputBox {
+    margin: 10px;
+    width: auto;
+    height: auto;
+  }
+  
+  #inputBox button {
+    padding: 3px 5px;
+  }
+  
+  #btn-check{
+    border-radius: 10px;
+    margin-left: 10px;
+    font-size: 0.9rem;
+  }
+
+  .input-form-box > i {
+    margin-left: 10px;
+  }
+
+ .RegisterBox Stepper{
+    margin-top: 30px;
+  }

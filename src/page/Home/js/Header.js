@@ -22,10 +22,10 @@ function Header(){
                 <div className="right">
                     <div className="btn_box">
                         <Link to="/LoginPage">
-                            <Button variant="link">Login</Button>
+                            <Button variant="link">로그인</Button>
                         </Link>
-                        <Link to="/Mypage">
-                            <Button variant="primary">Mypage</Button>
+                        <Link to="/Register">
+                            <Button variant="primary">회원가입</Button>
                         </Link>
                     </div>
                 </div>
