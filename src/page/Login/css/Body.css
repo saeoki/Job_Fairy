@@ -1,0 +1,32 @@
+#loginBox {
+    width: 300px;
+    height: auto;
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+  }
+  .input-form-box {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .input-form-box > span {
+    display: block;
+    text-align: left;
+    padding-top: 5px;
+    min-width: 65px;
+  }
+  .button-login-box {
+    margin: 10px 0;
+  }
+ 
+  #inputBox {
+    margin: 10px;
+    width: auto;
+    height: auto;
+
+  }
+  
+  #inputBox button {
+    text-align: center;
+    height: 50px;
+  }

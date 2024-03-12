@@ -9,12 +9,14 @@ import CVletter from './CVletter';
 import Report from './page/Report/js/Report';
 import AIinterview from './page/AI/js/AIinterview';
 import Epinformation from './Epinformation';
+import Register from './page/Register/js/Register';
 
 function App() {
   return (
    <div className="App">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path='/Register' element={<Register />} />
           <Route path='/Mypage' element={<Mypage />} />
           <Route path='/LoginPage' element={<LoginPage />} />
           {/* <Route path='/CVletter' element={<CVletter />} />
