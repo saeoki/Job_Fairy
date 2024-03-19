@@ -20,13 +20,13 @@ export default function Stepper() {
   return (
     <MobileStepper
       variant="dots"
-      steps={6}
+      steps={3}
       position="static"
       activeStep={activeStep}
       sx={{ maxWidth: 400, flexGrow: 1 }}
       nextButton={
         <Button size="small" onClick={handleNext} disabled={activeStep === 5}>
-          Next
+          다음
           {theme.direction === 'rtl' ? (
             <KeyboardArrowLeft />
           ) : (
@@ -41,7 +41,7 @@ export default function Stepper() {
           ) : (
             <KeyboardArrowLeft />
           )}
-          Back
+          이전
         </Button>
       }
     />
