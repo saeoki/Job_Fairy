@@ -7,16 +7,17 @@ import "../css/Header.css"
 function Header(){
     return(
         <div className="row">
-            <div className="col-12 header">
+            <div className="col-12 header" style={{padding:0}}>
                 <div className="left">
-                    <img src="/logo/fairy.png" alt="Fairy" />
+                    <Link to="/">
+                        <img src="/logo/fairy.png" alt="Fairy" />                    
+                    </Link>
                 </div>
                 {/* 가운데 열 */}
                 <div className="center">
-                    <div className="text">
-                        <h1>취업의 요정</h1>
-                        <p>AI 면접 마스터</p>
-                    </div>
+                    <Link to="/">
+                        <img src="/logo/title.png" alt="title" />
+                    </Link>
                 </div>
                 {/* 우측 열 */}
                 <div className="right">
