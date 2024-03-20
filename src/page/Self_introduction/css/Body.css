@@ -1,0 +1,115 @@
+
+/* Self Introduction Box */
+#Self_introductionBox {
+    width: auto;
+    height: auto;
+    text-align: center;
+    align-self: center;
+    padding-top: 1vh;
+}
+
+    .jobinput-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    /* 자기소개서 키워드 입력하기 */
+    .horizontal-container {
+        display: flex;
+        align-items: center; /* 세로 중앙 정렬 */
+        width: auto;
+    }
+      .input-textarea-row {
+        margin-bottom: 10px; /* 각 텍스트 입력 칸 사이의 간격 조절 */
+      } 
+    /* Input Keywords Box */
+    .inputkeywords-box {
+        display: flex;
+        flex-direction: column; /* 요소들을 세로로 배치 */
+        align-items: center; /* 가운데 정렬 */
+        padding-top: 2vh;
+    }
+
+    /* Input Textarea */
+    #input-textarea-box {
+        min-width: 200px;
+        width: 22.5vw;
+        height: 6.7vh;
+        align-items: center;
+        border-color: rgba(128, 128, 128, 0.345)
+    }
+    .keywords-button {
+        justify-content: flex-end; /* 우측 정렬 */
+        width: 10px; /* 버튼의 너비를 20px로 지정 */
+        height: 20px; /* 버튼의 높이를 20px로 지정 */
+        background-color: #3498db;
+        color: #fff;
+        font-size: 1rem;
+        border-radius: 4px;
+    }
+    
+    /* 자기소개서 키워드 입력하기 */
+
+
+    /* Setting Apply Box */
+    .settingapply-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2vh;
+    }
+
+    .settingapply-box label {
+        font-size: 15px;
+        color: red;
+        position: relative;
+        top: -2vh; /* 원하는 만큼 위로 이동 */
+        
+    }
+
+    .settingapply-box checkbox {
+        margin-left: 10vw;
+    }
+
+
+    /* Additional Content Box */
+    .addtionalcontent-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: auto;
+        padding-bottom: 3vh;
+    }
+
+    .additional-textarea-box {
+        min-width: 370px;
+        height: 10vh;
+        max-height: 80px;
+        resize: vertical;
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 1.0rem; /* 글자 크기 조절 */
+        margin-bottom: 5px; /* 마이페이지의 개인 설정을 적용합니다와의 간격 조절 */
+    }
+
+
+
+    /* Start Introduction Button */
+    .startintroduction-button {
+        min-width: 300px;
+        height: 8vh;
+        font-size: min(1.5rem, 4vw); /* 수정된 부분 */   
+        background-color: #3498db;
+        color: #fff;
+    }
+    
+
+    .startintroduction-button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;    
+        padding-bottom: 10vh;
+    }
+    

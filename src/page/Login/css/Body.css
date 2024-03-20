@@ -6,7 +6,7 @@
     align-self: center;
   }
   .input-form-box {
-    display: flex;
+    display: flex;  
     margin-bottom: 5px;
   }
   .input-form-box > span {

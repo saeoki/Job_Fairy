@@ -16,7 +16,7 @@ function Body(){
                     </Link>
                 </div>
                 <div className="col-12 col-md-6">
-                    <Link to="/CVletter">
+                    <Link to="/Self_introduction">
                         <Button variant="primary">
                             자소서 작성
                         </Button>

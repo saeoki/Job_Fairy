@@ -1,11 +1,17 @@
-/* AI 인터뷰 */
+import React, { useState } from "react";
+import Header from "../../Home/js/Header";
+
+import Body from "./Body";
 
 
-import React from "react";
 
 function AIinterview(){
     return(
-        <h1>AI 인터뷰 페이지</h1>
+        <div> 
+            <Header />
+            <Body />
+        </div>
+
     )
 }
 export default AIinterview;

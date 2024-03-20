@@ -1,0 +1,29 @@
+#Output_Self_introductionBox {
+    width: 500px;
+    height: auto;
+    text-align: center;
+    align-self: center;
+    padding-top: 10vh;
+}
+
+    .output-form-box {
+        display: flex;  
+        margin-bottom: 5px;
+        width: 300px; /* 원하는 너비로 조절 */
+        height: auto;
+    }
+
+
+    .output-title-box{
+        display: flex;
+        flex-direction: column; /* 요소들을 세로로 배치 */
+        align-items: center; /* 가운데 정렬 */
+        padding-top: 2vh;
+    }
+
+    .output-result-box{
+        display: flex;
+        flex-direction: column; /* 요소들을 세로로 배치 */
+        align-items: center; /* 가운데 정렬 */
+        padding-top: 2vh;
+    }
