@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -11,6 +11,8 @@ import Output_Self_introduction from './page/Self_introduction/js2/Output_Self_i
 import AIinterview from './page/AI/js/AIinterview';
 import JobInput from './page/Self_introduction/js/JobInput';
 import Outputpage from './page/Self_introduction/js2/Outputpage';
+import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
+
 
 function App() {
   // const [selectedJob, setSelectedJob] = useState('');
@@ -19,6 +21,16 @@ function App() {
   //   setSelectedJob(selectedJob);
   // };
 
+  // const [data, setData] = useState({});
+
+  // useEffect(() => {
+  //     const fetchData = async () => {
+  //         const result = await axios('/api/data');
+  //         setData(result.data);
+  //     };
+
+  //     fetchData();
+  // }, []);
   return (
    <div className="App">
       {/* <JobInput onJobSelect={handleJobSelect} />
@@ -28,10 +40,13 @@ function App() {
           <Route path='/Register' element={<Register />} />
           <Route path='/Mypage' element={<Mypage />} />
           <Route path='/LoginPage' element={<LoginPage />} />
+
           <Route path='/AIinterview' element={<AIinterview />} />
+          <Route path='/CheckCamMic' element={<CheckCamMic />} />
 
           <Route path='/Self_introduction' element={<Self_introduction />} />
           <Route path='/Output_Self_introduction' element={<Output_Self_introduction />} />
+
           {/* 
           <Route path='/Report' element={<Report />} />
 
