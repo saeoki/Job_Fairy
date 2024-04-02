@@ -1,12 +1,30 @@
-#checkcammic-box{
-    width: 80vw;
-    height: auto;
-    text-align: center;
-    justify-self: center;
-    align-self: center;
+.CheckCamMic-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    weight: 100vh;
+    padding-top: 1vh;
+  }
+  
+  .video-box {
+    width: 90vw;
+    height: 55%;
+  }
+  
+
+  .gauge-box {
+    width: 40vw;
+    margin-top: 2vh;
+  }
+
+  
+  .button-box {
+    margin-top: 3vh;
+
+  }
+
+  .icon-progress-container {
+    justify-content: flex-start;
 }
-
-
-    /* .cammic-box{
-
-    } */
+  
