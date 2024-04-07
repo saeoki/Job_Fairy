@@ -9,10 +9,9 @@ import Register from './page/Register/js/Register';
 import Self_introduction from './page/Self_introduction/js/Self_introduction';
 import Output_Self_introduction from './page/Self_introduction/js2/Output_Self_introduction';
 import AIinterview from './page/AI/js/AIinterview';
-import JobInput from './page/Self_introduction/js/JobInput';
-import Outputpage from './page/Self_introduction/js2/Outputpage';
 import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
 
+import Report from './page/Report/js/Report';
 
 function App() {
   // const [selectedJob, setSelectedJob] = useState('');
@@ -33,8 +32,6 @@ function App() {
   // }, []);
   return (
    <div className="App">
-      {/* <JobInput onJobSelect={handleJobSelect} />
-      <Outputpage selectedJob={selectedJob} /> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path='/Register' element={<Register />} />
@@ -47,10 +44,10 @@ function App() {
           <Route path='/Self_introduction' element={<Self_introduction />} />
           <Route path='/Output_Self_introduction' element={<Output_Self_introduction />} />
 
-          {/* 
+          
           <Route path='/Report' element={<Report />} />
 
-          <Route path='/Epinformation' element={<Epinformation />} /> */}
+          {/* <Route path='/Epinformation' element={<Epinformation />} /> */}
         </Routes>
     </div> 
   );

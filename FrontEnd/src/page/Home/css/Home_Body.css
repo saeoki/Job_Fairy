@@ -1,9 +1,11 @@
 .body{
-    display: grid;
-    width: auto;
-    height: 75vh;
-    /* border: 1px solid slateblue; */
     border-bottom: 7px solid rgba(52,147,215,0.694);
+
+}
+
+.body > .row {
+    height: 30vh;
+    width: auto;
 }
 
 .body > * > .col-12.col-md-6{

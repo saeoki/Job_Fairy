@@ -1,11 +1,18 @@
+.body {
+    display : flex;
+    min-height: 50vh;
+    flex-direction: column;
+}
+
 
 /* Self Introduction Box */
 #Self_introductionBox {
     width: auto;
-    height: auto;
     text-align: center;
     align-self: center;
-    padding-top: 1vh;
+    padding-top: 3vh;
+    flex: 1; /* body가 자신의 공간을 최대한 확장 */
+    /* overflow-y: auto; 내용이 넘칠 때 스크롤 표시 */
 }
 
     .jobinput-box {

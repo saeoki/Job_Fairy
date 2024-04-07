@@ -1,31 +1,30 @@
 // Body.js
-import "../css/Body.css"
+import "../../Self_introduction/css/Self_Body.css"
 
 import React from 'react';
 import Inputwords from './Inputwords';
-import JobInput from './JobInput';
 import SettingsApply from './SettingsApply';
 import AdditionalContent from './AdditionalContent';
-import Self_introduction from "./Self_introduction";
 import StartIntroduction from "./StartIntroduction";
+import InputBox from "./InputBox";
 
 function Body() {
   return (
     <div className="body">
       <div id = "Self_introductionBox" >
-        <div class="jobinput-box">
-            <JobInput />
+        <div className="jobinput-box">
+            <InputBox  />
         </div>
 
-        <div class="inputkeywords-box">
+        <div className="inputkeywords-box">
            <Inputwords />
         </div>
 
-        <div class="settingapply-box">
+        <div className="settingapply-box">
           <SettingsApply />
         </div>
 
-        <div class="addtionalcontent-box">
+        <div className="addtionalcontent-box">
             <AdditionalContent />
         </div>
         <StartIntroduction />

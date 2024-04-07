@@ -42,10 +42,10 @@ function StartIntroduction() {
           "네"를 선택하면 몇 초 후에 자동으로 결과 페이지로 이동합니다.
         </DialogContent>
         <DialogActions style={{ justifyContent: 'center' }} >
-          <Button onClick={handleClose}>아니요</Button>
           <Link to ="/Output_Self_introduction">
             <Button onClick={handleConfirm} autoFocus>네</Button>
           </Link>
+          <Button onClick={handleClose}>아니요</Button>
         </DialogActions>
       </Dialog>
     </div>

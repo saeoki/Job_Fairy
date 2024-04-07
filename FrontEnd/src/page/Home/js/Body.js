@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 
-import "../css/Body.css"
+import "../../Home/css/Home_Body.css"
 
 function Body(){
     return(
