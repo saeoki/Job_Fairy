@@ -1,0 +1,4 @@
+.footer {
+    margin-top: auto; /* body가 남은 공간을 모두 차지한 후에 footer가 자동으로 아래로 이동 */
+    text-align: center;
+  }

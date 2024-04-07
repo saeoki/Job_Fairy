@@ -25,7 +25,7 @@ export default function Stepper() {
       activeStep={activeStep}
       sx={{ maxWidth: 400, flexGrow: 1 }}
       nextButton={
-        <Button size="small" onClick={handleNext} disabled={activeStep === 5}>
+        <Button size="small" onClick={handleNext} disabled={activeStep === 2}>
           다음
           {theme.direction === 'rtl' ? (
             <KeyboardArrowLeft />

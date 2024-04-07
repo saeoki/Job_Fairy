@@ -9,20 +9,20 @@ function Body(){
             <div id="loginBox">
                 {/* 아이디, 비번, 버튼 박스 */}
                 <div id="inputBox">
-                    <div class="input-form-box">
+                    <div className="input-form-box">
                         <span>아이디 </span>
                         <input type="text" name="uid" className="form-control" />
                     </div>
-                    <div class="input-form-box">
+                    <div className="input-form-box">
                         <span>비밀번호 </span>
                         <input type="password" name="upw" className="form-control" />
                     </div>
-                    <div class="button-login-box" >
+                    <div className="button-login-box" >
                         <button type="button" className="btn btn-primary btn-xs" style={{width:"100%"}}>
                             로그인
                         </button>
                     </div>
-                    <div class="button-register-box" >
+                    <div className="button-register-box" >
                         <Link to="/Register">
                             <button type="button" className="btn btn-secondary btn-xs" style={{width:"100%"}}>
                                 회원가입

@@ -1,7 +1,7 @@
 // InputKeywords.js
 
 import React, { useState } from 'react';
-import '../css/Body.css';
+import '../css/Self_Body.css';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
