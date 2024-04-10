@@ -7,7 +7,7 @@ import "../../Home/css/Home_Body.css"
 function Body(){
     return(
         <div className="body">
-            <div className="row">
+            <div className="row" style={{marginTop:"3vh"}}>
                 <div className="col-12 col-md-6">
                     <Link to="/AIinterview">
                         <Button variant="primary">

@@ -4,6 +4,7 @@
     text-align: center;
     justify-self: center;
     align-self: center;
+    margin: auto;
   }
   
   .interview-type-box {
