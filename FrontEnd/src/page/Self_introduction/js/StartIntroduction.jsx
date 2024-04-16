@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from "react-router-dom";
 
 import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
+import CreateIcon from '@mui/icons-material/Create';
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 
-function StartIntroduction() {
+const StartIntroduction = ({infoList, isInput ,setIsInput }) => {
+
   const [open, setOpen] = useState(false);
 
   const handleStartButtonClick = () => {
@@ -18,10 +18,12 @@ function StartIntroduction() {
 
   const handleClose = () => {
     setOpen(false);
+    setIsInput(false)
   };
 
   const handleConfirm = () => {
     setOpen(false);
+    setIsInput(true)
   };
 
   return (
@@ -30,21 +32,37 @@ function StartIntroduction() {
         <Button
           variant="contained"
           className='startintroduction-button'
-          startIcon={<SendIcon />}
+          startIcon={<CreateIcon />}
           onClick={handleStartButtonClick}
         >
           자기소개서 작성 시작
         </Button>
       </Stack>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>자기소개서 작성을 시작하시겠습니까?</DialogTitle>
+        <DialogTitle>입력한 프롬프트를 확인해주세요.</DialogTitle>
         <DialogContent style={{ textAlign: 'center' }}>
-          "네"를 선택하면 몇 초 후에 자동으로 결과 페이지로 이동합니다.
+            <div>
+              <h2>선호 직무</h2>
+              <p>
+                {Object.values(infoList.jobList).map((job, index) => (
+                  <li key={index}>{job}</li>
+                ))}
+              </p>
+
+              <h2>키워드</h2>
+              <p>
+                {Object.values(infoList.keywordList).map((keyword, index) => (
+                  <li key={index}>{keyword}</li>
+                ))}
+              </p>
+
+              <h2>추가 내용</h2>
+              <p>{infoList.addContent}</p>
+            </div>
+            자기소개서 작성을 시작하시겠습니까?
         </DialogContent>
         <DialogActions style={{ justifyContent: 'center' }} >
-          <Link to ="/Output_Self_introduction">
-            <Button onClick={handleConfirm} autoFocus>네</Button>
-          </Link>
+          <Button onClick={handleConfirm} autoFocus>네</Button>
           <Button onClick={handleClose}>아니요</Button>
         </DialogActions>
       </Dialog>

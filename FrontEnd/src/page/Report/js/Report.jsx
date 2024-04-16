@@ -27,7 +27,7 @@ function Report(){
             자기소개서 결과 : {data}
         </div>
         <div>
-            isLoading : {isLoading ? "작성 중..." : ""}
+            isLoading : {isLoading ? "작성 중..." : "..."}
         </div>
         </>
     )
