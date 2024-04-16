@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Header from "../../Home/js/Header";
 
 import Body from "./Body";
+import Footer from "../../Home/js/Footer";
 
 function LoginPage() {
     // 아이디와 비밀번호 상태 관리
@@ -22,6 +23,7 @@ function LoginPage() {
         <div>
             <Header />
             <Body />
+            <Footer />
         </div>
     );
 }

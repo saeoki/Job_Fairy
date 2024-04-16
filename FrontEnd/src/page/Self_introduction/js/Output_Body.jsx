@@ -1,5 +1,5 @@
 // Body.js
-import "../css/Body2.css"
+import "../css/Output_Body.css"
 import React from 'react';
 import Outputpage from "./Outputpage";
 

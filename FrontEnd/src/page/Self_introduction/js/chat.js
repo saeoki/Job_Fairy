@@ -1,3 +1,9 @@
+/*
+    ChatGPT API 연결하는 파일
+    유저의 입력을 받아와 자기소개서 초안을 작성하는 함수
+*/
+
+
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -5,14 +11,20 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 });
 
-export const CallGPT = async () => {
+export const CallGPT = async ({prompt}) => {
     console.log(">> Call GPT")
+
+    const messages = [{
+        "role": "system",
+        "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드에 맞춰 초안을 작성하는 업무를 담당한다.\n작성할 내용은 200자 이내로 마무리해야한다."
+    },
+    {
+        "role": "user",
+        "content": `"${prompt}"`,
+    }]
     
     const completion = await openai.chat.completions.create({
-        messages: [{ 
-            "role": "system",
-            "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드에 맞춰 초안을 작성하는 업무를 담당한다.\n작성할 내용은 200자 이내로 마무리해야한다."
-        }],
+        messages,
         model: "gpt-3.5-turbo",
         temperature: 1,
         max_tokens: 256,
