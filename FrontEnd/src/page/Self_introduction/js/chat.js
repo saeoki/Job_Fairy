@@ -12,11 +12,11 @@ const openai = new OpenAI({
 });
 
 export const CallGPT = async ({prompt}) => {
-    console.log(">> Call GPT")
+    // console.log(">> Call GPT")
 
     const messages = [{
         "role": "system",
-        "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드에 맞춰 초안을 작성하는 업무를 담당한다.\n작성할 내용은 200자 이내로 마무리해야한다."
+        "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드를 포함한 자기소개서 초안을 작성하는 업무를 담당한다. 작성할 내용은 250자 이내로 마무리해야한다. 인삿말은 하지말고 자기소개서 바로 작성해야한다."
     },
     {
         "role": "user",
@@ -34,7 +34,7 @@ export const CallGPT = async ({prompt}) => {
     });
 
     const responseData = completion.choices[0]
-    console.log(responseData.message.content);
+    // console.log(responseData.message.content);
 
     return responseData.message.content;
 }

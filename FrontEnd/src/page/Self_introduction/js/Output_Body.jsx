@@ -3,11 +3,11 @@ import "../css/Output_Body.css"
 import React from 'react';
 import Outputpage from "./Outputpage";
 
-function Body() {
+const Body = ({ isInput, infoList }) => {
   return (
     <div className="body">
         <div id='Output_Self_introduction'>
-            <Outputpage />
+            <Outputpage isInput={isInput} infoList={infoList} />
         </div>
     </div>
   );
