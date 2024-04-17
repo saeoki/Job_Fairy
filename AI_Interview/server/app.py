@@ -1,13 +1,10 @@
-from flask import Flask, jsonify
-from CheckCameraMicrophone import CheckCameraMicrophone
+from flask import Flask, render_template
 
 app = Flask(__name__)
-checker = CheckCameraMicrophone()
 
-@app.route('/check_camera_microphone', methods=['GET'])
-def check_camera_microphone():
-    result = checker.check_camera_and_microphone()
-    return jsonify({'result': result})
+@app.route('/AI_interview_progress')  # React 앱을 렌더링할 경로 설정
+def index():
+    return render_template('index.html')  # React 앱의 메인 페이지 렌더링
 
 if __name__ == '__main__':
     app.run(debug=True)
