@@ -11,13 +11,18 @@ function Self_introduction(){
 
   const [isInput, setIsInput] = useState(false);
 
+  const [infoList, setInfoList] = useState({
+    jobList:{},
+    keywordList:{},
+    addContent:""
+  })
+
   return(
     <div className="container_box">
         <Header />
         {isInput ? 
-        <Output_Body /> :
-        // <></> :
-        <Input_Body isInput={isInput} setIsInput={setIsInput} />
+        <Output_Body isInput={isInput} infoList={infoList} /> :
+        <Input_Body isInput={isInput} setIsInput={setIsInput} infoList={infoList} setInfoList={setInfoList} />
         }
         <Footer />
     </div>

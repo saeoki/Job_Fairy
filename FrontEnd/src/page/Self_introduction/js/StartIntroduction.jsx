@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 
 import Button from '@mui/material/Button';
-import CreateIcon from '@mui/icons-material/Create';
 import Stack from '@mui/material/Stack';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 
-const StartIntroduction = ({infoList, isInput ,setIsInput }) => {
+import { Button as Antd_btn }  from "antd";
+import { EditOutlined } from "@ant-design/icons"
+
+import { PromptContainer, PromptContent, Divider, PromptTitle } from "../../../CommonStyles";
+// import CardContent from '@mui/material/CardContent';
+import {CheckCircleTwoTone, TagsTwoTone, PushpinTwoTone} from "@ant-design/icons"
+
+const StartIntroduction = ({infoList ,setIsInput }) => {
 
   const [open, setOpen] = useState(false);
 
@@ -26,39 +32,77 @@ const StartIntroduction = ({infoList, isInput ,setIsInput }) => {
     setIsInput(true)
   };
 
+  const isJobListEmpty = Object.keys(infoList.jobList).length === 0;
+  const isKeywordListEmpty = Object.keys(infoList.keywordList).length === 0;
+  const isAddContentListEmpty = Object.keys(infoList.addContent).length === 0;
+
+  // 버튼 비활성화 여부를 결정하는 함수
+  const shouldDisableButton = isJobListEmpty || isKeywordListEmpty 
+  // || isAddContentListEmpty;
+  // console.log(infoList)
+  // console.log(shouldDisableButton)
+
   return (
     <div className="startintroduction-button-container">
       <Stack direction="row" spacing={2}>
-        <Button
-          variant="contained"
+        <Antd_btn
+          type='primary'
           className='startintroduction-button'
-          startIcon={<CreateIcon />}
+          icon={<EditOutlined />}
           onClick={handleStartButtonClick}
+          size='Default'
+          disabled={shouldDisableButton}
         >
           자기소개서 작성 시작
-        </Button>
+        </Antd_btn>
+
       </Stack>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>입력한 프롬프트를 확인해주세요.</DialogTitle>
         <DialogContent style={{ textAlign: 'center' }}>
-            <div>
-              <h2>선호 직무</h2>
-              <p>
-                {Object.values(infoList.jobList).map((job, index) => (
+        <PromptContainer>
+            <PromptTitle>
+              <CheckCircleTwoTone 
+                twoToneColor="#B5DAE7"
+                style={{ marginRight: "6px" }}
+              />
+              선호 직무
+            </PromptTitle>
+            <PromptContent>
+              {Object.values(infoList.jobList).map((job, index) => (
                   <li key={index}>{job}</li>
                 ))}
-              </p>
-
-              <h2>키워드</h2>
-              <p>
-                {Object.values(infoList.keywordList).map((keyword, index) => (
+            </PromptContent>
+        </ PromptContainer>
+        <Divider />
+        <PromptContainer>
+            <PromptTitle>
+              <TagsTwoTone 
+                twoToneColor="#FF9AA2"
+                style={{ marginRight: "6px" }}
+              />
+              키워드
+            </PromptTitle>
+            <PromptContent>
+              {Object.values(infoList.keywordList).map((keyword, index) => (
                   <li key={index}>{keyword}</li>
                 ))}
-              </p>
-
-              <h2>추가 내용</h2>
-              <p>{infoList.addContent}</p>
-            </div>
+            </PromptContent>
+        </ PromptContainer>
+        <Divider />
+        { isAddContentListEmpty ? <></> :
+        <PromptContainer>
+            <PromptTitle>
+              <PushpinTwoTone 
+                twoToneColor="#FF9AA2"
+                style={{ marginRight: "6px" }}
+              />
+              추가 내용
+            </PromptTitle>
+            <PromptContent>
+              {infoList.addContent}
+            </PromptContent>
+          </PromptContainer> }
             자기소개서 작성을 시작하시겠습니까?
         </DialogContent>
         <DialogActions style={{ justifyContent: 'center' }} >

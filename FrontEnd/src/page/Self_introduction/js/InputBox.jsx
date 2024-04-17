@@ -34,7 +34,7 @@ const InputBox = ({isCheck, setInfoList}) => {
             id="multiple-limit-tags"
             options={programmerList}
             getOptionLabel={(option) => option.title}
-            defaultValue={[programmerList[0]]}
+            // defaultValue={[programmerList[0]]}
             disabled={isCheck}
             onChange={(e,value) => jobInputHandler(value)}
             renderInput={(params) => (

@@ -8,14 +8,9 @@ import AdditionalContent from './AdditionalContent';
 import StartIntroduction from "./StartIntroduction";
 import InputBox from "./InputBox";
 
-const Body = ({isInput, setIsInput}) => {
-  const [isCheck, setIsCheck] = useState(false);
+const Body = ({isInput, setIsInput, infoList, setInfoList}) => {
 
-  const [infoList, setInfoList] = useState({
-    jobList:{},
-    keywordList:{},
-    addContent:""
-  })
+  const [isCheck, setIsCheck] = useState(false);
 
   return (
     <div className="body">

@@ -37,3 +37,15 @@
     width: 100vw;
     font-family: "Noto Serif KR";
 }
+
+.save_box{
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+}
+
+.save_btn{
+    min-width: 300px;
+    min-height: 40px;
+    font-size: 20px;
+}
