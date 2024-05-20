@@ -5,27 +5,18 @@ import Button from '@mui/material/Button';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 
-export default function Stepper() {
+export default function Stepper({activeStep,handleNext,handleBack}) {
   const theme = useTheme();
-  const [activeStep, setActiveStep] = React.useState(0);
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
 
   return (
     <MobileStepper
       variant="dots"
-      steps={3}
+      steps={2}
       position="static"
       activeStep={activeStep}
       sx={{ maxWidth: 400, flexGrow: 1 }}
       nextButton={
-        <Button size="small" onClick={handleNext} disabled={activeStep === 2}>
+        <Button size="small" onClick={handleNext} disabled={activeStep === 1}>
           다음
           {theme.direction === 'rtl' ? (
             <KeyboardArrowLeft />
