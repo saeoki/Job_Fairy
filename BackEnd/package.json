@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "backend": "cd server && nodemon server",
+    "client": "cd to-do-list_client && yarn start"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.4",
+    "nodemon": "^3.1.0"
+  }
+}

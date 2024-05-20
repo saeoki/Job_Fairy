@@ -1,27 +1,7 @@
-.body{
-  width: auto;
-  height: 75vh;
-  border-bottom: 7px solid rgba(52,147,215,0.694);
-}
-
-.box{
-  width: auto;
-  min-height: 65vh;
-}
-
-#RegisterBox {
-    width: 500px;
-    text-align: center;
-    margin: 14vh auto;
-    padding: 15px;
-    @media screen and (max-width: 767px){
-      width: 350px;
-      padding: 10px;
-  }
-  }
-  .input-form-box {
+.input-form-box {
     display: flex;
     margin-bottom: 5px;
+    padding: 2px;
   }
   .input-form-box > span {
     display: block;
@@ -61,16 +41,6 @@
   .input-form-box > i {
     margin-left: 10px;
   }
-
- .stepper{
-    height: 7vh;
-  }
-
-  .stepper > *{
-    width: 30vw;
-    margin: auto;
-    @media screen and (max-width: 767px){
-      width: 90%;
-      margin: auto;
-    }
-  }
+.mili_btn > button {
+    margin-left: 1vw;
+}

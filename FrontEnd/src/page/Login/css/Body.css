@@ -1,9 +1,15 @@
+.bodyBox{
+  height: 70vh;
+}
+
 #loginBox {
     width: 300px;
     height: auto;
     text-align: center;
     justify-self: center;
     align-self: center;
+    margin: auto;
+    margin-top: 15vh;
   }
   .input-form-box {
     display: flex;  
@@ -21,9 +27,6 @@
  
   #inputBox {
     margin: 10px;
-    width: auto;
-    height: auto;
-
   }
   
   #inputBox button {

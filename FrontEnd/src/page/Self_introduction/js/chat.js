@@ -16,7 +16,7 @@ export const CallGPT = async ({prompt}) => {
 
     const messages = [{
         "role": "system",
-        "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드를 포함한 자기소개서 초안을 작성하는 업무를 담당한다. 작성할 내용은 250자 이내로 마무리해야한다. 인삿말은 하지말고 자기소개서 바로 작성해야한다."
+        "content": "개발자 자기소개서 초안을 작성해주는 컨설턴트이다. 입력한 키워드를 포함한 자기소개서 초안을 작성하는 업무를 담당한다. 작성할 내용은 500자 이내로 마무리해야한다. 인삿말은 하지말고 자기소개서 바로 작성해야한다."
     },
     {
         "role": "user",
@@ -27,7 +27,7 @@ export const CallGPT = async ({prompt}) => {
         messages,
         model: "gpt-3.5-turbo",
         temperature: 1,
-        max_tokens: 256,
+        max_tokens: 500,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,

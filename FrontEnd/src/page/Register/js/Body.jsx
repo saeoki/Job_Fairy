@@ -1,46 +1,35 @@
 import * as React from 'react';
-import { Tooltip } from '@mui/material';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+
 
 import "../css/Body.css"
 import Stepper from './Stepper';
+import InputForm from './input_form';
+import InputForm2 from './input_form2';
 
 
 function Body(){
+    const [activeStep, setActiveStep] = React.useState(0);
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
     return(
         <div className="body">
             <div className='box'>
                 <div id="RegisterBox">
                     <div id="inputBox">
-                        <div className="input-form-box">
-                            <span>아이디 </span>
-                            <input type="text" name="uid" className="form-control" placeholder="아이디를 입력하세요"/>
-                            <button type="button" className="btn btn-primary btn-sm" id="btn-check" style={{maxHeight:"26px", maxWidth:"60px", marginTop:"5px"}}>
-                                중복체크
-                            </button>
-                        </div>
-                        <div className="input-form-box">
-                            <span>이름 </span>
-                            <input type="text" name="uid" className="form-control" placeholder="이름을 입력하세요"/>
-                        </div>
-                        <div className="input-form-box">
-                            <span>비밀번호 </span>
-                            <input type="password" name="upw" className="form-control" placeholder="비밀번호를 입력하세요"/>
-                            <Tooltip title="비밀번호는 영문,숫자,특수기호를 포함한 6~12자리" placement="right">
-                                <ErrorOutlineIcon sx={{fontSize: 33, marginLeft:1}}/>
-                            </Tooltip>
-                        </div>
-                        <div className="input-form-box">
-                            <span>비밀번호 확인 </span>
-                            <input type="text" name="uid" className="form-control" placeholder="비밀번호를 재입력하세요"/>
-                        </div>
+                        {activeStep === 0 && <InputForm />}
+                        {activeStep ===1 && <InputForm2 />}
                     </div>
                 </div>
             </div>
             <div className='stepper'>
-                <div>
-                    <Stepper/>                
-                </div>
+                <Stepper activeStep={activeStep} handleNext={handleNext} handleBack={handleBack}/>
             </div>
         </div>
     )
