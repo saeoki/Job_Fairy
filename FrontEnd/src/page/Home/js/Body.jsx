@@ -25,7 +25,7 @@ function Body(){
             </div>
             <div className="row">
                 <div className="col-12 col-md-6">
-                    <Link to="/Epinformation">
+                    <Link to="/Recruitment">
                         <Button variant="primary">
                             채용 정보
                         </Button>
