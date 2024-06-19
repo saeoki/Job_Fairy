@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Box, Typography } from '@mui/material';
 
-function MilitaryStatus() {
+const MilitaryStatus = ({setRegisterList}) => {
   const [selectedStatus, setSelectedStatus] = useState('');
 
   const handleButtonClick = (status) => () => {
     setSelectedStatus(status);
+    setRegisterList(prevState=> ({
+      ...prevState,
+      military : status
+  }))
   };
 
   return (

@@ -6,15 +6,28 @@ const userSchema = mongoose.Schema({
     id: {
         type: String,
         maxlength: 20,
+        required : true,
+        unique: true
     },
     name: {
         type: String,
         maxlength: 10,
     },
-    email: {
-        type: String,
-        trim: true,
-        unique: 1,
+    location: {
+      type: String,
+      maxlength: 5,
+    },
+    military: {
+      type: String,
+      maxlength: 10,
+    },
+    position: {
+      type: String,
+      maxlength: 50,
+    },
+    salary: {
+      type: String,
+      maxlength: 40,
     },
     password: {
         type: String,
@@ -68,7 +81,7 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 userSchema.methods.generateToken = function (cb) {
   var user = this;
   //jsonwebtoken을 이용해서 token 을 생성하기
-  var token = jwt.sign(user._id.toHexString(), "secreatToken");
+  var token = jwt.sign(user._id.toHexString(), "secretToken");
 
   user.token = token;
   user.save(function (err, user) {

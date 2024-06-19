@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Slider, Typography, Box } from '@mui/material';
 
-function SalarySlider() {
+const SalarySlider = ({setRegisterList}) => {
   const [value, setValue] = useState([2000, 12000]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    setRegisterList(prevState => ({
+      ...prevState,
+      salary : newValue
+    }))
   };
 
   return (
