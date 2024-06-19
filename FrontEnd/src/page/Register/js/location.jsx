@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, Fo
 
 const locations = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 
-function LocationSelector() {
+const LocationSelector = ({setRegisterList}) => {
   const [open, setOpen] = useState(false);
   const [selectedLocations, setSelectedLocations] = useState([]);
 
@@ -26,11 +26,24 @@ function LocationSelector() {
     }
 
     setSelectedLocations(newChecked);
+    setRegisterList(prevState => ({
+      ...prevState,
+      location : newChecked
+    }))
   };
 
   const handleDelete = (locationToDelete) => () => {
-    setSelectedLocations((locations) => locations.filter((location) => location !== locationToDelete));
-  };
+    setSelectedLocations((locations) => {
+      const updatedLocations = locations.filter((location) => location !== locationToDelete)
+
+      // registerList 업데이트
+      setRegisterList((prevState) => ({
+          ...prevState,
+          location: updatedLocations
+      }));
+      return updatedLocations; // updatedPositions 반환
+    }) 
+  }
 
   return (
     <div>

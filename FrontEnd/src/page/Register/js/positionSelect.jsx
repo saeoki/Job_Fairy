@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip, Box } from '@mui/material';
 
 const positions = [
   '백엔드 개발자', '프론트엔드 개발자', '풀스택 개발자',
@@ -7,7 +7,7 @@ const positions = [
   'AI 엔지니어', '모바일 앱 개발자', '웹 개발자', '시스템 엔지니어'
 ];
 
-function PositionSelector() {
+const PositionSelector = ({setRegisterList}) => {
   const [open, setOpen] = useState(false);
   const [selectedPositions, setSelectedPositions] = useState([]);
 
@@ -30,10 +30,23 @@ function PositionSelector() {
     }
 
     setSelectedPositions(newSelected);
+    setRegisterList(prevState => ({
+      ...prevState,
+      position : newSelected
+    }))
   };
 
   const handleDelete = (positionToDelete) => () => {
-    setSelectedPositions((positions) => positions.filter((position) => position !== positionToDelete));
+    setSelectedPositions((positions) => {
+      const updatedPositions = positions.filter((position) => position !== positionToDelete);
+
+      // registerList 업데이트
+      setRegisterList((prevState) => ({
+          ...prevState,
+          position: updatedPositions
+      }));
+      return updatedPositions; // updatedPositions 반환
+    }) 
   };
 
   return (

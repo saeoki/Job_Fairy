@@ -12,13 +12,23 @@
 #RegisterBox {
     width: 500px;
     text-align: center;
-    margin: 14vh auto;
+    margin: 16vh auto;
     padding: 15px;
     @media screen and (max-width: 767px){
       width: 350px;
       padding: 10px;
   }
+}
+#RegisterBox2 {
+  width: 500px;
+  text-align: center;
+  margin: 9vh auto;
+  padding: 15px;
+  @media screen and (max-width: 767px){
+    width: 350px;
+    padding: 10px;
   }
+}
   .input-form-box {
     display: flex;
     margin-bottom: 5px;
@@ -74,3 +84,11 @@
       margin: auto;
     }
   }
+.btn_register{
+  width: 15vw;
+  height: auto;
+  margin-left: 44.5vw;
+  @media screen and (max-width: 767px){
+    margin-left: 42.5vw;
+  }
+}

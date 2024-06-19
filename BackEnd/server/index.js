@@ -37,12 +37,12 @@ app.post("/api/users/register", (req, res) => {
   });
 });
 app.post("/api/users/login", (req, res) => {
-  //요청된 이메일을 데이터베이스에서 있는지 찾는다
-  User.findOne({ email: req.body.email }, (err, user) => {
+  //요청된 아이디를 데이터베이스에서 있는지 찾는다
+  User.findOne({ id: req.body.id }, (err, user) => {
     if (!user) {
       return res.json({
         loginSuccess: false,
-        message: "입력한 이메일에 해당하는 정보가 없습니다.",
+        message: "입력한 아이디에 해당하는 정보가 없습니다.",
       });
     }
 
@@ -76,9 +76,11 @@ app.get("/api/users/auth", auth, (req, res) => {
     //role이 0이면 일반유저, 0이 아니면 관리자로 표현
     isAdmin: req.user.role === 0 ? false : true,
     isAuth: true,
-    email: req.user.email,
     name: req.user.name,
-    lastname: req.user.lastname,
+    location: req.user.location,
+    military: req.user.military,
+    position: req.user.position,
+    salary: req.user.salary,
     role: req.user.role,
   });
 });

@@ -6,24 +6,24 @@ import SlideBar from "./slider"
 
 
 
-const InputForm2 = () => {
+const InputForm2 = ({setRegisterList}) => {
     return (
         <>
             <div className="input-form-box">
                 <span>병역의무</span>
-                <MilitaryStatus />
+                <MilitaryStatus setRegisterList={setRegisterList} />
             </div>
             <div className="input-form-box">
                 <span>희망 직무</span>
-                <PositionSelector />
+                <PositionSelector setRegisterList={setRegisterList} />
             </div>
             <div className="input-form-box">
                 <span>관심 지역</span>
-                <LocationSelector />
+                <LocationSelector setRegisterList={setRegisterList} />
             </div>
             <div className="input-form-box">
                 <span>희망 연봉</span>
-                <SlideBar />
+                <SlideBar setRegisterList={setRegisterList} />
             </div>
         </>
     )
