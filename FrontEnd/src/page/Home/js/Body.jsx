@@ -11,14 +11,14 @@ function Body(){
                 <div className="col-12 col-md-6">
                     <Link to="/AIinterview">
                         <Button variant="primary">
-                            AI 면접
+                            AI 면접✨
                         </Button>
                     </Link>
                 </div>
                 <div className="col-12 col-md-6">
                     <Link to="/Self_introduction">
                         <Button variant="primary">
-                            자소서 작성
+                            자소서 작성🧚‍♀️
                         </Button>
                     </Link>
                 </div>
@@ -27,14 +27,14 @@ function Body(){
                 <div className="col-12 col-md-6">
                     <Link to="/Recruitment">
                         <Button variant="primary">
-                            채용 정보
+                            채용 정보🔎
                         </Button>
                     </Link>
                 </div>
                 <div className="col-12 col-md-6">
                     <Link to="/Report">
                         <Button variant="primary">
-                            리포트
+                            리포트📃
                         </Button>
                     </Link>
                 </div>
