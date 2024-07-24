@@ -1,18 +1,17 @@
 import React from "react";
 import Header from "../../Home/js/Header";
-import RecruitmentBody from "./RecruitmentBody";
+import JobPostingListBody from "./JobPostingListBody";
 import Footer from "../../Home/js/Footer";
 
 
 
-function Recruitment(){
+function JobPostingList(){
     return(
         <div> 
             <Header />
-            <RecruitmentBody />
+            <JobPostingListBody />
             <Footer />
         </div>
-
     )
 }
-export default Recruitment;
+export default JobPostingList;

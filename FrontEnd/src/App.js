@@ -10,6 +10,7 @@ import Self_introduction from './page/Self_introduction/js/Self_introduction';
 import AIinterview from './page/AI/js/AIinterview';
 import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
 import Recruitment from './page/Recruitment/js/Recruitment';
+import JobPostingList from './page/Recruitment/js/JobPostingList';
 
 import Report from './page/Report/js/Report';
 
@@ -47,6 +48,7 @@ function App() {
           <Route path='/Report' element={<Report />} />
 
           <Route path='/Recruitment' element={<Recruitment />} />
+          <Route path='/Recruitment/JobPostingList' element={<JobPostingList />} />
         </Routes>
     </div> 
   );
