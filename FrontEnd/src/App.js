@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Home from './page/Home/js/Home';
 import Mypage from './page/Mypage/js/Mypage';
-import LoginPage from './page/Login/js/LoginPage';
 import Register from './page/Register/js/Register';
 import Self_introduction from './page/Self_introduction/js/Self_introduction';
 import AIinterview from './page/AI/js/AIinterview';
@@ -12,6 +11,8 @@ import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
 import Recruitment from './page/Recruitment/js/Recruitment';
 
 import Report from './page/Report/js/Report';
+
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   // const [selectedJob, setSelectedJob] = useState('');
@@ -32,11 +33,11 @@ function App() {
   // }, []);
   return (
    <div className="App">
+    <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path='/Register' element={<Register />} />
           <Route path='/Mypage' element={<Mypage />} />
-          <Route path='/LoginPage' element={<LoginPage />} />
 
           <Route path='/AIinterview' element={<AIinterview />} />
           <Route path='/CheckCamMic' element={<CheckCamMic />} />
@@ -48,6 +49,7 @@ function App() {
 
           <Route path='/Recruitment' element={<Recruitment />} />
         </Routes>
+      </AuthProvider>
     </div> 
   );
 }

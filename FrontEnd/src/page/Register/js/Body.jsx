@@ -17,7 +17,7 @@ function Body(){
         military: "",
         position: [],
         location: [],
-        salary: [],
+        salary: [2000, 12000],
     })
 
     const handleNext = () => {
@@ -35,7 +35,7 @@ function Body(){
                 <div id={activeStep === 0 ? "RegisterBox" : "RegisterBox2"}>
                     <div id="inputBox">
                         {activeStep === 0 && <InputForm registerList={registerList} setRegisterList={setRegisterList} />}
-                        {activeStep === 1 && <InputForm2 setRegisterList={setRegisterList} />}
+                        {activeStep === 1 && <InputForm2 registerList={registerList} setRegisterList={setRegisterList} />}
                     </div>
                 </div>
                 <div className='btn_register'>

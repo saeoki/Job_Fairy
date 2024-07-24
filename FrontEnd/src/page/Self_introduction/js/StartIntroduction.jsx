@@ -11,7 +11,6 @@ import { Button as Antd_btn }  from "antd";
 import { EditOutlined } from "@ant-design/icons"
 
 import { PromptContainer, PromptContent, Divider, PromptTitle } from "../../../CommonStyles";
-// import CardContent from '@mui/material/CardContent';
 import {CheckCircleTwoTone, TagsTwoTone, PushpinTwoTone} from "@ant-design/icons"
 
 const StartIntroduction = ({infoList ,setIsInput }) => {
@@ -38,9 +37,6 @@ const StartIntroduction = ({infoList ,setIsInput }) => {
 
   // 버튼 비활성화 여부를 결정하는 함수
   const shouldDisableButton = isJobListEmpty || isKeywordListEmpty 
-  // || isAddContentListEmpty;
-  // console.log(infoList)
-  // console.log(shouldDisableButton)
 
   return (
     <div className="startintroduction-button-container">

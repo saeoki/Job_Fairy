@@ -7,9 +7,9 @@ const positions = [
   'AI 엔지니어', '모바일 앱 개발자', '웹 개발자', '시스템 엔지니어'
 ];
 
-const PositionSelector = ({setRegisterList}) => {
+const PositionSelector = ({registerList, setRegisterList}) => {
   const [open, setOpen] = useState(false);
-  const [selectedPositions, setSelectedPositions] = useState([]);
+  const [selectedPositions, setSelectedPositions] = useState(registerList.position);
 
   const handleClickOpen = () => {
     setOpen(true);
