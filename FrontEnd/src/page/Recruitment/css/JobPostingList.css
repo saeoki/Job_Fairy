@@ -1,0 +1,51 @@
+/* JobPostingListBody.css */
+.job-posting-list {
+    width: 100%;
+}
+
+.job-posting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f5f5f5;
+}
+
+.job-info {
+    flex: 1;
+}
+
+.company {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.position {
+    color: #555;
+}
+
+.additional-info {
+    display: flex;
+    align-items: center;
+}
+
+.location, .department, .code {
+    margin-right: 15px;
+    color: #777;
+    font-size: 0.9em;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input {
+    margin-right: 5px;
+}
+
+.checkbox label {
+    font-size: 0.9em;
+    color: #555;
+}
