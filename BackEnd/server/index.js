@@ -1,21 +1,23 @@
 const express = require("express");
-const app = express();
-const test = require("./Router/test");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const { User } = require("./models/User");
-const config = require("./config/key");
-const cookieParser = require("cookie-parser");
+// const config = require("./config/key");
 const { auth } = require("./middleware/auth");
-//클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
-app.use(bodyParser.urlencoded({ extended: true }));
+const cors = require('cors');
 
-//json 타입으로 된 것을 분석해서 가져올 수 있다.
+const app = express();
+//클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
+// app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(bodyParser.json());
-app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:3000', // 클라이언트 도메인 명시
+  credentials: true // 자격 증명(쿠키 등) 포함 허용
+})); // cors 미들웨어 사용
 
 mongoose
-  .connect(config.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
@@ -42,7 +44,6 @@ app.post("/api/users/login", (req, res) => {
     if (!user) {
       return res.json({
         loginSuccess: false,
-        message: "입력한 아이디에 해당하는 정보가 없습니다.",
       });
     }
 
@@ -67,6 +68,7 @@ app.post("/api/users/login", (req, res) => {
     });
   });
 });
+
 //auth는 미들웨어
 //미들웨어 : 리퀘스트 받고 콜백전 중간에서 해주는것
 app.get("/api/users/auth", auth, (req, res) => {
@@ -85,13 +87,26 @@ app.get("/api/users/auth", auth, (req, res) => {
   });
 });
 
-app.get("/api/users/logout", auth, (req, res) => {
-  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, user) => {
-    if (err) return res.json({ success: false, err });
-    return res.status(200).send({
-      success: true,
-    });
-  });
+app.post('/api/auth/kakao', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+
+  try {
+    let user = await User.findOne({ kakaoId });
+
+    if (user) {
+        // 사용자 정보 업데이트
+        user.nickname = nickname;
+        await user.save();
+        return res.status(200).json({ message: 'User updated successfully' });
+    } else {
+        // 사용자 정보 저장
+        const newUser = new User({ kakaoId, nickname });
+        await newUser.save();
+        return res.status(201).json({ message: 'User created successfully' });
+    }
+} catch (err) {
+    return res.status(500).json({ error: 'Database error' });
+}
 });
 const port = 5000;
 app.listen(port, () => console.log(`${port}`));
