@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { Link } from "react-router-dom";
 
 function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChecked, isRecordingChecked }) {
     const [open, setOpen] = useState(false); // 다이얼로그 열고 닫는 상태 관리
@@ -18,13 +19,6 @@ function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChe
         setOpen(false);
     };
 
-    const handleStartInterview = () => {
-        // 면접 시작 로직 추가
-        // 예를 선택하면 면접을 시작할 수 있도록 구현
-        // 이 함수는 예 버튼 클릭 시 호출됩니다.
-        console.log("면접 시작");
-        handleClose();
-    };
 
     return (
         <div className="interview-start-box">
@@ -63,9 +57,11 @@ function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChe
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleStartInterview} color="primary">
-                        예
-                    </Button>
+                    <Link to="/AI_interview_start">          
+                        <Button color="primary">
+                            예
+                        </Button>
+                    </Link>
                     <Button onClick={handleClose} color="primary">
                         아니오
                     </Button>
