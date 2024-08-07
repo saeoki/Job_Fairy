@@ -1,69 +1,108 @@
-import "../css/Output_Body.css"
-
-import React, {useState, useEffect} from 'react';
+import "../css/Output_Body.css";
+import React, { useState, useEffect } from 'react';
 import { CardContainer, CardTitle, Self_Container, CardContent } from "../../../CommonStyles";
+import Typography from '@mui/material/Typography';
+import { LoadingOutlined, SoundTwoTone, CheckCircleTwoTone } from "@ant-design/icons";
+import { Button } from "antd";
+import { CallGPT, GPT_keyword } from "./chat";
 
-import {LoadingOutlined, SoundTwoTone} from "@ant-design/icons"
-import {Button} from "antd"
-
-import { CallGPT } from "./chat";
-
-const Outputpage =  ({ infoList }) => {
-  const [data,setData] = useState("")
-  const [isLoading,setIsLoading] = useState(false)
+const Outputpage = ({ infoList }) => {
+  const [data, setData] = useState("");
+  const [keyData, setKeyData] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const isAddContentListEmpty = Object.keys(infoList.addContent).length === 0;
+      if (isLoading) return;
 
-      const sentence = `희망 직무: ${Object.values(infoList.jobList).join(', ')}, ` +
-                       `키워드 : ${Object.values(infoList.keywordList).join(', ')}, ` +
-                       `추가 내용: ${isAddContentListEmpty ? "없음" : infoList.addContent}`;
+      setIsLoading(true);
       
-      // console.log(sentence)
       try {
-        setIsLoading(true);
-        const messages = await CallGPT(sentence);
+        const isAddContentListEmpty = Object.keys(infoList.addContent).length === 0;
+
+        const sentence = `희망 직무: ${Object.values(infoList.jobList).join(', ')}, ` +
+                         `키워드 : ${Object.values(infoList.keywordList).join(', ')}, ` +
+                         `${isAddContentListEmpty ? "" : "추가 내용:" + infoList.addContent}`;
+        const keySentence = `희망 직무: ${Object.values(infoList.jobList).join(', ')}, ` +
+                         `키워드 : ${Object.values(infoList.keywordList).join(', ')}`;
+
+        // 병렬 처리
+        const [messages, keyMessages] = await Promise.all([
+          CallGPT(sentence),
+          GPT_keyword(keySentence),
+        ]);
+
         setData(messages);
+        setKeyData(keyMessages);
       } catch (error) {
-        console.log(error);
+        console.error('API 호출 오류:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // infoList가 변경될 때마다 API 호출
     fetchData();
   }, [infoList]);
-
 
   return (
     <div className='outPage'>
       {isLoading && (
-          <div>
-            불러오는 중...
-            <LoadingOutlined />
-          </div>
-        )}
-        <Self_Container>
-          <CardContainer>
-            <CardTitle>
-              <SoundTwoTone 
-                twoToneColor="#FF9AA2"
-                style={{ marginRight: "6px" }}
-              />
-              초안 작성 결과
-            </CardTitle>
-            <CardContent>{data}</CardContent>
-          </CardContainer>
-        </Self_Container>
-        <div className="save_box">
-            <Button className="save_btn" type="primary">
-                저장하기
-            </Button>
+        <div>
+          불러오는 중...
+          <LoadingOutlined />
         </div>
+      )}
+      <Self_Container>
+        <CardContainer>
+          <CardTitle>
+            <SoundTwoTone 
+              twoToneColor="#FF9AA2"
+              style={{ marginRight: "6px" }}
+            />
+            초안 작성 결과
+          </CardTitle>
+          <CardContent>
+            {data.split('\n\n').map((paragraph, index) => (
+              <Typography key={index} variant="body1" paragraph>
+                {paragraph.split('\n').map((line, lineIndex) => (
+                  <React.Fragment key={lineIndex}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Typography>
+            ))}
+          </CardContent>
+        </CardContainer>
+        <CardContainer>
+          <CardTitle>
+            <CheckCircleTwoTone 
+              twoToneColor="#01DF01"
+              style={{ marginRight: "6px" }}
+            />
+            키워드 별 평가
+          </CardTitle>
+          <CardContent>
+            {keyData.split('\n\n').map((paragraph, index) => (
+              <Typography key={index} variant="body1" paragraph>
+                {paragraph.split('\n').map((line, lineIndex) => (
+                  <React.Fragment key={lineIndex}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Typography>
+            ))}
+          </CardContent>
+        </CardContainer>
+      </Self_Container>
+      <div className="save_box">
+        <Button className="save_btn" type="primary">
+          저장하기
+        </Button>
+      </div>
     </div>
-    
   );
 }
+
 export default Outputpage;
