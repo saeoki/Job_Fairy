@@ -37,3 +37,17 @@ export const ErrorToast = (errorCode) => {
         timerProgressBar: true
     });
 };
+
+export const LoginErrorToast = () => {
+    Swal.fire({
+        icon: 'error',
+        title: `로그인 후 이용가능합니다.`,
+        // toast: true,
+        position: 'center-center',
+        showConfirmButton: true, // Show the confirm button
+        confirmButtonText: '확인', // Customize the confirm button text
+        preConfirm: () => {
+            window.location.href = '/'; // Replace with your desired URL
+        }
+    });
+};
