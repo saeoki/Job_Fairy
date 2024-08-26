@@ -1,0 +1,265 @@
+/* 공통 스타일 */
+.recruitment {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 11px 0 80px 0;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.recruitment__block_section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1440px;
+  margin-bottom: 30px;
+}
+
+.recruitment__rectangle_section {
+  display: flex;
+  flex-direction: column; /* 변경: flex-direction을 column으로 설정 */
+  align-items: center; /* 변경: 요소들을 중앙 정렬 */
+  width: 100%;
+  max-width: 1440px;
+  margin-bottom: 30px;
+  box-sizing: border-box;
+}
+
+.recruitment__rectangle_items {
+  display: flex; /* 변경: 새로운 클래스 추가 */
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.recruitment__image {
+  width: 56px;
+  height: 56px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.recruitment__vector {
+  width: 56px;
+  height: 56px;
+}
+
+.recruitment__text {
+  overflow-wrap: break-word;
+  font-weight: 400;
+  color: #000000;
+}
+
+.recruitment__subheading {
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.recruitment__heading1 {
+  margin: 0 5%;
+  align-self: flex-start;
+  overflow-wrap: break-word;
+  font-family: 'Inter';
+  font-weight: 600;
+  font-size: 25px;
+  color: #000000;
+}
+
+.recruitment__moreheader {
+  margin: 0 5% 18px 5%;
+  display: inline-block;
+  align-self: flex-end;
+  overflow-wrap: break-word;
+  font-family: 'Inter';
+  font-weight: 200;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+}
+
+.recruitment__link {
+  font-size: 15px;
+  color: #226bd8;
+}
+
+.recruitment__rectangle-block {
+  margin: 10px;
+  box-sizing: border-box;
+  width: calc(25% - 20px); /* 25% 너비에서 마진을 뺀 값 */
+}
+
+.recruitment__rectangle {
+  position: relative;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 17px;
+  border: 1px solid #000000;
+  background-size: cover;
+  background-position: center;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: white;
+  padding: 10px;
+}
+
+.recruitment__d-day {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.recruitment__scrap-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.recruitment__info {
+  text-align: center;
+  margin-top: 5px;
+}
+
+.recruitment__title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.recruitment__company {
+  font-size: 14px;
+  color: #555;
+}
+
+.recruitment__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.recruitment__block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 30px;
+}
+
+.recruitment__block:hover {
+  cursor: pointer; /* 마우스 오버 시 커서 변경 */
+}
+
+.recruitment__block img {
+  margin-bottom: 10px;
+}
+
+.recruitment__container--columns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 미디어 쿼리 추가 */
+@media (max-width: 1200px) {
+  .recruitment__rectangle-block {
+    width: calc(33.333% - 20px); /* 3열로 변경 */
+  }
+}
+
+@media (max-width: 768px) {
+  .recruitment__rectangle-block {
+    width: calc(50% - 20px); /* 2열로 변경 */
+  }
+
+  .recruitment__heading1 {
+    margin: 0 5%;
+  }
+
+  .recruitment__moreheader {
+    margin: 0 5% 18px 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .recruitment__rectangle-block {
+    width: 100%; /* 1열로 변경 */
+  }
+
+  .recruitment__heading1 {
+    margin: 0 5%;
+    font-size: 20px;
+  }
+
+  .recruitment__moreheader {
+    margin: 0 5% 18px 5%;
+    font-size: 12px;
+  }
+
+  .recruitment__subheading {
+    font-size: 13px;
+  }
+}
+
+/* 추가된 미디어 쿼리 */
+@media (max-width: 768px) {
+  .recruitment__image,
+  .recruitment__vector {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 590px) {
+  .recruitment__block_section {
+    flex-direction: row;
+    flex-wrap: nowrap; /* 요소들이 한 줄로 배치되도록 설정 */
+    justify-content: space-between; /* 요소들 간의 공간을 균등하게 배분 */
+  }
+
+  .recruitment__image,
+  .recruitment__vector {
+    width: 44px;
+    height: 44px;
+  }
+
+  .recruitment__block {
+    width: calc(100% - 20px);
+    margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .recruitment__image,
+  .recruitment__vector {
+    width: 40px;
+    height: 40px;
+  }
+
+  .recruitment__block_section {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .recruitment__block {
+    width: calc(50% - 20px);
+    margin: 10px;
+  }
+}
