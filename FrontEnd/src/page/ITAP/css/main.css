@@ -1,0 +1,28 @@
+#main{
+    background-color: whitesmoke;
+    width: 80%;
+    text-align: center;
+    border-radius: 20px;
+  }
+
+  p{
+    font-size: 30px;
+  }
+  
+  #main > * > .red {
+    color: red;
+  }
+  #main > * > .blue {
+    color: blue;
+  }
+  #main > * > .green {
+    color: green;
+  }
+  #main > * > .purple {
+    color: purple;
+  }
+
+  .mainImg {
+    max-width: 100%;
+    height: auto;
+  }

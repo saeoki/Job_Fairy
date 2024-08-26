@@ -13,10 +13,9 @@ function getInfo() {
         success: function (res) {
             console.log(res);
             // 이메일, 닉네임
-            var email = res.kakao_account.email;
-            var profile_nickname = res.kakao_account.profile.nickname;
+            // var email = res.kakao_account.email;
+            // var profile_nickname = res.kakao_account.profile.nickname;
 
-            console.log(email, profile_nickname);
             LoginToast()
 
             fetch('http://localhost:5000/api/auth/kakao', {

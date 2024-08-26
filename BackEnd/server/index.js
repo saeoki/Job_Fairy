@@ -96,7 +96,7 @@ app.post('/api/auth/kakao', async (req, res) => {
 
     if (user) {
         // 사용자 정보 업데이트
-        user.nickname = nickname;
+        // user.nickname = nickname;
         await user.save();
         return res.status(200).json({ message: 'User updated successfully' });
     } else {
@@ -109,5 +109,32 @@ app.post('/api/auth/kakao', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
 }
 });
+
+app.post('/api/auth/kakao/register', async (req, res) => {
+  const { kakaoId, nickname, location, military, position, salary, isUpdate } = req.body;
+
+  try {
+    let user = await User.findOne({ kakaoId });
+
+    if (user) {
+        // 사용자 정보 업데이트
+        user.nickname = nickname;
+        user.location = location;
+        user.military = military;
+        user.position = position;
+        user.salary = salary;
+        user.isUpdate = isUpdate;
+        await user.save();
+        return res.status(200).json({ message: 'User updated successfully' });
+    } else {
+        // 오류 반환
+        return res.status(304).json({ error: 'Not Modified' });
+    }
+} catch (err) {
+    return res.status(500).json({ error: 'Database error' });
+}
+});
+
+
 const port = 5000;
 app.listen(port, () => console.log(`${port}`));
