@@ -7,7 +7,9 @@
   display: flex;
   width: auto;
   height: 17vh;
-  border-bottom: 7px solid rgba(52,147,215,0.694);
+  border-bottom: 1px solid lightgray  
+  /* border-bottom: 7px solid rgba(52,147,215,0.694); */
+  /* border-bottom: 1px solid lightgray */
 }
 
     /* 왼쪽 열 스타일 */

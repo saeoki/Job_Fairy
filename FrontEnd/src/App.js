@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -12,24 +12,10 @@ import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
 import Report from './page/Report/js/Report';
 
 import { AuthProvider } from './context/AuthContext';
+import Itap from './page/ITAP/js/Itap';
 
 function App() {
-  // const [selectedJob, setSelectedJob] = useState('');
 
-  // const handleJobSelect = (selectedJob) => {
-  //   setSelectedJob(selectedJob);
-  // };
-
-  // const [data, setData] = useState({});
-
-  // useEffect(() => {
-  //     const fetchData = async () => {
-  //         const result = await axios('/api/data');
-  //         setData(result.data);
-  //     };
-
-  //     fetchData();
-  // }, []);
   return (
    <div className="App">
     <AuthProvider>
@@ -45,6 +31,8 @@ function App() {
 
           
           <Route path='/Report' element={<Report />} />
+          
+          <Route path='/ITAP' element={<Itap />} />
 
           {/* <Route path='/Epinformation' element={<Epinformation />} /> */}
         </Routes>

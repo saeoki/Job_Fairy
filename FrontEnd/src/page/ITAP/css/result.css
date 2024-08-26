@@ -1,0 +1,33 @@
+#result{
+    /* display: none; */
+    background-color: whitesmoke;
+    width: 80%;
+    text-align: center;
+    border-radius: 20px;
+  }
+  .resultDetails{
+    padding: 0 3vw;
+    text-align: center;
+  }
+  .resultTitle{
+    font-size: 5vw;
+  }
+  
+  .resultname{
+    font-size: 2.5vw;
+  }
+  
+  .resultDesc{
+    font-size: 2vw;
+    font-family: "Gothic A1", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+  
+  .kakao{
+    color: white;
+    background-color: #FEE500;
+    font-size: 20px;
+    border: 0px;
+    border-radius: 20px;
+  }
