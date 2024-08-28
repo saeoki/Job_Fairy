@@ -96,7 +96,7 @@ app.post('/api/auth/kakao', async (req, res) => {
 
     if (user) {
         // 사용자 정보 업데이트
-        user.nickname = nickname;
+        // user.nickname = nickname;
         await user.save();
         return res.status(200).json({ message: 'User updated successfully' });
     } else {
