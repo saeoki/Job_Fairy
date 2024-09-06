@@ -24,6 +24,7 @@
     "openai": "^4.32.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-material-ui-carousel": "^3.4.2",
     "react-responsive": "^10.0.0",
@@ -34,7 +35,7 @@
     "react-webcam": "^7.2.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.8",
-    "sweetalert2": "^11.12.2",
+    "sweetalert2": "^11.12.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

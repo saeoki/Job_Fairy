@@ -18,7 +18,7 @@ app.use(cors({
 
 mongoose
   .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
-  // .connect(process.env.MONGO_URI)
+  //.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
@@ -96,6 +96,30 @@ app.post('/api/run', (req, res) => {
   const result = `Running code: ${code}`; // 임시 결과
   res.json({ result });
 });
+
+
+// 채용정보 불러오기 시작
+const JobPostingSchema = new mongoose.Schema({}, { strict: false });
+const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
+
+app.get("/api/Recruitment/JobPostingList", async (req, res) => {
+  try {
+    const jobs = await JobPosting.find();
+    const formattedJobs = jobs.map(job => ({
+      company: job.company.detail.name,
+      position: job.position.title,
+      location: job.position.location.name.split(',')[0],
+      department: `${job.position.experience-level.name}, ${job.position.required-education-level.name}`,
+      code: `D - ${Math.floor((job.expiration-timestamp - Date.now() / 1000) / 86400)}`
+    }));
+    res.json(formattedJobs);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching jobs', error: error.message });
+  }
+});
+
+
+
 
 
 const port = 5000;
