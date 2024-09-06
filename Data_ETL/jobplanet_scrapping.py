@@ -4,11 +4,16 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
+import time
 
 chrome_options = Options()
-#chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless")
+chrome_options.add_argument('--ignore-ssl-errors')
+chrome_options.add_argument('--ignore-certificate-errors')
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=(chrome_options))
+driver.maximize_window()
 driver.implicitly_wait(5)
 
 company_names = []
@@ -17,10 +22,11 @@ company_reviews = []
 company_ratings = []
 average_salaries = []
 
-for page in range(1, 622):
+for page in range(1, 4):
     url = f"https://www.jobplanet.co.kr/companies?industry_id=700&page={page}"
     driver.get(url)
-
+    
+    time.sleep(0.5)
     for i in range(1, 11):
         try:
             company_names.append(driver.find_element(By.XPATH, f'//*[@id="listCompanies"]/div/div[1]/section[{i}]/div/div/dl[1]/dt/a').text)
@@ -30,7 +36,7 @@ for page in range(1, 622):
             average_salaries.append(driver.find_element(By.XPATH, f'//*[@id="listCompanies"]/div/div[1]/section[{i}]/div/div/dl[2]/dd[2]/a/strong').text)
         except :
             print(f"Element not found on page {page}, section {i}. Skipping...")
-    
+    print(f"{page} 페이지 수집 완료")
 # 모든 페이지 처리가 완료된 후 드라이버 종료
 driver.quit()
 

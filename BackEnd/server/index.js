@@ -136,5 +136,29 @@ app.post('/api/auth/kakao/register', async (req, res) => {
 });
 
 
+// 채용정보 불러오기 시작
+const JobPostingSchema = new mongoose.Schema({}, { strict: false });
+const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
+
+app.get("/api/Recruitment/JobPostingList", async (req, res) => {
+  try {
+    const jobs = await JobPosting.find();
+    const formattedJobs = jobs.map(job => ({
+      company: job.company.detail.name,
+      position: job.position.title,
+      location: job.position.location.name.split(',')[0],
+      department: `${job.position.experience-level.name}, ${job.position.required-education-level.name}`,
+      code: `D - ${Math.floor((job.expiration-timestamp - Date.now() / 1000) / 86400)}`
+    }));
+    res.json(formattedJobs);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching jobs', error: error.message });
+  }
+});
+
+
+
+
+
 const port = 5000;
 app.listen(port, () => console.log(`${port}`));
