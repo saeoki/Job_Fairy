@@ -37,7 +37,7 @@ const Carousel = () => {
     <Slider {...settings}>
       {currentImages.map((image, index) => (
         <div key={index}>
-          <Link to={index===0 ? "/":"/ITAP"}>
+          <Link to={index===0 ? "/CodingTest":"/ITAP"}>
             <img src={image} alt={`Slide ${index}`} style={{ width: '100%', height: 'auto' }} />
           </Link>
         </div>

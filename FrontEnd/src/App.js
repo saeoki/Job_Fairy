@@ -19,6 +19,8 @@ import Report from './page/Report/js/Report';
 
 import { AuthProvider } from './context/AuthContext';
 import Itap from './page/ITAP/js/Itap';
+import ProblemPage from './page/codingtest/js/ProblemPage';
+import CondingTest from './page/codingtest/js/CodingTest';
 
 function App() {
 
@@ -40,6 +42,8 @@ function App() {
           
           <Route path='/Report' element={<Report />} />
           
+          <Route path='/CodingTest' element={<CondingTest />} />
+          <Route path='/ProblemPage' element={<ProblemPage/>} />
           <Route path='/ITAP' element={<Itap />} />
 
           <Route path='/Recruitment' element={<Recruitment />} />

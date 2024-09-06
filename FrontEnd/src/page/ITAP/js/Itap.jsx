@@ -104,7 +104,8 @@ const Itap = () => {
   };
 
   useEffect(() => {
-    document.body.style.backgroundColor = 'skyblue'; // 전체 페이지 배경색
+    // 전체 페이지 배경색
+    document.body.style.backgroundColor = 'skyblue'; 
     if (currentStep === 'qna') {
       const status = document.querySelector('.statusBar');
       status.style.width = `${(100 / qnaList.length) * (qIdx + 1)}%`;
@@ -118,7 +119,9 @@ const Itap = () => {
   }, [isresult]);
 
   return (
-    <div className="container" id="ITAP">
+    <div className="ITAP_container">
+      <div className="container" id="ITAP">
+        <div>
       {currentStep === 'main' && (
         <section
           id="main"
@@ -181,6 +184,8 @@ const Itap = () => {
         </button>
         </section>
       )}
+    </div>
+    </div>
     </div>
   );
 };
