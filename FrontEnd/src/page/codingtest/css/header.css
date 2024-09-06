@@ -1,0 +1,51 @@
+.breadcrumb {
+    padding: 0.375rem 0;
+    margin-bottom: 0;
+    background-color: transparent;
+    list-style: none;
+    display: flex;
+    margin-left: 10px;
+}
+
+@media (max-width: 991px) {
+    .navbar-content .breadcrumb {
+        position: absolute;
+        top: 0.5rem;
+        left: 3.375rem;
+    }
+}
+ol {
+    display: block;
+    list-style-type: decimal;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+}
+ol, ul, dl {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+.breadcrumb>li {
+    font-size: 14px;
+    margin-right: 4px;
+}
+li {
+    line-height: 1.6;
+    letter-spacing: -0.009em;
+    list-style: none;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    color: grey; /* 원하는 색상으로 변경 */
+}
+/* 브래드크럼 항목의 기본 색상 */
+.items{
+  color: #b0b0b0; /* 연한 회색 */
+}
+
+/* 브래드크럼 항목에 마우스를 올렸을 때 색상 */
+.items:hover {
+  color: #ffffff; /* 흰색 */
+}
