@@ -157,15 +157,14 @@ const CondingTest = ({problemNo=1}) => {
           </div>
 
           <div className="test-results">
-          <pre>결과:<hr />{output}</pre>
-            <ul>
+          <pre>결과:<hr /></pre>
+            { isClick ? output : "결과가 여기에 나타납니다."}
           {/* {problem?.testCases.map((test, index) => (
             <li key={index}>
               <strong>Input:</strong> {test.input} <br />
               <strong>Expected Output:</strong> {test.expectedOutput}
             </li>
           ))} */}
-        </ul>
           </div>
         </div>
       </main>
