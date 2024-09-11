@@ -56,11 +56,11 @@ body {
   }
   
   .sidebar {
-    width: 250px;
+    width: 300px;
     background-color: #4F6B81; /* 어두운 파란색 계열 */
     position: fixed;
     top: 0;
-    left: -250px;
+    left: -300px;
     /* 사이드바가 푸터를 침범하지 않도록 설정 */
     /* height: calc(100% - 50px);  */
     height: 100%;

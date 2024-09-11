@@ -5,6 +5,7 @@ import axios from 'axios';
 import "../css/header.css"
 import "../css/default.css"
 import "../css/font.css"
+import "../css/sidebar.css"
 
 import CodeMirror from '@uiw/react-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -12,6 +13,7 @@ import 'codemirror/theme/dracula.css';
 import 'codemirror/mode/javascript/javascript';
 import { javascript } from '@codemirror/lang-javascript';
 import { Theme } from "./Theme";
+import Sidebar from "./Sidebar";
 
 const CondingTest = ({problemNo=1}) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -99,6 +101,9 @@ const CondingTest = ({problemNo=1}) => {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <button className="close-btn" onClick={toggleSidebar}>×</button>
         {/* 사이드 바 내용 */}
+        <div className="sidebar_content">
+          <Sidebar />
+        </div>
       </aside>
 
       <main className="main-content">
