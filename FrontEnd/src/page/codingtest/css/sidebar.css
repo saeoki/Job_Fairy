@@ -1,0 +1,140 @@
+/* 기본 사이드바 스타일 */
+.sidebar_content {
+    margin-top: 30px;
+}
+
+.sidebar_container {
+    width: 240px;
+    background-color: #7890A0;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    color: white;
+    overflow-y: auto;
+    border-radius: 20px;
+}
+
+/* 레벨 섹션 스타일 */
+.level-section {
+    margin-bottom: 20px;
+}
+
+.level-section h4 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.level-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.level-section li {
+    background-color: #263747;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.level-section li:hover {
+    background-color: #4A5E6E;
+}
+
+.level-section p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #B2C0CC;
+}
+
+/* 필터 아이콘 스타일 */
+.problem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filter-icon {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px;
+}
+
+/* 필터 모달 스타일 */
+.filter-modal {
+    position: absolute;
+    width: 140px;
+    top: 80px; /* 아이콘 바로 아래에 표시 */
+    right: 10px; /* 오른쪽 끝에 맞춤 */
+    background-color: #263747;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+}
+
+.filter-modal select {
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    background-color: #263747;
+    color: #ffffff;
+    border: 1px solid #4A5E6E;
+}
+
+.filter-modal label {
+    color: #ffffff;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+    .sidebar_container {
+        width: 100%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar_container {
+        width: 100%;
+        padding: 10px;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        height: 100vh;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .filter-modal {
+        top: 60px; /* 필터 아이콘이 상단에 가까워짐 */
+        width: 100%;
+        right: 0;
+        border-radius: 0;
+    }
+
+    .filter-modal select {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar_container {
+        padding: 5px;
+    }
+
+    .filter-modal {
+        top: 50px; /* 필터 아이콘과의 거리 조정 */
+        width: 100%;
+    }
+
+    .filter-modal select {
+        padding: 6px;
+        margin-bottom: 6px;
+    }
+}

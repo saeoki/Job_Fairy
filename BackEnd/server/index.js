@@ -75,7 +75,24 @@ app.post('/api/auth/kakao/register', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
 }
 });
+// 레벨별 그룹화 반환
+app.get('/api/problem/level', async (req, res) => {
+  try {
+    const problemsByLevel = await Problem.aggregate([
+      {
+        $group: {
+          _id: "$level",  // level 필드 기준으로 그룹화
+          problems: { $push: "$$ROOT" }  // 해당 레벨의 문제들을 배열로 묶음
+        }
+      },
+      { $sort: { _id: 1 } }  // 레벨 순으로 정렬 (오름차순)
+    ]);
 
+    res.json(problemsByLevel);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 // 문제와 테스트셋을 가져오는 API
 app.get('/api/problem/:no', async (req, res) => {
   try {
