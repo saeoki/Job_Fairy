@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -17,28 +17,66 @@ import {
   FormControlLabel
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function JobPostingListBody() {
+  const [jobPostings, setJobPostings] = useState([]);  // 서버에서 가져올 데이터 상태
+  const [totalPages, setTotalPages] = useState(1);      // 전체 페이지 수
+  const [totalItems, setTotalItems] = useState(0);      // 전체 공고 개수
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sortBy, setSortBy] = useState('');
 
-  const handleSortChange = (event) => {
-    setSortBy(event.target.value);
+
+  // 쿼리 파라미터에서 페이지 번호 추출
+  const query = new URLSearchParams(location.search);
+  const currentPage = parseInt(query.get('page')) || 1;  // 쿼리 파라미터가 없으면 1로 설정
+
+  // 페이지 변경 시 API 호출
+  const fetchJobPostings = async (page) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`);
+      const data = await response.json();
+      setJobPostings(data.jobPostings);
+      setTotalPages(data.totalPages);
+      setTotalItems(data.totalItems);
+    } catch (error) {
+      console.error("Error fetching job postings:", error);
+    }
   };
 
-  const jobPostings = [
-    { company: '기업 1', position: '[플랫폼엔지니어링팀] 플랫폼 컨설턴트 경력사원 채용', location: '서울전체', department: '7~8년 - 경력직', code: 'D - 21' },
-    { company: '기업 2', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 3', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 4', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 5', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 6', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 7', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 8', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 9', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
-    { company: '기업 10', position: 'AI Researcher 신입 채용', location: '서울전체', department: '신입·경력', code: 'D - 30' },
+  // 컴포넌트가 처음 렌더링될 때와 페이지 변경 시 데이터를 가져옴
+  useEffect(() => {
+    fetchJobPostings(currentPage);  // currentPage는 URL에서 가져옴
+  }, [currentPage]);
 
-  ];
+  const handleSortChange = (event) => {
+    // 정렬 기준 변경 시 처리 (필요에 따라 구현)
+  };
 
+  const handlePageChange = (event, value) => {
+    // 페이지 변경 시 URL 업데이트
+    navigate(`?page=${value}`);
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return ''; // timestamp가 없으면 빈 문자열 반환
+    const date = new Date(timestamp * 1000); // timestamp는 초 단위이므로 1000을 곱해 밀리초로 변환
+    return date.toLocaleDateString(); // YYYY-MM-DD 형식으로 변환
+  };
+
+  const formatLocation = (location) => {
+    if (!location) return '위치 정보 없음'; 
+    // '&gt;'를 '>'로 변환
+    const decodedLocation = location.replace(/&gt;/g, '>');
+  
+    // 두 번째 '>'를 찾아 그 앞까지만 사용
+    const firstPart = decodedLocation.split('>').slice(0, 2).join(' ');
+  
+    // '>'을 공백으로 변환하여 반환
+    return firstPart.replace(/>/g, ' ');
+  };
+  
   return (
     <Container maxWidth="lg">
       <Typography variant="h4" gutterBottom sx={{ my: 3 }}>
@@ -110,7 +148,10 @@ export default function JobPostingListBody() {
       </Grid>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" sx={{ color: '#1976d2' }}>총 0000 건</Typography>
+        {jobPostings.length > 0 && (
+          <Typography variant="h6" sx={{ color: '#1976d2' }}>
+            총 {totalItems} 건
+          </Typography>)}
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="sort-select-label">정렬 기준</InputLabel>
           <Select
@@ -127,25 +168,44 @@ export default function JobPostingListBody() {
         </FormControl>
       </Box>
 
+
+      {/* 여기서 위에 정의한 것을 각 박스에 할당 */}
+      {/* 프론트 코드 분석좀 하자 */}
+
       {jobPostings.map((job, index) => (
         <Paper key={index} elevation={3} sx={{ mb: 2, p: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{job.company}</Typography>
-              <Typography variant="body1">{job.position}</Typography>
+              <Typography variant="body1">
+                <a href={job.company.detail.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1E90FF' }}>
+                  {job.company.detail.name}
+                </a>
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <a href={job.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {job.position.title}
+                </a>
+        </Typography>
             </Box>
             <Box textAlign="right">
-              <Typography variant="body2">{job.location}</Typography>
-              <Typography variant="body2">{job.department}</Typography>
-              <Typography variant="body2">{job.code}</Typography>
+              <Typography variant="body2">{formatLocation(job.position.location.name)}</Typography>
+              {/* JS에서 하이픈은 변수명으로 사용할 수 없기 때문에 대괄호표기 */}
+              <Typography variant="body2">{job.position['experience-level'].name}</Typography>
+              <Typography variant="body2">{formatTimestamp(job['expiration-timestamp'])}</Typography>
             </Box>
             <FormControlLabel control={<Checkbox />} label="스크랩" />
           </Box>
         </Paper>
       ))}
 
+      {/* 페이지네이션 */}
       <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination count={10} color="primary" />
+        <Pagination
+          count={totalPages}  // 전체 페이지 수 반영
+          page={currentPage}   // 현재 페이지 상태 반영
+          onChange={handlePageChange}  // 페이지 변경 시 이벤트 핸들러
+          color="primary"
+        />
       </Box>
     </Container>
   );
