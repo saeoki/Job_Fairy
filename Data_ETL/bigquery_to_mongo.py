@@ -18,7 +18,7 @@ mongo_uri = os.getenv('MONGO_URI')
 mongo_client = MongoClient(mongo_uri)
 
 # database 선택
-db = mongo_client['recruitment']
+db = mongo_client['Job_Fairy']
 # collenction 선택
 collection = db['all-job-posting']
 
