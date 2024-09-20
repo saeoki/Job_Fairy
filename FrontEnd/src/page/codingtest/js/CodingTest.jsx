@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
 
 import "../css/header.css"
 import "../css/default.css"
 import "../css/font.css"
 import "../css/sidebar.css"
+import "../css/main.css"
 
 import CodeMirror from '@uiw/react-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -15,7 +16,12 @@ import { javascript } from '@codemirror/lang-javascript';
 import { Theme } from "./Theme";
 import Sidebar from "./Sidebar";
 
-const CondingTest = ({problemNo=1}) => {
+const CondingTest = () => {
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const problemNo = queryParams.get('problemNo') || 1; // 기본값을 1로 설정
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [problem, setProblem] = useState(null);
     const [code, setCode] = useState('');
@@ -33,7 +39,7 @@ const CondingTest = ({problemNo=1}) => {
         setIsClick(false)
 
         // 기본 코드 틀 설정
-        setCode(`function solution(nums) {
+        setCode(`function solution(${response.data.params}) {
   // 여기에 코드를 작성하세요
   var answer = 0;
   return answer;
@@ -107,41 +113,61 @@ const CondingTest = ({problemNo=1}) => {
       </aside>
 
       <main className="main-content">
-        <div className="headerbar">
-          <h5>문제 설명</h5>
-        </div>
-
         <div className="content-grid">
           <div className="problem-description">
             {/* 문제 및 문제 예시 */}
-            <h5>{problem?.description}</h5>
+            <h5>문제 설명</h5>
+            <h6 dangerouslySetInnerHTML={{__html:problem?.description}}></h6>
             <hr />
-            <h6>입출력 예</h6>
+            {(problem?.inputType.length > 0 || problem?.outputType.length > 0 ) ? 
+            <h5>제한 사항</h5>
+            : null}
+            <ul>
+            {problem?.inputType.map((inputType)=>(
+              <li dangerouslySetInnerHTML={{__html:inputType}}></li>
+            ))}
+            {problem?.outputType.map((outputType)=>(
+              <li>{outputType}</li>
+            ))}
+            </ul>
+            
+            <h5>입출력 예</h5>
             <table className="testcase_tb">
               <thead>
                 <tr>
-                  <th>nums</th>
+                  {problem?.params.map((param) => (
+                  <th>{param}</th>
+                  ))}
                   <th>result</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{problem?.testCases[0].input}</td>
-                  <td>{problem?.testCases[0].expectedOutput}</td>
-                </tr>
-                <tr>
-                  <td>{problem?.testCases[1].input}</td>
-                  <td>{problem?.testCases[1].expectedOutput}</td>
-                </tr>
-                <tr>
-                  <td>{problem?.testCases[2].input}</td>
-                  <td>{problem?.testCases[2].expectedOutput}</td>
-                </tr>
+                {problem?.testCases.slice(0, 3).map((testCase) => (
+                  <tr>
+                    {testCase.input.map((input)=>(
+                      <td>
+                        {input}
+                      </td>
+                    ))}
+                    <td>
+                      {testCase.expectedOutput}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <br />
-            <h6>입출력 예 설명</h6>
-
+            <h5>입출력 예 설명</h5>
+            {problem?.inputDescription.map((inputDes, index)=>(
+              <div className="inputDescription">
+                  입출력 예#{index+1}
+                  <br />
+                  {inputDes.example.map((example)=>(
+                    <p>{example}</p>
+                ))}
+                <br />
+              </div>
+            ))}
           </div>
 
           <div className="code-editor">
@@ -149,7 +175,6 @@ const CondingTest = ({problemNo=1}) => {
             <CodeMirror
           value={code}
           onChange={(newCode) => setCode(newCode)}
-          // theme={copilot}
           theme={Theme}
           extensions={[javascript({ jsx: true })]}
           options={{
@@ -164,16 +189,10 @@ const CondingTest = ({problemNo=1}) => {
           <div className="test-results">
           <pre>결과:<hr /></pre>
             { isClick ? output : "결과가 여기에 나타납니다."}
-          {/* {problem?.testCases.map((test, index) => (
-            <li key={index}>
-              <strong>Input:</strong> {test.input} <br />
-              <strong>Expected Output:</strong> {test.expectedOutput}
-            </li>
-          ))} */}
           </div>
         </div>
       </main>
-      <footer className="footer">
+      <footer className="code_footer">
           <button className="run-code-button" onClick={runCode}>실행하기</button>
       </footer>
     </div>
