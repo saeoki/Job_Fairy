@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
     const [problemsByLevel, setProblemsByLevel] = useState([]);
@@ -112,17 +113,19 @@ const Sidebar = () => {
 
             {/* 필터링된 문제 목록 */}
             {filteredProblems.length === 0 ? (
-                <p>문제를 불러오는 중...</p>
+                <p>검색된 문제가 없습니다.</p>
             ) : (
                 filteredProblems.map((levelData) => (
-                    <div key={levelData._id} className="level-section">
+                    <div className="level-section">
                         <h4>레벨 {levelData._id}</h4>
                         <ul>
                             {levelData.problems.map((problem) => (
-                                <li key={problem._id}>
-                                    <strong>{problem.title}</strong>
-                                    <p>{problem.type}</p>
-                                </li>
+                                <Link to={`/CodingTest?problemNo=${problem.no}`} style={{ textDecoration: "none", color:"#ffffff"}} >
+                                    <li>
+                                        <strong>{problem.title}</strong>
+                                        <p>{problem.type}</p>
+                                    </li>
+                                </Link>
                             ))}
                         </ul>
                     </div>
