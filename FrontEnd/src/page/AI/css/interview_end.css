@@ -1,0 +1,22 @@
+.interview-results-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 위쪽에 정렬 */
+    min-height: 100vh;
+    padding: 40px; /* 위쪽 여백을 줄임 */
+  }
+  
+  .interview-results-card {
+    width: 100%;
+    max-width: 1200px; /* 최대 너비를 900px로 설정 */
+    margin: 0 20px; /* 좌우 여백을 추가하여 작은 화면에서 여백 확보 */
+  }
+  
+  /* 작은 화면 (핸드폰) 대응 */
+  @media (max-width: 600px) {
+    .interview-results-card {
+      max-width: 100%; /* 카드가 화면 너비에 맞게 확장되도록 설정 */
+      margin: 0; /* 작은 화면에서는 여백을 없앰 */
+    }
+  }
+  
