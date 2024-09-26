@@ -116,38 +116,97 @@ app.post('/api/run', (req, res) => {
 });
 
 
-// 페이지네이션 API
-app.get("/api/Recruitment/JobPostingList", async (req, res) => {
+// 채용 데이터 불러오기 API
+app.post("/api/Recruitment/JobPostingList", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;  // 페이지 번호 (기본값 1)
-    const limit = 10;  // 한 페이지에 표시할 데이터 수
-    const skip = (page - 1) * limit;  // 건너뛸 데이터 수
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    const total = await JobPosting.countDocuments(); // 전체 데이터 수
-    const jobPostings = await JobPosting.find({}, {
-      "bbs_gb": 1,  // 공채 구분
+    const { jobs, locations, experiences } = req.body;
+    
+    console.log("필터 데이터: ", {jobs, locations, experiences});
 
-      "company.detail.name": 1,  // 기업 이름
-      "company.detail.href": 1,  // 기업 정보 링크
-    
-      "position.location.name": 1,  // 위치
-      "position.required-education-level.name": 1,  // 학력 기준
-      "position.experience-level.name": 1,  // 경력 기준
-      "position.experience-level.max": 1,  // 최대 경력
-      "position.experience-level.min": 1,  // 최소 경력
-      "position.job-mid-code.name": 1,  // 중간 직종
-      "position.job-type.name": 1,  // 직종 유형 (예: 정규직)
-      "position.title": 1,  // 공고 제목
-    
-      "posting-timestamp": 1,  // 게시 날짜
-      "modification-timestamp": 1,  // 수정 날짜
-      "expiration-timestamp": 1,  // 마감 기한
-      "salary": 1,  // 연봉 정보
-      "active": 1,  // 공고 진행 여부
-      "url": 1  // 공고 링크
-    })
+    const query = {};
+
+    // 직무 필터
+    if (jobs && jobs.length > 0) {
+      query["position.job_code.name"] = {
+        $regex: new RegExp(jobs.join('|')),  // jobs 배열의 값을 정규식으로 연결
+        $options: "i"  // 대소문자 구분 없이 검색 (필요할 경우)
+      };
+    }
+
+
+    // 지역 필터
+    if (locations && locations.length > 0) {
+      query["position.location.name"] = {
+        $regex: new RegExp(locations.join('|')),  // locations 배열을 정규식으로 변환
+        $options: "i"  // 대소문자 구분 없이 검색
+      };
+    }
+
+    // 경력 필터
+    if (experiences && experiences.length > 0) {
+      // 각 경력 옵션에 따른 min/max 범위를 설정합니다.
+      const experienceRanges = {
+        "신입": { min: 0, max: 0 },            // 신입은 경력 0년
+        "1~3년": { min: 1, max: 3 },           // 1~3년 경력
+        "4~8년": { min: 4, max: 8 },           // 4~8년 경력
+        "9년 이상": { min: 9, max: Infinity }  // 9년 이상 경력
+      };
+
+      // 각 경력 조건에 맞는 쿼리 생성
+      const experienceConditions = experiences.map(exp => {
+        const range = experienceRanges[exp];  // 선택한 경력 범위에 맞는 값
+        if (range) {
+          return {
+            $and: [
+              { "position.experience_level.min": { $lte: range.max } },  // 최소 경력이 선택한 범위의 최대값 이하
+              { "position.experience_level.max": { $gte: range.min } }   // 최대 경력이 선택한 범위의 최소값 이상
+            ]
+          };
+        }
+        return null;
+      }).filter(condition => condition !== null);  // null 값 제거
+
+      // 경력무관인 항목은 항상 포함
+      query.$or = [
+        { "position.experience_level.name": "경력무관" },
+        ...experienceConditions
+  ];
+}
+
+
+    const total = await JobPosting.countDocuments(query);
+    const jobPostings = await JobPosting.find(query)
+      .select({
+        "bbs_gb": 1,
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.location.name": 1,
+        "position.experience_level.name": 1,
+        "position.experience_level.min": 1,
+        "position.experience_level.max": 1,
+        "position.job_code.name": 1,
+        "position.job_mid_code.name": 1,
+        "position.title": 1,
+        "posting_timestamp": 1,
+        "expiration_timestamp": 1,
+        "salary": 1,
+        "url": 1
+      })
       .skip(skip)
       .limit(limit);
+
+    if (jobPostings.length === 0) {
+      return res.status(200).json({
+        jobPostings: [],
+        currentPage: page,
+        totalPages: 0,
+        totalItems: 0
+      });
+    }
 
     res.status(200).json({
       jobPostings,
@@ -156,9 +215,11 @@ app.get("/api/Recruitment/JobPostingList", async (req, res) => {
       totalItems: total
     });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching job postings", error: err });
+    console.error("Error in /api/Recruitment/JobPostingList:", err);
+    res.status(500).json({ message: "채용 정보를 가져오는 중 오류가 발생했습니다.", error: err.message });
   }
 });
+
 
 
 
