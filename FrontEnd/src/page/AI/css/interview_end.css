@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; /* 위쪽에 정렬 */
-    min-height: 100vh;
+    min-height: 30vh;
     padding: 40px; /* 위쪽 여백을 줄임 */
   }
   

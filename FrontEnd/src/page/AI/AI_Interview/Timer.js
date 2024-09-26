@@ -1,74 +1,61 @@
 import React, { useEffect, useState } from 'react';
+import { CircularProgress, Box, Typography } from '@mui/material';
 
 function Timer({ initialTime, isRunning, onTimeUp }) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   // 타이머 로직
   useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return; // 타이머가 실행 중이 아니거나 시간이 끝났으면 종료
+    if (!isRunning || timeLeft <= 0) return;
     const timerId = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0)); // 1초씩 줄이기
+      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0)); // 1초마다 시간 감소
     }, 1000);
 
-    return () => clearInterval(timerId); // 클린업
+    return () => clearInterval(timerId);
   }, [isRunning, timeLeft]);
 
   useEffect(() => {
-    setTimeLeft(initialTime); // 초기 타임 설정
+    if (timeLeft === 0) {
+      onTimeUp(); // 시간이 다 되면 부모 컴포넌트로 알림
+    }
+  }, [timeLeft, onTimeUp]);
+
+  useEffect(() => {
+    setTimeLeft(initialTime); // 새로운 타이머 시작 시 초기화
   }, [initialTime]);
 
-  // 원형 타이머 설정
-  const radius = 50; // 원의 반지름
-  const circumference = 2 * Math.PI * radius; // 원의 둘레 계산
-  const progress = timeLeft / initialTime; // 남은 시간 비율 계산
-  const strokeDashoffset = circumference * (1 - progress); // 원이 줄어드는 비율 계산
-
-  // 투명도와 색상 변화를 위한 변수 설정
-  const strokeOpacity = progress; // 시간이 지남에 따라 원이 점점 사라지게
-  const color = `blue`; // 원의 기본 색상은 파란색
+  const progress = (timeLeft / initialTime) * 100; // 남은 시간에 비례하는 진행률
+  const opacity = progress / 100; // 남은 시간에 비례해 투명도 조정
 
   return (
-    <div className="timer-container" style={{ textAlign: 'center', marginTop: '20px' }}>
-      <svg width="120" height="120" viewBox="0 0 120 120">
-        {/* 배경 원 */}
-        <circle
-          cx="60"
-          cy="60"
-          r={radius}
-          stroke="lightgray"
-          strokeWidth="10"
-          fill="none"
-        />
-        {/* 진행 원 */}
-        <circle
-          cx="60"
-          cy="60"
-          r={radius}
-          stroke={color}
-          strokeWidth="10"
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeOpacity={strokeOpacity} // 투명도 적용
-          style={{
-            transition: 'stroke-dashoffset 1s linear, stroke-opacity 1s linear',
-            transform: 'rotate(-90deg)',
-            transformOrigin: '50% 50%',
-          }}
-        />
-        {/* 남은 시간 표시 */}
-        <text
-          x="50%"
-          y="50%"
-          dominantBaseline="middle"
-          textAnchor="middle"
-          fontSize="24"
-          fill="black"
-        >
-          {timeLeft}
-        </text>
-      </svg>
-    </div>
+    <Box position="relative" display="inline-flex">
+      <CircularProgress
+        variant="determinate"
+        value={progress} // 0-100% 사이로 진행률 설정
+        size={120} // 원의 크기
+        thickness={5} // 원의 두께
+        sx={{
+          color: progress > 30 ? 'primary.main' : 'error.main', // 남은 시간에 따라 색상 변화
+          transform: 'rotate(-90deg)', // 시계방향에서 반시계방향으로 회전
+          transition: 'all 1s linear', // 애니메이션 부드럽게 적용
+          opacity: opacity, // 시간이 지나면서 투명해지도록 설정
+        }}
+      />
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Typography variant="h6" component="div" color="textSecondary">
+          {timeLeft}s
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 
