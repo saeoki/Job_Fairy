@@ -1,0 +1,12 @@
+[
+    "RESTful API가 무엇인지 설명해주세요.",
+    "SQL과 NoSQL 데이터베이스의 차이점에 대해 설명해주세요.",
+    "Node.js에서 비동기 처리 방법을 설명해주세요.",
+    "HTTP와 HTTPS의 차이점에 대해 설명해주세요.",
+    "웹 보안에서 CORS(Cross-Origin Resource Sharing)에 대해 설명해주세요.",
+    "JWT(JSON Web Token)를 사용한 인증 방식에 대해 설명해주세요.",
+    "ORM(Object-Relational Mapping)이 무엇인지 설명하고, 언제 사용하는지 말해주세요.",
+    "마이크로서비스 아키텍처와 모놀리식 아키텍처의 차이점에 대해 설명해주세요.",
+    "데이터베이스에서 인덱싱이 무엇인지, 그리고 왜 중요한지 설명해주세요.",
+    "API에서 인증(Authentication)과 인가(Authorization)의 차이점에 대해 설명해주세요."
+]

@@ -1,41 +1,104 @@
-import React, { useRef, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Button from '@mui/material/Button';
-import LinearProgress from '@mui/material/LinearProgress';
-import MicIcon from '@mui/icons-material/Mic';
-import axios from 'axios';
-import '../css/Body.css';
+
+
+import React, { useState, useRef, useEffect } from 'react';
+import VideoStream from './VideoStream';
+import AudioRecorder from './AudioRecorder';
+import EmotionAnalyzer from './EmotionAnalyzer';
+import VolumeMeter from './VolumeMeter';
+import Timer from './Timer';
+import QuestionDisplay from './QuestionDisplay';
+import ControlButtons from './ControlButtons';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Body() {
+  const location = useLocation();
+  const {
+    isPersonalityInterviewChecked,
+    isTechnicalInterviewChecked,
+    isRecordingChecked = true,
+    selectedJob,
+  } = location.state || {};
+
   const videoRef = useRef(null);
-  const constraints = {
-    video: true,
-    audio: true
-  };
-  const [volume, setVolume] = useState(0); // 마이크 음량 상태
-  const [intervalId, setIntervalId] = useState(null);
-  const [accumulatedEmotions, setAccumulatedEmotions] = useState({}); // 누적된 감정값 상태
-  const [timeLeft, setTimeLeft] = useState(20); // 타이머 상태 설정 (준비 시간)
-  const [questionIndex, setQuestionIndex] = useState(0); // 현재 질문 인덱스
-  const [isPreparationTime, setIsPreparationTime] = useState(false); // 준비 시간 상태
-  const [isInterviewStarted, setIsInterviewStarted] = useState(false); // 면접 시작 상태
-  const [isAnsweringTime, setIsAnsweringTime] = useState(false); // 답변 시간 상태
+  const socketRef = useRef(null);
+  const [videoStream, setVideoStream] = useState(null);
+  const [audioStream, setAudioStream] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isEmotionAnalyzing, setIsEmotionAnalyzing] = useState(false);
+  const [transcription, setTranscription] = useState('');
+  const [accumulatedEmotions, setAccumulatedEmotions] = useState({});
+  const [questions, setQuestions] = useState([]); // 질문 리스트
+  const [questionIndex, setQuestionIndex] = useState(-1); // 현재 질문 인덱스
+  const [isInterviewStarted, setIsInterviewStarted] = useState(false);
+  const [isAnsweringTime, setIsAnsweringTime] = useState(false);
+  const [isPreparationTime, setIsPreparationTime] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const navigate = useNavigate();
 
-  const questions = [
-    "1분간 자기 소개를 하세요.",
-    "당신의 강점을 말해보세요.",
-    "최근에 해결한 문제를 설명해주세요.",
-    "팀에서 갈등이 발생했을 때 어떻게 해결했나요?",
-    "가장 자랑스러운 성과는 무엇인가요?"
-  ];
+  // 질문 로드
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      let combinedQuestions = [];
 
+      // 인적성 질문 로드
+      if (isPersonalityInterviewChecked) {
+        try {
+          const response = await fetch('/questions/personality_questions.json');
+          const data = await response.json();
+          combinedQuestions = [...combinedQuestions, ...data];
+        } catch (error) {
+          console.error('Error fetching personality questions:', error);
+        }
+      }
+
+      // 기술 질문 로드
+      if (isTechnicalInterviewChecked && selectedJob) {
+        try {
+          const response = await fetch(`/questions/technical_questions_${selectedJob}.json`);
+          const data = await response.json();
+          combinedQuestions = [...combinedQuestions, ...data];
+        } catch (error) {
+          console.error(`Error fetching technical questions for ${selectedJob}:`, error);
+        }
+      }
+
+      // 랜덤으로 5개의 질문 선택
+      const randomQuestions = getRandomQuestions(combinedQuestions, 5);
+      setQuestions(randomQuestions);
+    };
+
+    fetchQuestions();
+  }, [isPersonalityInterviewChecked, isTechnicalInterviewChecked, selectedJob]);
+
+  // 질문을 랜덤으로 선택하는 함수
+  const getRandomQuestions = (questions, count) => {
+    const shuffled = [...questions].sort(() => 0.5 - Math.random()); // 무작위로 섞음
+    return shuffled.slice(0, count); // 상위 5개 선택
+  };
+
+  // 미디어 스트림 설정
   useEffect(() => {
     const requestUserMedia = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        handleSuccess(stream);
-        setupAudioAnalyzer(stream); // 오디오 분석기 설정
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.muted = true;
+        }
+        setVideoStream(stream);
+
+        // 오디오 트랙만 추출하여 오디오 전용 스트림 생성
+        const audioTracks = stream.getAudioTracks();
+        const audioOnlyStream = new MediaStream(audioTracks);
+        setAudioStream(audioOnlyStream);
       } catch (err) {
         console.error('Error accessing user media:', err);
       }
@@ -43,374 +106,166 @@ function Body() {
 
     requestUserMedia();
 
+    // 클린업
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      if (videoStream) {
+        videoStream.getTracks().forEach((track) => track.stop());
+      }
+      if (audioStream) {
+        audioStream.getTracks().forEach((track) => track.stop());
+      }
     };
-  }, [intervalId]);
+  }, []);
 
+  // WebSocket 설정
   useEffect(() => {
-    if (timeLeft > 0 && (isPreparationTime || isAnsweringTime)) {
-      const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timerId);
-    } else if (timeLeft === 0 && isPreparationTime) {
-      setIsPreparationTime(false);
-    } else if (timeLeft === 0 && isAnsweringTime) {
-      stopSendingImages();
-    }
-  }, [timeLeft, isPreparationTime, isAnsweringTime]);
+    socketRef.current = new WebSocket('ws://localhost:5001');
+    socketRef.current.binaryType = 'arraybuffer'; // 바이너리 타입 설정
 
-  const handleSuccess = stream => {
-    const video = videoRef.current;
-    if (video) {
-      video.srcObject = stream;
-    }
-  };
-
-  const setupAudioAnalyzer = stream => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const audioStream = audioContext.createMediaStreamSource(stream);
-    const analyzer = audioContext.createAnalyser();
-    analyzer.fftSize = 256;
-    audioStream.connect(analyzer);
-
-    const dataArray = new Uint8Array(analyzer.frequencyBinCount);
-    
-    const updateVolume = () => {
-      analyzer.getByteFrequencyData(dataArray);
-      const total = dataArray.reduce((acc, val) => acc + val, 0);
-      const average = total / dataArray.length;
-      setVolume(average);
-      requestAnimationFrame(updateVolume);
+    socketRef.current.onopen = () => {
+      console.log('WebSocket connection established');
     };
 
-    updateVolume();
-  };
+    socketRef.current.onmessage = (message) => {
+      const data = JSON.parse(message.data);
+      if (data.transcription) {
+        setTranscription((prev) => prev + ' ' + data.transcription);
+      }
+    };
 
-  const captureImage = () => {
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg');
-  };
+    socketRef.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
 
-  const sendImageToServer = async () => {
-    const image = captureImage();
-    const blob = await (await fetch(image)).blob();
-    const formData = new FormData();
-    formData.append('image', blob, 'image.jpg');
-    
-    try {
-      const response = await axios.post('http://localhost:5000/predict', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      console.log(response.data);
-      setAccumulatedEmotions(prevState => ({
-        ...prevState,
-        ...response.data.accumulated_emotions
-      })); // 누적된 감정값 상태 설정
-    } catch (error) {
-      console.error('Error uploading image', error);
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, []);
+
+  // 타이머 로직
+  useEffect(() => {
+    let timerId;
+    if (isTimerRunning && timeLeft > 0) {
+      timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    } else if (timeLeft === 0) {
+      if (isPreparationTime) {
+        startAnswering();
+      } else if (isAnsweringTime) {
+        completeAnswering();
+      }
     }
-  };
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [timeLeft, isTimerRunning, isPreparationTime, isAnsweringTime]);
 
+  // 면접 준비 시작
   const startPreparation = () => {
-    setTimeLeft(20); // 준비 시간 설정
-    setIsPreparationTime(true); // 준비 시간 시작
+    setQuestionIndex((prevIndex) => prevIndex + 1);
+    setIsPreparationTime(true);
     setIsAnsweringTime(false);
-    setQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length); // 다음 질문 설정
+    setTimeLeft(8);
+    setIsTimerRunning(true);
   };
 
+  // 답변 시작
   const startAnswering = () => {
-    setTimeLeft(60); // 답변 시간 설정
-    setIsAnsweringTime(true); // 답변 시간 시작
-    const id = setInterval(sendImageToServer, 500); // 1초마다 이미지 캡처 및 전송
-    setIntervalId(id);
+    setIsPreparationTime(false);
+    setIsAnsweringTime(true);
+    setTimeLeft(45);
+    setIsTimerRunning(true);
+    setIsRecording(true);
+    setIsEmotionAnalyzing(true);
   };
 
+  // 답변 완료
   const completeAnswering = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
+    setIsRecording(false);
+    setIsEmotionAnalyzing(false);
+    setIsTimerRunning(false);
+    setIsAnsweringTime(false);
+    if (questionIndex >= questions.length - 1) {
+      stopInterview();
+    } else {
+      startPreparation();
     }
-    setIsAnsweringTime(false); // 답변 시간 종료
-    startPreparation(); // 다음 질문으로 넘어가기 위해 준비 시간 시작
   };
 
+  // 면접 시작
   const startInterview = () => {
+    if (questions.length === 0) {
+      alert('선택한 옵션에 해당하는 질문이 없습니다.');
+      return;
+    }
     setIsInterviewStarted(true);
-    startPreparation(); // 면접 시작 시 준비 시간 시작
+    startPreparation();
   };
 
+  // 면접 종료
   const stopInterview = () => {
     setIsInterviewStarted(false);
-    stopSendingImages();
-    navigate('/Interview_end', { state: { accumulatedEmotions } }); // 상태를 Interview_end로 전달
+    setIsRecording(false);
+    setIsEmotionAnalyzing(false);
+    setIsTimerRunning(false);
+    // 결과 페이지로 이동
+    navigate('/Interview_result', { state: { accumulatedEmotions, transcription } });
   };
 
-  const stopSendingImages = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
+  // 시간 초과 시 처리
+  const handleTimeUp = () => {
+    if (isPreparationTime) {
+      startAnswering();
+    } else if (isAnsweringTime) {
+      completeAnswering();
     }
+  };
+
+  // 감정 데이터 업데이트
+  const handleEmotionData = (data) => {
+    setAccumulatedEmotions((prevState) => ({
+      ...prevState,
+      ...data,
+    }));
   };
 
   return (
     <div className="CheckCamMic-box">
-      <video ref={videoRef} autoPlay playsInline className="video-box" />
-      <div className="gauge-box">
-        <div className="icon-progress-container">
-          <MicIcon />
-          <LinearProgress variant="determinate" value={volume} className="gauge-progress" />
-        </div>
-      </div>
-      <div className="timer-box">
-        <h2>{questions[questionIndex]}</h2>
-        <h3>{isPreparationTime ? "준비 시간: " : "답변 시간: "} {timeLeft}초 남음</h3>
-      </div>
-      <div className="button-box">
-        {!isInterviewStarted ? (
-          <Button className="return-button" variant="contained" onClick={startInterview}>
-            면접 시작
-          </Button>
-        ) : (
-          <Button className="return-button" variant="contained" onClick={stopInterview}>
-            면접 종료
-          </Button>
-        )}
-        {isInterviewStarted && (
-          <Button className="return-button" variant="contained" onClick={isAnsweringTime ? completeAnswering : startAnswering}>
-            {isAnsweringTime ? "답변 완료" : "답변 시작"}
-          </Button>
-        )}
-      </div>
+      <VideoStream videoRef={videoRef} />
+      {audioStream && <VolumeMeter audioStream={audioStream} />}
+      {videoRef.current && (
+        <EmotionAnalyzer
+          videoRef={videoRef}
+          isActive={isEmotionAnalyzing}
+          onEmotionData={handleEmotionData}
+        />
+      )}
+      {audioStream && (
+        <AudioRecorder
+          isRecording={isRecording}
+          socketRef={socketRef}
+          audioStream={audioStream}
+        />
+      )}
+      <Timer initialTime={timeLeft} isRunning={isTimerRunning} onTimeUp={handleTimeUp} />
+      <QuestionDisplay
+        question={questions[questionIndex]}
+        isPreparationTime={isPreparationTime}
+        timeLeft={timeLeft}
+      />
+      <ControlButtons
+        isInterviewStarted={isInterviewStarted}
+        isAnsweringTime={isAnsweringTime}
+        onStartInterview={startInterview}
+        onStopInterview={stopInterview}
+        onStartAnswering={startAnswering}
+        onCompleteAnswering={completeAnswering}
+      />
     </div>
   );
 }
 
 export default Body;
-// import React, { useRef, useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import Button from '@mui/material/Button';
-// import LinearProgress from '@mui/material/LinearProgress';
-// import MicIcon from '@mui/icons-material/Mic';
-// import axios from 'axios';
-// import '../css/Body.css';
-
-// function Body() {
-//   const videoRef = useRef(null);
-//   const constraints = {
-//     video: true,
-//     audio: true
-//   };
-//   const [volume, setVolume] = useState(0);
-//   const [intervalId, setIntervalId] = useState(null);
-//   const [accumulatedEmotions, setAccumulatedEmotions] = useState({});
-//   const [timeLeft, setTimeLeft] = useState(20);
-//   const [questionIndex, setQuestionIndex] = useState(0);
-//   const [isPreparationTime, setIsPreparationTime] = useState(false);
-//   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
-//   const [isAnsweringTime, setIsAnsweringTime] = useState(false);
-//   const [sttResult, setSttResult] = useState('');
-//   const navigate = useNavigate();
-//   const mediaRecorderRef = useRef(null);
-//   const audioChunksRef = useRef([]);
-
-//   const questions = [
-//     "1분간 자기 소개를 하세요.",
-//     "당신의 강점을 말해보세요.",
-//     "최근에 해결한 문제를 설명해주세요.",
-//     "팀에서 갈등이 발생했을 때 어떻게 해결했나요?",
-//     "가장 자랑스러운 성과는 무엇인가요?"
-//   ];
-
-//   useEffect(() => {
-//     const requestUserMedia = async () => {
-//       try {
-//         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-//         handleSuccess(stream);
-//         setupAudioAnalyzer(stream);
-//       } catch (err) {
-//         console.error('Error accessing user media:', err);
-//       }
-//     };
-
-//     requestUserMedia();
-
-//     return () => {
-//       if (intervalId) clearInterval(intervalId);
-//     };
-//   }, [intervalId]);
-
-//   useEffect(() => {
-//     if (timeLeft > 0 && (isPreparationTime || isAnsweringTime)) {
-//       const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-//       return () => clearTimeout(timerId);
-//     } else if (timeLeft === 0 && isPreparationTime) {
-//       setIsPreparationTime(false);
-//     } else if (timeLeft === 0 && isAnsweringTime) {
-//       completeAnswering();
-//     }
-//   }, [timeLeft, isPreparationTime, isAnsweringTime]);
-
-//   const handleSuccess = stream => {
-//     const video = videoRef.current;
-//     if (video) {
-//       video.srcObject = stream;
-//     }
-//     mediaRecorderRef.current = new MediaRecorder(stream);
-//     mediaRecorderRef.current.ondataavailable = (event) => {
-//       audioChunksRef.current.push(event.data);
-//     };
-//   };
-
-//   const setupAudioAnalyzer = stream => {
-//     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-//     const audioStream = audioContext.createMediaStreamSource(stream);
-//     const analyzer = audioContext.createAnalyser();
-//     analyzer.fftSize = 256;
-//     audioStream.connect(analyzer);
-
-//     const dataArray = new Uint8Array(analyzer.frequencyBinCount);
-
-//     const updateVolume = () => {
-//       analyzer.getByteFrequencyData(dataArray);
-//       const total = dataArray.reduce((acc, val) => acc + val, 0);
-//       const average = total / dataArray.length;
-//       setVolume(average);
-//       requestAnimationFrame(updateVolume);
-//     };
-
-//     updateVolume();
-//   };
-
-//   const captureImage = () => {
-//     const video = videoRef.current;
-//     const canvas = document.createElement('canvas');
-//     canvas.width = video.videoWidth;
-//     canvas.height = video.videoHeight;
-//     const context = canvas.getContext('2d');
-//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//     return canvas.toDataURL('image/jpeg');
-//   };
-
-//   const sendImageToServer = async () => {
-//     const image = captureImage();
-//     const blob = await (await fetch(image)).blob();
-//     const formData = new FormData();
-//     formData.append('image', blob, 'image.jpg');
-
-//     try {
-//       const response = await axios.post('http://localhost:4000/predict', formData, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data'
-//         }
-//       });
-//       console.log(response.data);
-//       setAccumulatedEmotions(prevState => ({
-//         ...prevState,
-//         ...response.data.accumulated_emotions
-//       }));
-//     } catch (error) {
-//       console.error('Error uploading image', error);
-//     }
-//   };
-
-//   const startPreparation = () => {
-//     setTimeLeft(20);
-//     setIsPreparationTime(true);
-//     setIsAnsweringTime(false);
-//     setQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
-//   };
-
-//   const startAnswering = () => {
-//     setTimeLeft(60);
-//     setIsAnsweringTime(true);
-//     const id = setInterval(sendImageToServer, 1000);
-//     setIntervalId(id);
-//     mediaRecorderRef.current.start();
-//   };
-
-//   const completeAnswering = async () => {
-//     if (intervalId) {
-//       clearInterval(intervalId);
-//       setIntervalId(null);
-//     }
-//     setIsAnsweringTime(false);
-//     mediaRecorderRef.current.stop();
-//     mediaRecorderRef.current.onstop = async () => {
-//       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-//       audioChunksRef.current = [];
-//       const formData = new FormData();
-//       formData.append('audio', audioBlob, 'audio.wav');
-//       try {
-//         const response = await axios.post('http://localhost:4000/transcribe', formData, {
-//           headers: {
-//             'Content-Type': 'multipart/form-data'
-//           }
-//         });
-//         setSttResult(response.data.transcription);
-//       } catch (error) {
-//         console.error('Error transcribing audio', error);
-//       }
-//     };
-//     startPreparation();
-//   };
-
-//   const startInterview = () => {
-//     setIsInterviewStarted(true);
-//     startPreparation();
-//   };
-
-//   const stopInterview = () => {
-//     setIsInterviewStarted(false);
-//     stopAnswering();
-//     navigate('/Interview_end', { state: { accumulatedEmotions, sttResult } });
-//   };
-
-//   const stopAnswering = () => {
-//     if (intervalId) {
-//       clearInterval(intervalId);
-//       setIntervalId(null);
-//     }
-//     mediaRecorderRef.current.stop();
-//   };
-
-//   return (
-//     <div className="CheckCamMic-box">
-//       <video ref={videoRef} autoPlay playsInline className="video-box" />
-//       <div className="gauge-box">
-//         <div className="icon-progress-container">
-//           <MicIcon />
-//           <LinearProgress variant="determinate" value={volume} className="gauge-progress" />
-//         </div>
-//       </div>
-//       <div className="timer-box">
-//         <h2>{questions[questionIndex]}</h2>
-//         <h3>{isPreparationTime ? "준비 시간: " : "답변 시간: "} {timeLeft}초 남음</h3>
-//       </div>
-//       <div className="button-box">
-//         {!isInterviewStarted ? (
-//           <Button className="return-button" variant="contained" onClick={startInterview}>
-//             면접 시작
-//           </Button>
-//         ) : (
-//           <Button className="return-button" variant="contained" onClick={stopInterview}>
-//             면접 종료
-//           </Button>
-//         )}
-//         {isInterviewStarted && (
-//           <Button className="return-button" variant="contained" onClick={isAnsweringTime ? completeAnswering : startAnswering}>
-//             {isAnsweringTime ? "답변 완료" : "답변 시작"}
-//           </Button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Body;

@@ -11,7 +11,7 @@ import CheckCamMic from './page/AI/Checkcammic/CheckCamMic';
 import Recruitment from './page/Recruitment/js/Recruitment';
 
 import AI_interview_start from './page/AI/AI_Interview/AI_interview_start';
-import Interview_end from './page/AI/Interview_end/Interview_end';
+import Interview_result from './page/AI/Interview_end/Interview_result';
 
 import JobPostingList from './page/Recruitment/js/JobPostingList';
 
@@ -34,7 +34,7 @@ function App() {
           <Route path='/AIinterview' element={<AIinterview />} />
           <Route path='/CheckCamMic' element={<CheckCamMic />} />
           <Route path='/AI_interview_start' element={<AI_interview_start />} />
-          <Route path='/Interview_end' element={<Interview_end />} />
+          <Route path='/Interview_result' element={<Interview_result />} />
 
           <Route path='/Self_introduction' element={<Self_introduction />} />
 

@@ -87,7 +87,7 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 CORS(app)
 
-model = load_model(r'C:\Users\wyzmq\OneDrive\바탕 화면\capstone\Job_Fairy\AI_Interview\Face_Recognition\model_name.h5')
+model = load_model(r'C:\Users\wyzmq\OneDrive\바탕 화면\Job_Fairy\AI_Interview\Face_Recognition\model_name.h5')
 shape_x, shape_y = 48, 48
 
 emotion_labels = {
@@ -166,4 +166,4 @@ def predict():
         return jsonify({'error': str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5003)
