@@ -1,0 +1,41 @@
+/* 부모 요소 공통 스타일 */
+.camcheck-box, .interview-start-box {
+    width: 100%; /* 부모 요소의 너비를 동일하게 설정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* 버튼 공통 스타일 */
+.custom-button {
+    width: 60%; /* 버튼 너비를 동일하게 설정 */
+    max-width: 300px; /* 최대 너비를 설정하여 너무 커지지 않도록 제한 */
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.custom-button:hover {
+    box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* 선택된 직무 표시 텍스트 스타일 */
+.selected-job-text {
+    font-weight: bold;
+    color: #3f51b5;
+    background-color: #f0f4ff;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+.warning-text {
+    color: red;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+

@@ -32,7 +32,7 @@ function STTResult({ transcription }) {
     <Box className="stt-result-container">
       <Card className="stt-result-card">
         <CardContent>
-          <Typography variant="h5" component="div" gutterBottom>
+          {/* <Typography variant="h5" component="div" gutterBottom>
             STT 변환 결과
           </Typography>
           {transcription ? (
@@ -43,7 +43,7 @@ function STTResult({ transcription }) {
             <Typography variant="body2" color="text.secondary">
               No transcription available.
             </Typography>
-          )}
+          )} */}
 
           <Box mt={3}>
             <Typography variant="h6" component="div" gutterBottom>

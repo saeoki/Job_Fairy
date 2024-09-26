@@ -39,7 +39,7 @@ function CameraMicAccess() {
     const audioContext = new AudioContext();
     const audioStream = audioContext.createMediaStreamSource(stream);
     const analyzer = audioContext.createAnalyser();
-    analyzer.fftSize = 256;
+    analyzer.fftSize = 32;
     audioStream.connect(analyzer);
 
     const dataArray = new Uint8Array(analyzer.frequencyBinCount);

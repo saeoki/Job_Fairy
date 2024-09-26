@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
@@ -5,16 +6,18 @@ import Button from 'react-bootstrap/Button';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 import "../css/Body.css"
 import StartInterview from "./Startinterview";
 import Camcheck from "./Camcheck";
 
-
-function Body(){
+function Body() {
     const [isPersonalityInterviewChecked, setIsPersonalityInterviewChecked] = useState(false);
     const [isTechnicalInterviewChecked, setIsTechnicalInterviewChecked] = useState(false);
     const [isRecordingChecked, setIsRecordingChecked] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(""); // 직무 선택 상태 추가
 
     const handlePersonalityInterviewChange = (event) => {
         setIsPersonalityInterviewChecked(event.target.checked);
@@ -28,44 +31,69 @@ function Body(){
         setIsRecordingChecked(event.target.checked);
     };
 
-    return(
+    const handleJobChange = (event) => {
+        setSelectedJob(event.target.value); // 직무 선택 값 업데이트
+    };
+
+    return (
         <div className="body">
             <div id="AIinterviewbox">
                 <div className="interview-type-box">
                     <span> <h5>면접 종류를 선택하세요</h5></span>
-                    <FormControlLabel  
-                        control={<Checkbox checked={isPersonalityInterviewChecked} onChange={handlePersonalityInterviewChange} />} 
-                        label="인적성 면접" 
+                    <FormControlLabel
+                        control={<Checkbox checked={isPersonalityInterviewChecked} onChange={handlePersonalityInterviewChange} />}
+                        label="인적성 면접"
                         labelPlacement="start"
                     />
-                    <FormControlLabel  
-                        control={<Checkbox checked={isTechnicalInterviewChecked} onChange={handleTechnicalInterviewChange} />} 
+                    <FormControlLabel
+                        control={<Checkbox checked={isTechnicalInterviewChecked} onChange={handleTechnicalInterviewChange} />}
                         label="기술 면접"
-                        labelPlacement="start" 
+                        labelPlacement="start"
                     />
+
+                    {/* 기술 면접 선택 시 직무 선택 콤보박스 표시 */}
+                    {isTechnicalInterviewChecked && (
+                        <div>
+                            <h5>직무를 선택하세요</h5>
+                            <Select
+                                value={selectedJob}
+                                onChange={handleJobChange}
+                                displayEmpty
+                                fullWidth
+                            >
+                                <MenuItem value="">
+                                    <em>직무 선택</em>
+                                </MenuItem>
+                                <MenuItem value="frontend">프론트엔드</MenuItem>
+                                <MenuItem value="backend">백엔드</MenuItem>
+                                <MenuItem value="ai">인공지능</MenuItem>
+                                <MenuItem value="network">네트워크</MenuItem>
+                                <MenuItem value="firmware">펌웨어</MenuItem>
+                            </Select>
+                        </div>
+                    )}
                 </div>
 
                 <div className="interview-type-box">
-                    <span> <h5>해당 면접에 대하여<br/> 녹화를 하시겠습니까?</h5> </span>
-                    <FormControlLabel  
-                        control={<Checkbox checked={isRecordingChecked} onChange={handleRecordingChange} />} 
-                        label=" 녹화 여부" 
+                    <span> <h5>해당 면접에 대하여<br /> 녹화를 하시겠습니까?</h5> </span>
+                    <FormControlLabel
+                        control={<Checkbox checked={isRecordingChecked} onChange={handleRecordingChange} />}
+                        label=" 녹화 여부"
                         labelPlacement="start"
                     />
                 </div>
 
                 <Camcheck />
 
-                <StartInterview 
+                <StartInterview
                     isPersonalityInterviewChecked={isPersonalityInterviewChecked}
                     isTechnicalInterviewChecked={isTechnicalInterviewChecked}
                     isRecordingChecked={isRecordingChecked}
+                    selectedJob={selectedJob}  // 선택한 직무 값 전달
                 />
-
             </div>
-
         </div>
-    )
+    );
 }
 
 export default Body;

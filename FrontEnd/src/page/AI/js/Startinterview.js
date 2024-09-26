@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,10 +8,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "../css/ButtonStyles.css"; // 공통 버튼 스타일 적용
 
-function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChecked, isRecordingChecked }) {
-    const [open, setOpen] = useState(false); // 다이얼로그 열고 닫는 상태 관리
+function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChecked, isRecordingChecked, selectedJob }) {
+    const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
 
     const handleOpen = () => {
         setOpen(true);
@@ -19,50 +23,80 @@ function StartInterview({ isPersonalityInterviewChecked, isTechnicalInterviewChe
         setOpen(false);
     };
 
+    const handleStartInterview = () => {
+        navigate('/AI_interview_start', {
+            state: {
+                isPersonalityInterviewChecked,
+                isTechnicalInterviewChecked,
+                isRecordingChecked,
+                selectedJob,
+            }
+        });
+    };
+
+    // 기술 면접이 선택되면 직무도 선택되어야 "예" 버튼을 누를 수 있음
+    const isStartButtonDisabled = (!isPersonalityInterviewChecked && !isTechnicalInterviewChecked) || 
+                                  (isTechnicalInterviewChecked && selectedJob === "");
 
     return (
         <div className="interview-start-box">
-            <Button className="btn btn-primary btn-xs" onClick={handleOpen} variant="contained" color="primary" style={{width:"50%"}}> 
+            <Button
+                className="custom-button"
+                onClick={handleOpen}
+                variant="contained"
+                color="primary"
+            >
                 면접 시작
             </Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>면접 시작</DialogTitle>
                 <DialogContent>
-                    <p>해당 면접 정보로 면접을 시작하겠습니까?</p>
+                    {isTechnicalInterviewChecked && selectedJob === "" ? (
+                        <p className="warning-text">직무를 선택하세요!</p>  
+                    ) : (
+                        <p className="selected-job-text">해당 면접 정보로 면접을 시작하겠습니까?</p>  
+                    )}
                     <div>
-                        <div>
+                        {isPersonalityInterviewChecked && (
                             <FormControlLabel
-                                control={<Checkbox checked={isPersonalityInterviewChecked} />}
+                                control={<Checkbox checked={true} />}
                                 label="인적성 면접"
                                 labelPlacement="start"
-                                disabled={!isPersonalityInterviewChecked}
+                                disabled
                             />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={<Checkbox checked={isTechnicalInterviewChecked} />}
-                                label="기술 면접"
-                                labelPlacement="start"
-                                disabled={!isTechnicalInterviewChecked}
-                            />
-                        </div>
-                        <div>
-                            <FormControlLabel
-                                control={<Checkbox checked={isRecordingChecked} />}
-                                label="녹화 여부"
-                                labelPlacement="start"
-                                disabled={!isRecordingChecked}
-                            />
-                        </div>
+                        )}
+                        {isTechnicalInterviewChecked && (
+                            <>
+                                <FormControlLabel
+                                    control={<Checkbox checked={true} />}
+                                    label="기술 면접"
+                                    labelPlacement="start"
+                                    disabled
+                                />
+                                {selectedJob && (
+                                    <p className="selected-job-text">선택한 직무: {selectedJob}</p>
+                                )}
+                            </>
+                        )}
+                        <FormControlLabel
+                            control={<Checkbox checked={isRecordingChecked} />}
+                            label="녹화 여부"
+                            labelPlacement="start"
+                            disabled
+                        />
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Link to="/AI_interview_start">          
-                        <Button color="primary">
-                            예
-                        </Button>
-                    </Link>
-                    <Button onClick={handleClose} color="primary">
+                    <Button 
+                        onClick={handleStartInterview} 
+                        className="custom-button" 
+                        color="primary" 
+                        variant="contained" 
+                        disabled={isStartButtonDisabled} // 버튼 활성화 조건 적용
+                    >
+                        예
+                    </Button>
+                    <Button onClick={handleClose} color="primary" variant="outlined">
                         아니오
                     </Button>
                 </DialogActions>
