@@ -51,3 +51,28 @@ export const LoginErrorToast = () => {
         }
     });
 };
+
+export const RegisterToast = () => {
+    Swal.fire({
+        icon: 'info',
+        title: '추가정보를 등록해야됩니다.!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+
+    });
+};
+
+export const RegisterSuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '추가정보 등록완료!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+};

@@ -1,23 +1,12 @@
 .body{
   width: auto;
   height: 75vh;
-  border-bottom: 7px solid rgba(52,147,215,0.694);
+  /* border-bottom: 7px solid rgba(52,147,215,0.694); */
 }
 
 .box{
   width: auto;
   min-height: 65vh;
-}
-
-#RegisterBox {
-    width: 500px;
-    text-align: center;
-    margin: 16vh auto;
-    padding: 15px;
-    @media screen and (max-width: 767px){
-      width: 350px;
-      padding: 10px;
-  }
 }
 #RegisterBox2 {
   width: 500px;
@@ -41,7 +30,6 @@
   }
   .input-form-box > input {
     max-width: 250px;
-    margin-left: 10px;
     @media screen and (max-width: 767px){
       max-width: 160px;
   }
@@ -61,34 +49,8 @@
   #inputBox button {
     padding: 3px 5px;
   }
-  
-  #btn-check{
-    border-radius: 12px;
-    margin-left: 5px;
-    font-size: 0.7rem;
-  }
-
-  .input-form-box > i {
-    margin-left: 10px;
-  }
-
- .stepper{
-    height: 7vh;
-  }
-
-  .stepper > *{
-    width: 30vw;
-    margin: auto;
-    @media screen and (max-width: 767px){
-      width: 90%;
-      margin: auto;
-    }
-  }
 .btn_register{
-  width: 15vw;
+  width: max-content;
   height: auto;
-  margin-left: 44.5vw;
-  @media screen and (max-width: 767px){
-    margin-left: 42.5vw;
-  }
+  margin: 0 auto;
 }
