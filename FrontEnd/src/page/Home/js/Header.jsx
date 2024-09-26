@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 
@@ -10,7 +10,7 @@ import KakaoLogin from "../../Login/js/Kakao_login";
 
 function Header(){
 
-    const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+    const { isLoggedIn, logout } = useContext(AuthContext);
 
     // 카카오 로그아웃 기능
     const handleKakaoLogout = () => {
@@ -20,7 +20,10 @@ function Header(){
         }
         window.Kakao.Auth.logout(function() {
             LogoutToast()
-            setIsLoggedIn(false)
+            setTimeout(() => {
+                logout(); // 로그아웃 상태 업데이트
+                window.location.href = '/';
+              }, 1200); 
         });
     }
 
@@ -51,13 +54,6 @@ function Header(){
                     :
                     <div className="login_box">
                         <KakaoLogin />
-                        {/* 240717 기존 회원가입 버전 삭제 */}
-                        {/* <Link to="/Login">
-                            <Button variant="link">로그인</Button>
-                        </Link>
-                        <Link to="/Register">
-                            <Button variant="primary">회원가입</Button>
-                        </Link> */}
                     </div>
                     }
                 </div>

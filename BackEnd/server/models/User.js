@@ -9,37 +9,14 @@ const userSchema = mongoose.Schema({
         required : true,
         unique: true
     },
-    nickname: {
-        type: String,
-        maxlength: 10,
-    },
-    location: {
-      type: String,
-      maxlength: 20,
-    },
-    military: {
-      type: String,
-      maxlength: 8,
-    },
-    position: {
-      type: String,
-      maxlength: 50,
-    },
-    salary: {
-      type: String,
-      maxlength: 40,
-    },
-    role: {
-        type: Number,
-        default: 0,
-    },
-    token: {
-        type: String,
-    },
-    isUpdate: {
-      type: Number,
-      default: 0,
-    }
+    nickname: { type: String, maxlength: 10 },
+    location: { type: [String], maxlength: 40, default: ""},
+    military: { type: String, maxlength: 8, default: ""},
+    position: { type: [String], maxlength: 50, default: ""},
+    salary: { type: [String], maxlength: 40, default: 0 },
+    role: { type: Number, default: 0, },
+    token: { type: String, },
+    isUpdate: { type: Boolean, default: false, }
 }, { collection: 'userinfo' });
 
 

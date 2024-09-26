@@ -5,7 +5,10 @@ const { User } = require("./models/User");
 const { Problem } = require("./models/Problem")
 // const config = require("./config/key");
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+require('dotenv').config(); // .env 파일 로드
 const { JobPosting } = require("./models/JobPosting")
+
 
 const app = express();
 //클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
@@ -18,54 +21,55 @@ app.use(cors({
 })); // cors 미들웨어 사용
 
 mongoose
-  .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
-  //.connect(process.env.MONGO_URI)
+  // .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-//app.use("/api", test);
-app.get("/api/hello", (req, res) => {
-  res.send("안녕하세요~");
-});
 
-
-
+// 로그인
 app.post('/api/auth/kakao', async (req, res) => {
-  const { kakaoId, nickname } = req.body;
-
+  const { kakaoId, nickname, location, military, position, salary } = req.body;
+  const secretKey = process.env.JWT_SECRET_KEY;
   try {
     let user = await User.findOne({ kakaoId });
-
     if (user) {
-        // 사용자 정보 업데이트
-        // user.nickname = nickname;
-        await user.save();
-        return res.status(200).json({ message: 'User updated successfully' });
+      // isUpdate 상태를 확인하여 로직 처리
+      if (user.isUpdate === false) {
+        const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
+        return res.status(200).json({ message: 'Redirect', redirectUrl: '/Register', token });
+      }
+      // 사용자 정보 업데이트
+      await user.save();
+      const token = jwt.sign({ kakaoId, nickname, location, military, position, salary }, secretKey, { expiresIn: '1h' });
+      return res.status(200).json({ message: 'User login successfully', token });
     } else {
-        // 사용자 정보 저장
-        const newUser = new User({ kakaoId, nickname });
-        await newUser.save();
-        return res.status(201).json({ message: 'User created successfully' });
+      // 사용자 정보 저장
+      const newUser = new User({ kakaoId, nickname });
+      await newUser.save();
+      const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
+      return res.status(201).json({ message: 'User created successfully', token });
     }
-} catch (err) {
+  } catch (err) {
+    console.log(err)
     return res.status(500).json({ error: 'Database error' });
-}
+  }
 });
 
 app.post('/api/auth/kakao/register', async (req, res) => {
-  const { kakaoId, nickname, location, military, position, salary, isUpdate } = req.body;
-
+  const { kakaoId, nickname, location, military, position, salary } = req.body;
+  console.log(req.body)
   try {
     let user = await User.findOne({ kakaoId });
 
     if (user) {
         // 사용자 정보 업데이트
-        user.nickname = nickname;
-        user.location = location;
-        user.military = military;
-        user.position = position;
-        user.salary = salary;
-        user.isUpdate = isUpdate;
+        user.nickname = nickname || user.nickname; // 기존 닉네임 유지;
+        user.location = location || user.location; // 기존 위치 유지
+        user.military = military || user.military; // 기존 군대 정보 유지
+        user.position = position || user.position; // 기존 직위 유지
+        user.salary = salary !== undefined ? salary : user.salary; // salary가 주어지면 업데이트
+        user.isUpdate = true;
         await user.save();
         return res.status(200).json({ message: 'User updated successfully' });
     } else {
@@ -108,12 +112,9 @@ app.get('/api/problem/:no', async (req, res) => {
   }
 });
 
-app.post('/api/run', (req, res) => {
-  const { code } = req.body;
-  // 여기에 코드 실행 로직 작성
-  const result = `Running code: ${code}`; // 임시 결과
-  res.json({ result });
-});
+// 채용정보 불러오기 시작
+const JobPostingSchema = new mongoose.Schema({}, { strict: false });
+const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
 
 
 // 채용 데이터 불러오기 API
