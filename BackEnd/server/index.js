@@ -7,6 +7,8 @@ const { Problem } = require("./models/Problem")
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // .env 파일 로드
+const { JobPosting } = require("./models/JobPosting")
+
 
 const app = express();
 //클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
@@ -114,19 +116,48 @@ app.get('/api/problem/:no', async (req, res) => {
 const JobPostingSchema = new mongoose.Schema({}, { strict: false });
 const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
 
+
+// 페이지네이션 API
 app.get("/api/Recruitment/JobPostingList", async (req, res) => {
   try {
-    const jobs = await JobPosting.find();
-    const formattedJobs = jobs.map(job => ({
-      company: job.company.detail.name,
-      position: job.position.title,
-      location: job.position.location.name.split(',')[0],
-      department: `${job.position.experience-level.name}, ${job.position.required-education-level.name}`,
-      code: `D - ${Math.floor((job.expiration-timestamp - Date.now() / 1000) / 86400)}`
-    }));
-    res.json(formattedJobs);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching jobs', error: error.message });
+    const page = parseInt(req.query.page) || 1;  // 페이지 번호 (기본값 1)
+    const limit = 10;  // 한 페이지에 표시할 데이터 수
+    const skip = (page - 1) * limit;  // 건너뛸 데이터 수
+
+    const total = await JobPosting.countDocuments(); // 전체 데이터 수
+    const jobPostings = await JobPosting.find({}, {
+      "bbs_gb": 1,  // 공채 구분
+
+      "company.detail.name": 1,  // 기업 이름
+      "company.detail.href": 1,  // 기업 정보 링크
+    
+      "position.location.name": 1,  // 위치
+      "position.required-education-level.name": 1,  // 학력 기준
+      "position.experience-level.name": 1,  // 경력 기준
+      "position.experience-level.max": 1,  // 최대 경력
+      "position.experience-level.min": 1,  // 최소 경력
+      "position.job-mid-code.name": 1,  // 중간 직종
+      "position.job-type.name": 1,  // 직종 유형 (예: 정규직)
+      "position.title": 1,  // 공고 제목
+    
+      "posting-timestamp": 1,  // 게시 날짜
+      "modification-timestamp": 1,  // 수정 날짜
+      "expiration-timestamp": 1,  // 마감 기한
+      "salary": 1,  // 연봉 정보
+      "active": 1,  // 공고 진행 여부
+      "url": 1  // 공고 링크
+    })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      jobPostings,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalItems: total
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching job postings", error: err });
   }
 });
 
