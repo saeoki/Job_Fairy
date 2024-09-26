@@ -33,6 +33,12 @@ const jobPostingSchema = new mongoose.Schema({
           alias: 'experience-level-min'  // 최소 경력
         }
       },
+      job_code: {
+        name: {
+          type: String,
+          alias: 'job-code-name'  //  직무명
+        }
+      },
       job_mid_code: {
         name: {
           type: String,

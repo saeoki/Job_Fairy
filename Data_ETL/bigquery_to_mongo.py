@@ -33,14 +33,16 @@ collection.delete_many({})
 collection.create_index("id", unique=True)
 
 for row in rows :
+    index = 1
     document = dict(row)
     try :
         collection.insert_one(document)
+        print(f"{index}번째 도큐먼트 삽입")
 
     except errors.DuplicateKeyError :
         print("중복된 id 필드가 발견되어 문서를 삽입하지 않았습니다.")
 
     except Exception as e :
         print(f"Document 삽입 실패: {e}")
-
+    index += 1
 print("Data가 MongoDB에 성공적으로 삽입되었습니다.")

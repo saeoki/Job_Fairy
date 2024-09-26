@@ -43,6 +43,19 @@ def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
     blob.upload_from_filename(source_file_name)
     print(f"File {source_file_name} uploaded to {destination_blob_name} in bucket {bucket_name}.")
 
+# 재귀적으로 딕셔너리의 키에서 '-'를 '_'로 바꾸는 함수
+def replace_hyphens(obj):
+    if isinstance(obj, dict):
+        new_obj = {}
+        for k, v in obj.items():
+            new_key = k.replace('-', '_')  # '-'를 '_'로 바꿈
+            new_obj[new_key] = replace_hyphens(v)  # 재귀적으로 모든 값에 대해 반복
+        return new_obj
+    elif isinstance(obj, list):
+        return [replace_hyphens(item) for item in obj]
+    else:
+        return obj
+
 
 def fetch_jobs(start, count, bbs_gb=None) :
     url = 'https://oapi.saramin.co.kr/job-search'
@@ -50,6 +63,7 @@ def fetch_jobs(start, count, bbs_gb=None) :
         'access-key' : access_key,
         'start' : start,
         'count' : count,
+        'job_mid_cd' : 2,
     }
     if bbs_gb is not None:
         params['bbs_gb'] = bbs_gb
@@ -60,7 +74,8 @@ def fetch_jobs(start, count, bbs_gb=None) :
 
     response = requests.get(url, params=params, headers=headers) #JSON 형식으로 반환
     if response.status_code == 200 :
-        return response.json() #JSON 형식의 응답 데이터를 파이썬 구조 객체로
+        data = response.json() #JSON 형식의 응답 데이터를 파이썬 구조 객체로
+        return replace_hyphens(data) # 필드명을 '-'에서 '_'로 변경
     else :
         print(f"Error : {response.status_code}, {response.text}")
         return None
@@ -74,7 +89,7 @@ def fetch_and_save_jobs(public_total_results, non_public_total_results, local_fi
         f.write('[')
 
     # 공채 데이터 fetch
-    for start in range(0, public_total_results, max_count) :
+    for start in range(0, public_total_results, 1) :
         public_data = fetch_jobs(start = start, count = max_count, bbs_gb = 1)
         if public_data and 'jobs' in public_data and 'job' in public_data['jobs'] :
             jobs = public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
@@ -112,7 +127,7 @@ def fetch_and_save_jobs(public_total_results, non_public_total_results, local_fi
         
         
     # 비공채 데이터 fetch
-    for start in range(0, non_public_total_results, max_count) :
+    for start in range(0, non_public_total_results, 1) :
         non_public_data = fetch_jobs(start = start, count = max_count, bbs_gb = None)
         if non_public_data and 'jobs' in non_public_data and 'job' in non_public_data['jobs'] :
             jobs = non_public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
