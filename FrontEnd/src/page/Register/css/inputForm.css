@@ -11,7 +11,6 @@
   }
   .input-form-box > input {
     max-width: 250px;
-    margin-left: 10px;
     @media screen and (max-width: 767px){
       max-width: 160px;
   }
@@ -30,12 +29,6 @@
   
   #inputBox button {
     padding: 3px 5px;
-  }
-  
-  #btn-check{
-    border-radius: 12px;
-    margin-left: 5px;
-    font-size: 0.7rem;
   }
 
   .input-form-box > i {
