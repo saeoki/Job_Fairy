@@ -51,14 +51,12 @@ app.post('/api/auth/kakao', async (req, res) => {
       return res.status(201).json({ message: 'User created successfully', token });
     }
   } catch (err) {
-    console.log(err)
     return res.status(500).json({ error: 'Database error' });
   }
 });
 
 app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
-  console.log(req.body)
   try {
     let user = await User.findOne({ kakaoId });
 
@@ -80,6 +78,20 @@ app.post('/api/auth/kakao/register', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
 }
 });
+
+app.post('/api/auth/info', async (req,res)=> {
+  const {kakaoId} = req.body
+  try{
+    const user = await User.findOne({ kakaoId });
+    if (!user) {
+      return res.status(404).json({ message: 'user not found' });
+    }
+    res.json(user)
+  } catch(err){
+    return res.status(500).json({ error: 'Database error' });
+  }
+})
+
 // 레벨별 그룹화 반환
 app.get('/api/problem/level', async (req, res) => {
   try {
@@ -107,7 +119,7 @@ app.get('/api/problem/:no', async (req, res) => {
     }
     res.json(problem);
   } catch (error) {
-    console.error('Error fetching problem:', error);
+    // console.error('Error fetching problem:', error);
     res.status(500).json({ message: error.message });
   }
 });

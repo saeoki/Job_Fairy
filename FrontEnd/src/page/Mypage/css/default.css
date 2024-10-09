@@ -1,0 +1,83 @@
+.register_container{
+    width: 100%;
+    height: 78vh;
+}
+
+.register_box{
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    padding-top: 8vh;
+}
+.register_box_modify{
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    padding-top: 5vh;
+}
+
+.modify_btn{
+    width: 500px;
+    margin: auto;
+    margin-top: 1vh;
+    overflow: auto;
+    @media screen and (max-width: 767px){
+        width: 350px
+    }
+}
+.modify_btn > * {
+    float: right;
+}
+#modify_btn {
+    margin-right: 10px;
+}
+
+.modify_box{
+    width: 500px;
+    height: max-content;
+    margin: auto;
+    @media screen and (max-width: 767px){
+        width: 350px
+    }
+}
+
+.modify_value {
+    padding: 10px;
+    display: flex;
+}
+.modify_value > span {
+    margin-left: 20px;
+    min-width: 90px;
+    display: block;
+    text-align: left;
+    padding-top: 12px;
+    @media screen and (max-width: 767px){
+        margin-left: 2px;
+        min-width: 60px;
+    }
+}
+.modify_value > div{
+    margin-left: 20px;
+    @media screen and (max-width: 767px){
+        margin-left: 5px
+    }
+}
+.modify_value input{
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+.text{
+    padding-top: 12px;
+}
+.modify_input{
+    width: 300px;
+    @media screen and (max-width: 767px){
+        width: 240px;
+    }
+}
+.modify_money{
+    width: 125px;
+    @media screen and (max-width: 767px){
+        width: 100px;
+    }
+}

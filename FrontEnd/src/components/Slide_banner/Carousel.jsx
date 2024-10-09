@@ -30,7 +30,7 @@ const Carousel = () => {
     slidesToScroll: 1,
     // arrows: true
     autoplay: true,  // 자동 전환 활성화
-    autoplaySpeed: 3000,  // 3초마다 자동 전환
+    autoplaySpeed: 4000,  // 3초마다 자동 전환
   };
 
   return (
