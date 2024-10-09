@@ -59,10 +59,9 @@ const Body = () => {
                 body: JSON.stringify(data),
             });
             ModifySuccessToast()
-            // 토스트 메시지가 사라진 후에 리다이렉션을 수행합니다.
             setTimeout(() => {
               window.location.href = '/Mypage';
-            }, 1500); // 2000ms = 2초 후에 리다이렉션
+            }, 1500); // 2000ms = 2초 후에 마이페이지로 리다이렉션 하여 수정된 정보 확인
         } catch (error) {
             console.error('Error:', error);
         }
