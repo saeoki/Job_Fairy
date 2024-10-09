@@ -14,7 +14,7 @@
 
     /* 왼쪽 열 스타일 */
 .header > .left {
-    width: 13vw;
+    width: 20vw;
     @media screen and (max-width: 767px){
         width: 20vw;
     }
@@ -35,7 +35,7 @@
     
     /* 가운데 열 스타일 */
 .header > .center {
-    width: 68vw;
+    width: 58vw;
     text-align: center;
     margin-bottom: 1vh;
     @media screen and (max-width: 767px){
@@ -66,13 +66,11 @@
   /* 오른쪽 열 스타일 */
 .header > .right {
     display: flex;
-    margin-right: 1vw;
     margin-top: 2vh;
-    width: 19vw;
-    @media screen and (max-width: 767px){
-        width: 18vw;
-        margin-right: 1vw;
-    }
+    margin-bottom: 0.5vh;
+    align-content: center;
+    justify-content: center;
+    width: 20vw;
 }
 
 .right > .btn_box {
@@ -80,10 +78,21 @@
 }
 
 .right > .btn_box > * {
-    margin-right: 5px;
+    margin-left: 5px;
+    max-width: max-content;
 }
 
 .right > .btn_box button {
+    @media screen and (max-width: 932px){
+        /* max-width: 90px; */
+        font-size: 0.9rem;
+        margin-top: 2px;
+    }
+    @media screen and (max-width: 872px){
+        /* max-width: 90px; */
+        font-size: 0.72rem;
+        margin-top: 2px;
+    }
     @media screen and (max-width: 767px){
         max-width: 90px;
         font-size: 0.65rem;
