@@ -7,7 +7,6 @@ const { Problem } = require("./models/Problem")
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // .env 파일 로드
-const { JobPosting } = require("./models/JobPosting")
 
 
 const app = express();
