@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema({
     location: { type: [String], maxlength: 40, default: ""},
     military: { type: String, maxlength: 8, default: ""},
     position: { type: [String], maxlength: 50, default: ""},
-    salary: { type: [String], maxlength: 40, default: 0 },
+    salary: { type: [String], maxlength: 40, default: [2000,12000] },
     role: { type: Number, default: 0, },
     token: { type: String, },
     isUpdate: { type: Boolean, default: false, }
