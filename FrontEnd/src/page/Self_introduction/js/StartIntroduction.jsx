@@ -54,7 +54,7 @@ const StartIntroduction = ({infoList ,setIsInput }) => {
 
       </Stack>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>입력한 프롬프트를 확인해주세요.</DialogTitle>
+        <DialogTitle>입력한 내용을 확인해주세요.</DialogTitle>
         <DialogContent style={{ textAlign: 'center' }}>
         <PromptContainer>
             <PromptTitle>

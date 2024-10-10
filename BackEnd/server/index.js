@@ -7,7 +7,6 @@ const { Problem } = require("./models/Problem")
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // .env 파일 로드
-const { JobPosting } = require("./models/JobPosting")
 
 
 const app = express();
@@ -17,7 +16,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: 'http://localhost:3000', // 클라이언트 도메인 명시
+  origin: ['http://localhost:3000','https://jobfairy.netlify.app/'], // 클라이언트 도메인 명시
   credentials: true // 자격 증명(쿠키 등) 포함 허용
 })); // cors 미들웨어 사용
 
@@ -51,14 +50,12 @@ app.post('/api/auth/kakao', async (req, res) => {
       return res.status(201).json({ message: 'User created successfully', token });
     }
   } catch (err) {
-    console.log(err)
     return res.status(500).json({ error: 'Database error' });
   }
 });
 
 app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
-  console.log(req.body)
   try {
     let user = await User.findOne({ kakaoId });
 
@@ -80,6 +77,20 @@ app.post('/api/auth/kakao/register', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
 }
 });
+
+app.post('/api/auth/info', async (req,res)=> {
+  const {kakaoId} = req.body
+  try{
+    const user = await User.findOne({ kakaoId });
+    if (!user) {
+      return res.status(404).json({ message: 'user not found' });
+    }
+    res.json(user)
+  } catch(err){
+    return res.status(500).json({ error: 'Database error' });
+  }
+})
+
 // 레벨별 그룹화 반환
 app.get('/api/problem/level', async (req, res) => {
   try {
@@ -107,7 +118,7 @@ app.get('/api/problem/:no', async (req, res) => {
     }
     res.json(problem);
   } catch (error) {
-    console.error('Error fetching problem:', error);
+    // console.error('Error fetching problem:', error);
     res.status(500).json({ message: error.message });
   }
 });

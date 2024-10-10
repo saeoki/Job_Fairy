@@ -76,3 +76,15 @@ export const RegisterSuccessToast = () => {
         timerProgressBar: true
     });
 };
+
+export const ModifySuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '내 정보 수정완료!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+};
