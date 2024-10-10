@@ -29,21 +29,22 @@ function getInfo(login) {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Success:', data);
 
                 if (data.token) {
                     LoginToast();
-                    setTimeout(() => {
-                        login(data.token); // 로그인 상태 업데이트
+                    setTimeout( async () => {
+                        await login(data.token); // 로그인 상태 업데이트
                         window.location.reload(); // 페이지 리로드 (로그인 상태 반영)
-                      }, 1200); 
+                      }, 1000); 
                     
                 }
 
                 // 서버에서 redirectUrl을 받아서 리다이렉션 처리
                 if (data.redirectUrl) {
                     // 해당 URL로 리다이렉션
-                    window.location.href = data.redirectUrl; 
+                    setTimeout(()=>{
+                        window.location.href = data.redirectUrl; 
+                    },1000)
                 } else{
                     
                 }

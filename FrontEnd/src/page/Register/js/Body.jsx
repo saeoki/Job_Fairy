@@ -11,7 +11,6 @@ import { RegisterSuccessToast } from "../../../components/ToastMessage";
 function Body(){
 
     const token = localStorage.getItem('token');
-
     const userData = jwtDecode(token);
     const { kakaoId, nickname } = userData;
 
@@ -52,6 +51,11 @@ function Body(){
             console.error('Error:', error);
         }
     }
+
+    const handleCancle = () => {
+        window.location.href = '/';
+    }
+
     return(
         <div className="body">
             <div className='box'>
@@ -62,7 +66,7 @@ function Body(){
                     <div className='btn_register'>
                         <Stack spacing={2} direction="row">
                             <Button variant="contained" size="large" type="submit" color='success' onClick={handleRegister} disabled={isDisableButton}>저장하기</Button>
-                            <Button variant='contained' size="large" color='error'>다음에 하기</Button>
+                            <Button variant='contained' size="large" color='error' onClick={handleCancle}>다음에 하기</Button>
                         </Stack>
                     </div>
                 </div>

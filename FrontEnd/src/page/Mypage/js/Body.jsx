@@ -19,17 +19,17 @@ import {ModifySuccessToast} from "../../../components/ToastMessage"
 const Body = () => {
     const token = localStorage.getItem('token');
     const userData = jwtDecode(token);
-    const { kakaoId } = userData;
+    const { kakaoId, nickname } = userData;
 
     const [open, setOpen] = useState(false);
     const [ismodify, setIsModify] = useState(true)
     const [data, setData] = useState({
         kakaoId: kakaoId,
-        nickname: '',
-        military: '',
-        position: '',
-        location: '',
-        salary: [0, 0] // 초기값을 빈 배열로 설정
+        nickname: nickname ? nickname : "",
+        military: "",
+        position: [],
+        location: [],
+        salary: [0, 12000] // 초기값을 빈 배열로 설정
     });
 
     const handleModify = () => {
@@ -91,7 +91,7 @@ const Body = () => {
                     <div className="modify_value">
                         <span>닉네임</span>
                         <TextField className="modify_input" id="outlined-basic" variant="outlined" disabled={ismodify} 
-                                    value={data.nickname}/>
+                                    defaultValue={data.nickname}/>
                     </div>
                     <div className="modify_value">
                         <span>병역 의무</span>
@@ -99,7 +99,7 @@ const Body = () => {
                         <MilitaryStatus registerList={data} setRegisterList={setData} />
                         :
                         <TextField className="modify_input" id="outlined-basic" variant="outlined" disabled={ismodify}
-                                    value={data.military} />
+                        defaultValue={data.military} />
                         }
                     </div>
                     <div className="modify_value">
@@ -108,7 +108,7 @@ const Body = () => {
                         <PositionSelector registerList={data} setRegisterList={setData} />
                         :
                         <TextField className="modify_input" id="outlined-basic" variant="outlined" disabled={ismodify} 
-                                    value={data.position}/>
+                        defaultValue={data.position}/>
                         }
                     </div>
                     <div className="modify_value">
@@ -117,7 +117,7 @@ const Body = () => {
                         <LocationSelector registerList={data} setRegisterList={setData} />
                         :
                         <TextField className="modify_input" id="outlined-basic" variant="outlined" disabled={ismodify} 
-                                    value={data.location}/>
+                        defaultValue={data.location}/>
                         }
                     </div>
                     <div className="modify_value">
@@ -127,12 +127,12 @@ const Body = () => {
                         :
                         <>
                         <TextField className="modify_money" id="outlined-basic" variant="outlined" disabled={ismodify} 
-                                    value={data.salary[0]}/>
+                                    defaultValue={data.salary[0]}/>
                         <div className="text">
                             ~
                         </div>
                         <TextField className="modify_money" id="outlined-basic" variant="outlined" disabled={ismodify} 
-                                    value={data.salary[1]}/>
+                                    defaultValue={data.salary[1]}/>
                         <div className="text">
                             만원
                         </div>
