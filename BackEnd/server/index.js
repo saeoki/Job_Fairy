@@ -15,7 +15,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cors({
-  origin: 'http://localhost:3000', // 클라이언트 도메인 명시
+  origin: ['http://localhost:3000','https://jobfairy.netlify.app/'], // 클라이언트 도메인 명시
   credentials: true // 자격 증명(쿠키 등) 포함 허용
 })); // cors 미들웨어 사용
 
