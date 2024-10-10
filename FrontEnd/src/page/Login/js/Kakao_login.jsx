@@ -29,7 +29,7 @@ function getInfo(login) {
             })
             .then(response => response.json())
             .then(data => {
-
+                
                 if (data.token) {
                     LoginToast();
                     setTimeout( async () => {

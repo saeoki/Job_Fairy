@@ -17,9 +17,9 @@
 }
 
 .modify_btn{
-    width: 500px;
+    width: 600px;
     margin: auto;
-    margin-top: 1vh;
+    margin-bottom: 1vh;
     overflow: auto;
     @media screen and (max-width: 767px){
         width: 350px

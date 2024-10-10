@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import {jwtDecode} from 'jwt-decode';
 /*
     Context 기능 설명
     Context 를 통해 전역으로 상태변수를 할당할 수 있다.
@@ -18,8 +18,22 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        // 토큰이 존재하면 로그인 상태 설정
-        setIsLoggedIn(!!token); // true/false로 변환
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            const currentTime = Date.now() / 1000; // 현재 시간 (초 단위)
+        
+            if (decodedToken.exp < currentTime) {
+              // 토큰이 만료됨
+              alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+              localStorage.removeItem('token'); // 토큰 삭제
+              setIsLoggedIn(false)
+              window.location.href = '/';  // 로그인 페이지로 리다이렉트
+            } else{
+                setIsLoggedIn(!!token); // true/false로 변환
+            }
+          }
+
+        
     }, []);
 
     const login = (token) => {
