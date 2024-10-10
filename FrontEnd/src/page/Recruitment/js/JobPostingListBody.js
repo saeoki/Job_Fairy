@@ -136,12 +136,13 @@ export default function JobPostingListBody() {
     if (selectedFilters.experiences.length > 0) params.set('experiences', selectedFilters.experiences.join(','));
     params.set('page', '1'); // Reset to first page when applying filters
     navigate(`?${params.toString()}`);
+    fetchJobPostings(1, selectedFilters);
   };
   
-  // 페이지가 바뀌거나 필터가 적용되면 fetch
+  // 페이지가 바뀌면 fetch, 검색 조건은 그대로
   useEffect(() => {
     fetchJobPostings(currentPage, selectedFilters);
-  }, [currentPage, selectedFilters]);
+  }, [currentPage]);
 
   return (
     <Container maxWidth="lg">

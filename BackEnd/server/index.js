@@ -15,13 +15,13 @@ const app = express();
 // app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
+
 app.use(cors({
   origin: 'http://localhost:3000', // 클라이언트 도메인 명시
   credentials: true // 자격 증명(쿠키 등) 포함 허용
 })); // cors 미들웨어 사용
 
 mongoose
-  // .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
@@ -114,7 +114,6 @@ app.get('/api/problem/:no', async (req, res) => {
 
 // 채용정보 불러오기 시작
 const JobPostingSchema = new mongoose.Schema({}, { strict: false });
-const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
 
 
 // 채용 데이터 불러오기 API
@@ -149,7 +148,6 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
 
     // 경력 필터
     if (experiences && experiences.length > 0) {
-      // 각 경력 옵션에 따른 min/max 범위를 설정합니다.
       const experienceRanges = {
         "신입": { min: 0, max: 0 },            // 신입은 경력 0년
         "1~3년": { min: 1, max: 3 },           // 1~3년 경력
