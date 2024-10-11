@@ -51,7 +51,7 @@ app.post('/api/auth/kakao', async (req, res) => {
       const newUser = new User({ kakaoId, nickname });
       await newUser.save();
       const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
-      return res.status(201).json({ message: 'User created successfully', token });
+      return res.status(201).json({ message: 'User created successfully', redirectUrl: '/Register', token });
     }
   } catch (err) {
     return res.status(500).json({ error: 'Database error' });
