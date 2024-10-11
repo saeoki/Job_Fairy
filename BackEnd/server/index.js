@@ -26,6 +26,9 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
+app.get('/', (req,res) => {
+  res.send('server root page');
+});
 
 // 로그인
 app.post('/api/auth/kakao', async (req, res) => {
@@ -123,9 +126,6 @@ app.get('/api/problem/:no', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// 채용정보 불러오기 시작
-const JobPostingSchema = new mongoose.Schema({}, { strict: false });
 
 
 // 채용 데이터 불러오기 API

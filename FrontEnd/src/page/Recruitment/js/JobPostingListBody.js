@@ -68,7 +68,7 @@ export default function JobPostingListBody() {
   // 페이지 변경 시 API 호출
   const fetchJobPostings = async (page, filters = {}) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+      const response = await fetch(`${process.env.REACT_APP_EC2_IP}:5000/api/Recruitment/JobPostingList?page=${page}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -429,31 +429,6 @@ export default function JobPostingListBody() {
           </Paper>
         ))
       )}
-      
-      {/* {jobPostings.map((job, index) => (
-        <Paper key={index} elevation={3} sx={{ mb: 2, p: 2 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box>
-              <Typography variant="body1">
-                <a href={job.company.detail.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1E90FF' }}>
-                  {job.company.detail.name}
-                </a>
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                <a href={job.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  {job.position.title}
-                </a>
-              </Typography>
-            </Box>
-            <Box textAlign="right">
-              <Typography variant="body2">{formatLocation(job.position.location.name)}</Typography>
-              <Typography variant="body2">{job.position['experience-level'].name}</Typography>
-              <Typography variant="body2">{formatTimestamp(job['expiration-timestamp'])}</Typography>
-            </Box>
-            <FormControlLabel control={<Checkbox />} label="스크랩" />
-          </Box>
-        </Paper>
-      ))} */}
 
       {/* 페이지네이션 */}
       <Box display="flex" justifyContent="center" mt={4}>
