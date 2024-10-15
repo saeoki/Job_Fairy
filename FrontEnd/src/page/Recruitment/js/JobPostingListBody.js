@@ -68,7 +68,7 @@ export default function JobPostingListBody() {
   // 페이지 변경 시 API 호출
   const fetchJobPostings = async (page, filters = {}) => {
     try {
-      const response = await fetch(`jobfairy.store/api/Recruitment/JobPostingList?page=${page}`, {
+      const response = await fetch(`https://jobfairy.store/api/Recruitment/JobPostingList?page=${page}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
