@@ -35,7 +35,7 @@ function getInfo(login) {
                     setTimeout( async () => {
                         await login(data.token); // 로그인 상태 업데이트
                         window.location.reload(); // 페이지 리로드 (로그인 상태 반영)
-                      }, 1000); 
+                      }, 500); 
                     
                 }
 

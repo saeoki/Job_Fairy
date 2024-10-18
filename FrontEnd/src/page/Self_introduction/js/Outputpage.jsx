@@ -5,8 +5,15 @@ import Typography from '@mui/material/Typography';
 import { LoadingOutlined, SoundTwoTone, CheckCircleTwoTone } from "@ant-design/icons";
 import { Button } from "antd";
 import { CallGPT, GPT_keyword } from "./chat";
+import {jwtDecode} from 'jwt-decode';
+import { ErrorToast, SaveSuccessToast } from "../../../components/ToastMessage"
 
 const Outputpage = ({ infoList }) => {
+
+  const token = localStorage.getItem('token');
+  const userData = jwtDecode(token);
+  const { kakaoId, nickname } = userData;
+
   const [data, setData] = useState("");
   const [keyData, setKeyData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -44,9 +51,35 @@ const Outputpage = ({ infoList }) => {
     fetchData();
   }, [infoList]);
 
+  const handleSave = async () => {
+    try {
+        const response = await fetch('http://localhost:5000/api/jasose/save', {
+            method: 'POST',
+            credentials: 'include', // 필요 시 추가
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              kakaoId: kakaoId,
+              nickname: nickname,
+              jasose: data,
+              keyJasose: keyData,
+              job: infoList.jobList,
+              keyword: infoList.keywordList
+            }),
+        });
+        SaveSuccessToast()
+        setTimeout(() => {
+          window.location.href = '/Report';
+        }, 1000);
+    } catch (error) {
+      ErrorToast(22)
+    }
+}
+
   return (
     <div className='outPage'>
-      {isLoading && (
+      {isLoading&& (
         <div>
           불러오는 중...
           <LoadingOutlined />
@@ -97,7 +130,7 @@ const Outputpage = ({ infoList }) => {
         </CardContainer>
       </Self_Container>
       <div className="save_box">
-        <Button className="save_btn" type="primary">
+        <Button className="save_btn" type="primary" disabled={!(data&&keyData)} onClick={handleSave}>
           저장하기
         </Button>
       </div>

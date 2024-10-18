@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const { User } = require("./models/User");
 const { Problem } = require("./models/Problem")
+const { Jasose } = require("./models/Jasoses")
+const { Favorite } = require('./models/Favorites')
+
 // const config = require("./config/key");
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -20,7 +23,6 @@ app.use(cors({
 })); // cors 미들웨어 사용
 
 mongoose
-  // .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
@@ -39,13 +41,15 @@ app.post('/api/auth/kakao', async (req, res) => {
         return res.status(200).json({ message: 'Redirect', redirectUrl: '/Register', token });
       }
       // 사용자 정보 업데이트
-      await user.save();
+      // await user.save();
       const token = jwt.sign({ kakaoId, nickname, location, military, position, salary }, secretKey, { expiresIn: '1h' });
       return res.status(200).json({ message: 'User login successfully', token });
     } else {
       // 사용자 정보 저장
       const newUser = new User({ kakaoId, nickname });
+      const userFavorite = new Favorite({kakaoId, nickname})
       await newUser.save();
+      await userFavorite.save()
       const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
       return res.status(201).json({ message: 'User created successfully', redirectUrl: '/Register', token });
     }
@@ -58,8 +62,9 @@ app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
   try {
     let user = await User.findOne({ kakaoId });
+    let userFavorite = await Favorite.findOne({kakaoId})
 
-    if (user) {
+    if (user&&userFavorite) {
         // 사용자 정보 업데이트
         user.nickname = nickname || user.nickname; // 기존 닉네임 유지;
         user.location = location || user.location; // 기존 위치 유지
@@ -68,6 +73,8 @@ app.post('/api/auth/kakao/register', async (req, res) => {
         user.salary = salary !== undefined ? salary : user.salary; // salary가 주어지면 업데이트
         user.isUpdate = true;
         await user.save();
+        userFavorite.nickname = nickname || userFavorite.nickname;
+        await userFavorite.save()
         return res.status(200).json({ message: 'User updated successfully' });
     } else {
         // 오류 반환
@@ -90,6 +97,123 @@ app.post('/api/auth/info', async (req,res)=> {
     return res.status(500).json({ error: 'Database error' });
   }
 })
+
+app.post('/api/favorites/get', async (req,res) => {
+  const { kakaoId, nickname } = req.body; 
+  try{
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+    res.json(userFavorite)
+  }catch(error){
+    return res.status(500).json({ error: 'Database error' });
+  }
+})
+
+app.post('/api/favorites/add', async (req, res) => {
+  const { kakaoId, nickname, id, type } = req.body; 
+  try {
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+
+    if (type === 'jasose') {
+      userFavorite.data.jasose.push(id);
+    } else if (type === 'myeonjoeb') {
+      userFavorite.data.myeonjoeb.push(id);
+    } else if (type === 'employment') {
+      userFavorite.data.employment.push(id);
+    }
+
+    await userFavorite.save();
+    return res.status(200).json({ message: 'Favorite added successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+app.post('/api/favorites/remove', async (req, res) => {
+  const { kakaoId, nickname, id, type } = req.body; 
+
+  try {
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+
+    if (type === 'jasose') {
+      userFavorite.data.jasose.pull(id);
+    } else if (type === 'myeonjoeb') {
+      userFavorite.data.myeonjoeb.pull(id);
+    } else if (type === 'employment') {
+      userFavorite.data.employment.pull(id);
+    }
+
+    await userFavorite.save();
+    return res.status(200).json({ message: 'Favorite removed successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+
+app.post('/api/jasose/save', async (req, res) => {
+  const { kakaoId, nickname, jasose, keyJasose, job, keyword } = req.body;
+
+  try {
+    const newJasose = new Jasose({
+      kakaoId,
+      nickname,
+      data: {
+        jasose,
+        keyJasose,
+        job,
+        keyword
+      },
+      time: Date.now() // 전달된 시간이 없을 경우 현재 시간을 기본값으로 사용
+    });
+
+    await newJasose.save();
+    res.status(200).json({ success: true, message: '자기소개서가 저장되었습니다.' });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/jasose/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body; // req.body 대신 req.query를 사용하는 것이 더 일반적일 수 있습니다.
+  
+  try {
+    // 조건에 맞는 문서를 검색하고 최신순으로 정렬
+    let query = {};
+
+    // kakaoId와 nickname이 있을 경우에만 조건을 추가
+    if (kakaoId) query.kakaoId = kakaoId;
+    if (nickname) query.nickname = nickname;
+
+    let jasose = await Jasose.find(query).sort({ time: -1 }); // time을 기준으로 내림차순 정렬
+
+    if(!jasose){
+      return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+    }
+    res.status(200).json({ success: true, data: jasose });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+
 
 // 레벨별 그룹화 반환
 app.get('/api/problem/level', async (req, res) => {
@@ -238,4 +362,6 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
 
 
 const port = 5000;
-app.listen(port, () => console.log(`${port}`));
+app.listen(port, () => {
+  console.log(`${port}`)
+});
