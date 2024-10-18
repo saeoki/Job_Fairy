@@ -9,7 +9,7 @@ export const LoginToast = () => {
         toast: true,
         position: 'center-center',
         showConfirmButton: false,
-        timer: 1000,
+        timer: 500,
         timerProgressBar: true
     });
 };
@@ -85,6 +85,19 @@ export const ModifySuccessToast = () => {
         position: 'center-center',
         showConfirmButton: false,
         timer: 2000,
+        timerProgressBar: true
+    });
+};
+
+export const SaveSuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '저장 완료!',
+        text: "리포트페이지에서 확인하실 수 있습니다.",
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 1000,
         timerProgressBar: true
     });
 };

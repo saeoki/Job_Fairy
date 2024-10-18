@@ -12,7 +12,12 @@ import { LoginErrorToast } from "../../../components/ToastMessage";
 
 function Self_introduction(){
 
-  const { isLoggedIn } = useContext(AuthContext);
+  const token = localStorage.getItem('token');
+
+  if(!token){
+    LoginErrorToast()
+  }
+
   const [isInput, setIsInput] = useState(false);
 
   const [infoList, setInfoList] = useState({
@@ -21,9 +26,7 @@ function Self_introduction(){
     addContent:""
   })
 
-  if(!isLoggedIn){
-    LoginErrorToast()
-  }
+  
 
 
   return(

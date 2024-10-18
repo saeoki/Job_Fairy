@@ -6,7 +6,7 @@ import { Button } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import {jwtDecode} from 'jwt-decode';
-import { RegisterSuccessToast } from "../../../components/ToastMessage";
+import { ErrorToast, RegisterSuccessToast } from "../../../components/ToastMessage";
 
 function Body(){
 
@@ -48,7 +48,8 @@ function Body(){
               window.location.href = '/';
             }, 2000); // 2000ms = 2초 후에 리다이렉션
         } catch (error) {
-            console.error('Error:', error);
+            ErrorToast(20)
+            console.log(error)
         }
     }
 
