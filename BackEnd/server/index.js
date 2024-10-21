@@ -191,7 +191,7 @@ app.post('/api/jasose/save', async (req, res) => {
   }
 });
 
-app.get('/api/jasose/get', async (req, res) => {
+app.post('/api/jasose/get', async (req, res) => {
   const { kakaoId, nickname } = req.body; // req.body 대신 req.query를 사용하는 것이 더 일반적일 수 있습니다.
   
   try {
@@ -210,6 +210,29 @@ app.get('/api/jasose/get', async (req, res) => {
     res.status(200).json({ success: true, data: jasose });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/jasose/remove', async (req, res) => {
+  const { kakaoId, nickname, id } = req.body;
+
+  try {
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    // 해당 조건으로 데이터 삭제
+    const result = await Jasose.findOneAndDelete({
+      kakaoId: kakaoId,
+      nickname: nickname,
+      _id: objectId
+    });
+
+    if (result) {
+      return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: '데이터베이스 오류' });
   }
 });
 

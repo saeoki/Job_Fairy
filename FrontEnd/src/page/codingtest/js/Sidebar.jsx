@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Link } from 'react-router-dom';
 
+const BackendIP = process.env.REACT_APP_EC2_IP
+
 const Sidebar = () => {
     const [problemsByLevel, setProblemsByLevel] = useState([]);
     const [filteredProblems, setFilteredProblems] = useState([]);
@@ -14,7 +16,8 @@ const Sidebar = () => {
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/problem/level');
+                // const response = await fetch('http://localhost:5000/api/problem/level');
+                const response = await fetch(`${BackendIP}/api/problem/level`);
                 const data = await response.json();
                 setProblemsByLevel(data);
                 setFilteredProblems(data); // 기본적으로 모든 문제를 필터링 목록에 설정

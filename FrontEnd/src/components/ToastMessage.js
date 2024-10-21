@@ -101,3 +101,14 @@ export const SaveSuccessToast = () => {
         timerProgressBar: true
     });
 };
+
+export const RemoveJasoseReportToast = ({func}) => {
+    Swal.fire({
+        icon: 'warning',
+        title: `정말 삭제하시겠습니까?`,
+        position: 'center-center',
+        showConfirmButton: true, 
+        confirmButtonText: '확인',
+        preConfirm: func
+    });
+}

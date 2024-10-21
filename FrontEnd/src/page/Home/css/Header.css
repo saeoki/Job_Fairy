@@ -30,7 +30,10 @@
         width: 110px;
         margin-top: 1vh;
     }
-    
+    @media screen and (max-width: 480px){
+        width: 80px;
+        margin-top: 3vh;
+    }
 }
     
     /* 가운데 열 스타일 */
@@ -61,6 +64,9 @@
 .center > * > img{
     width: 200px;
     user-select: none;
+    @media screen and (max-width: 480px){
+        width: 160px;
+    }
 }
 
   /* 오른쪽 열 스타일 */
@@ -71,10 +77,16 @@
     align-content: center;
     justify-content: center;
     width: 20vw;
+    @media screen and (max-width: 480px){
+        margin-right: 10px;
+    }
 }
 
 .right > .btn_box {
     margin-top: 6vh;
+    @media screen and (max-width: 480px){
+        margin-top: 4vh;
+    }
 }
 
 .right > .btn_box > * {
@@ -98,9 +110,18 @@
         font-size: 0.65rem;
         margin-top: 2px;
     }
+    @media screen and (max-width: 480px){
+        max-width: 90px;
+        font-size: 0.6rem;
+    }
 }
 
 .login_box{
     width: fit-content;
     margin-top: 40px;
+    @media screen and (max-width: 480px){
+        max-width: 90px;
+        font-size: 0.5rem;
+        margin-top: 20px;
+    }
 }

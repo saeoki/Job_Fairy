@@ -16,6 +16,8 @@ import LocationSelector from "../../Register/js/location";
 import SalarySlider from "../../Register/js/slider"
 import {ModifySuccessToast} from "../../../components/ToastMessage"
 
+const BackendIP = process.env.REACT_APP_EC2_IP
+
 const Body = () => {
     const token = localStorage.getItem('token');
     const userData = jwtDecode(token);
@@ -36,7 +38,8 @@ const Body = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.post('http://localhost:5000/api/auth/info', 
+                // const response = await axios.post('http://localhost:5000/api/auth/info', 
+                const response = await axios.post(`${BackendIP}/api/auth/info`, 
                     { kakaoId }, // 객체 형태로 감싸기
                     { withCredentials: true } // 크로스 도메인 요청 시 쿠키를 포함
                 );
@@ -69,7 +72,8 @@ const Body = () => {
     const handleConfirm = async () => {
         setOpen(false);
         try {
-            const response = await fetch('http://localhost:5000/api/auth/kakao/register', {
+            // const response = await fetch('http://localhost:5000/api/auth/kakao/register', {
+            const response = await fetch(`${BackendIP}/api/auth/kakao/register`, {
                 method: 'POST',
                 credentials: 'include', // 필요 시 추가
                 headers: {

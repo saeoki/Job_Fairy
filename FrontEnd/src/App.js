@@ -21,6 +21,8 @@ import { AuthProvider } from './context/AuthContext';
 import Itap from './page/ITAP/js/Itap';
 import CondingTest from './page/codingtest/js/CodingTest';
 
+import "./App.css"
+
 function App() {
 
   return (
