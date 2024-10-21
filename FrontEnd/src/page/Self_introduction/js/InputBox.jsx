@@ -14,9 +14,13 @@ const InputBox = ({isCheck, setInfoList}) => {
   const programmerList = [
     { title: '프론트엔드'},
     { title: '벡엔드'},
-    { title: '인공지능'},
-    { title: '네트워크'},
-    { title: '펌웨어'},
+    { title: '풀스택'},
+    { title: '데브옵스'},
+    { title: '데이터 엔지니어'},
+    { title: '데이터 사이언티스트'},
+    { title: 'AI 엔지니어'},
+    { title: '모바일 앱'},
+    { title: '시스템 엔지니어'},
   ];
   
   const jobInputHandler = (value) => {

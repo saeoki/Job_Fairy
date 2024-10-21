@@ -8,6 +8,8 @@ import { CallGPT, GPT_keyword } from "./chat";
 import {jwtDecode} from 'jwt-decode';
 import { ErrorToast, SaveSuccessToast } from "../../../components/ToastMessage"
 
+const BackendIP = process.env.REACT_APP_EC2_IP
+
 const Outputpage = ({ infoList }) => {
 
   const token = localStorage.getItem('token');
@@ -53,7 +55,8 @@ const Outputpage = ({ infoList }) => {
 
   const handleSave = async () => {
     try {
-        const response = await fetch('http://localhost:5000/api/jasose/save', {
+        // const response = await fetch('http://localhost:5000/api/jasose/save', {
+          const response = await fetch(`${BackendIP}/api/jasose/save`, {
             method: 'POST',
             credentials: 'include', // 필요 시 추가
             headers: {

@@ -56,3 +56,8 @@
         }
     }
 }
+
+#content_delbtn{
+    float: right;
+    margin-bottom: 1%;
+}

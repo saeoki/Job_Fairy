@@ -18,6 +18,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-top: 2vh;
 }
 
 
@@ -34,7 +35,7 @@
     display: flex;
     flex-direction: column; /* 요소들을 세로로 배치 */
     align-items: center; /* 가운데 정렬 */
-    padding-top: 2vh;
+    padding: 2vh 0;
 }
 
 /* Input Textarea */
@@ -81,7 +82,7 @@
 
 .additional-textarea-box {
     min-width: 370px;
-    height: 10vh;
+    height: 15vh;
     max-height: 80px;
     resize: none;
     max-height: 400px;

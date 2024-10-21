@@ -30,5 +30,8 @@ export const Theme = createTheme({
       { tag: t.bool, color: '#a16a94' },
       { tag: t.keyword, color: '#c38fe5' },
       { tag: t.bracket, color: '#ffffff' },
+      { tag: t.separator, color: '#ffffff' },
+      { tag: t.definitionOperator, color: '#ffffff' },
+      { tag: t.compareOperator, color: '#ffffff' },
     ],
 });

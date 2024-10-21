@@ -16,6 +16,8 @@ import { javascript } from '@codemirror/lang-javascript';
 import { Theme } from "./Theme";
 import Sidebar from "./Sidebar";
 
+const BackendIP = process.env.REACT_APP_EC2_IP
+
 const CondingTest = () => {
 
     const location = useLocation();
@@ -33,7 +35,8 @@ const CondingTest = () => {
     setSidebarOpen(!sidebarOpen);
   };
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/problem/${problemNo}`)
+    // axios.get(`http://localhost:5000/api/problem/${problemNo}`)
+    axios.get(`${BackendIP}/api/problem/${problemNo}`)
       .then(response => {
         setProblem(response.data);
         setIsClick(false)

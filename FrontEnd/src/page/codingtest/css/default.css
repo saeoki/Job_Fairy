@@ -172,7 +172,7 @@ body {
   /* 반응형 디자인 */
   @media (max-width: 768px) {
     .current-problem {
-      flex-direction: column;
+      /* flex-direction: column; */
       align-items: flex-start;
     }
   
@@ -206,17 +206,19 @@ body {
   }
   
   @media (max-width: 480px) {
-    .navbar-content {
-      font-size: 16px;
-    }
   
     .current-problem-title {
+      margin-top: 5px;
       font-size: 16px;
     }
   
     .run-code-button {
       font-size: 14px;
       padding: 8px 16px;
+    }
+    .logo{
+      width: 40px;
+      height: 40px;
     }
   }
   

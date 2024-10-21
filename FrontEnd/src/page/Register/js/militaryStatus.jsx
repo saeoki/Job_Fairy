@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Box, Typography } from '@mui/material';
+import { Button, Box } from '@mui/material';
 
 const MilitaryStatus = ({registerList, setRegisterList}) => {
   const [selectedStatus, setSelectedStatus] = useState(registerList.military);
