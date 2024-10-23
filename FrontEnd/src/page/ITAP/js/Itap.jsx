@@ -121,7 +121,10 @@ const Itap = () => {
   return (
     <div className="ITAP_container">
       <div className="container" id="ITAP">
-        <div>
+      <div className="home">
+        home
+      </div>
+        {/* <div> */}
       {currentStep === 'main' && (
         <section
           id="main"
@@ -184,7 +187,7 @@ const Itap = () => {
         </button>
         </section>
       )}
-    </div>
+    {/* </div> */}
     </div>
     </div>
   );

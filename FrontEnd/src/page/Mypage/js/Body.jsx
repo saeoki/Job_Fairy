@@ -83,8 +83,8 @@ const Body = () => {
             });
             ModifySuccessToast();
             setTimeout(() => {
-              window.location.href = '/Mypage';
-            }, 1500); // 2초 후에 마이페이지로 리다이렉션 하여 수정된 정보 확인
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             console.error('Error:', error);
         }
