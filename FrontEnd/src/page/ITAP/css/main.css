@@ -1,9 +1,14 @@
 #main{
     background-color: whitesmoke;
     width: 80%;
+    height: auto;
     text-align: center;
     border-radius: 20px;
   }
+
+.home{
+  text-align: center;
+}
 
   p{
     font-size: 30px;
@@ -23,6 +28,6 @@
   }
 
   .mainImg {
-    max-width: 100%;
+    max-width: 80%;
     height: auto;
   }

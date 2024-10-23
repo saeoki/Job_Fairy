@@ -49,14 +49,13 @@ const Jasose = () => {
     useEffect(() => {
         const fetchJasoseData = async () => {
             try {
-                // const jasoseResponse = await axios.post('http://localhost:5000/api/jasose/get', 
-                const jasoseResponse = await axios.post(`${BackendIP}/api/jasose/get`, 
-                    
+                const jasoseResponse = await axios.post('http://localhost:5000/api/jasose/get', 
+                // const jasoseResponse = await axios.post(`${BackendIP}/api/jasose/get`, 
                     { kakaoId, nickname },
                     { withCredentials: true }
                 );
-                // const favoriteResponse = await axios.post('http://localhost:5000/api/favorites/get', 
-                const favoriteResponse = await axios.post(`${BackendIP}/api/favorites/get`, 
+                const favoriteResponse = await axios.post('http://localhost:5000/api/favorites/get', 
+                // const favoriteResponse = await axios.post(`${BackendIP}/api/favorites/get`, 
                     { kakaoId, nickname }, 
                     { withCredentials: true } 
                 );
@@ -91,6 +90,8 @@ const Jasose = () => {
         } catch (error) {
             if (error.response && error.response.status !== 404) {
                 ErrorToast(32);
+            } else {
+                ErrorToast(99)
             }
         }
     };
@@ -103,10 +104,9 @@ const Jasose = () => {
         setIsModalOpen(true); 
     };
 
-    // Confirm deletion and close modal
     const confirmDelete = () => {
         removeJasoseReport(deleteId);
-        setIsModalOpen(false); // Close modal
+        setIsModalOpen(false);
     };
 
     return (
@@ -171,12 +171,12 @@ const Jasose = () => {
                     </div>
                 )}
             </div>
-
-            {/* Modal for deletion confirmation */}
             <Modal
                 title="삭제 확인"
                 open={isModalOpen}
+                centered
                 onOk={confirmDelete}  // Confirm deletion
+                okType='danger'
                 onCancel={() => setIsModalOpen(false)}  // Close modal
                 okText="삭제"
                 cancelText="취소"

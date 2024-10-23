@@ -197,7 +197,7 @@ app.post('/api/jasose/save', async (req, res) => {
 });
 
 app.post('/api/jasose/get', async (req, res) => {
-  const { kakaoId, nickname } = req.body; // req.body 대신 req.query를 사용하는 것이 더 일반적일 수 있습니다.
+  const { kakaoId, nickname } = req.body;
   
   try {
     // 조건에 맞는 문서를 검색하고 최신순으로 정렬
