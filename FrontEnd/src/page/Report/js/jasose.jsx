@@ -49,13 +49,13 @@ const Jasose = () => {
     useEffect(() => {
         const fetchJasoseData = async () => {
             try {
-                const jasoseResponse = await axios.post('http://localhost:5000/api/jasose/get', 
-                // const jasoseResponse = await axios.post(`${BackendIP}/api/jasose/get`, 
+                // const jasoseResponse = await axios.post('http://localhost:5000/api/jasose/get', 
+                const jasoseResponse = await axios.post(`${BackendIP}/api/jasose/get`, 
                     { kakaoId, nickname },
                     { withCredentials: true }
                 );
-                const favoriteResponse = await axios.post('http://localhost:5000/api/favorites/get', 
-                // const favoriteResponse = await axios.post(`${BackendIP}/api/favorites/get`, 
+                // const favoriteResponse = await axios.post('http://localhost:5000/api/favorites/get', 
+                const favoriteResponse = await axios.post(`${BackendIP}/api/favorites/get`, 
                     { kakaoId, nickname }, 
                     { withCredentials: true } 
                 );
