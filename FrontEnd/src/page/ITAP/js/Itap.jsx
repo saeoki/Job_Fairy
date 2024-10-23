@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { qnaList, infoList } from "./data"; // 데이터 파일 경로에 따라 수정해야 합니다.
+import { qnaList, infoList } from "./data"; 
+import {HomeFilled} from '@ant-design/icons'
+import { Link } from "react-router-dom";
 import "../css/main.css";
 import "../css/default.css";
 import "../css/animation.css";
@@ -121,21 +123,24 @@ const Itap = () => {
   return (
     <div className="ITAP_container">
       <div className="container" id="ITAP">
-      <div className="home">
-        home
+      <div className="home mt-3">
+        <Link to="/" className="home_link">
+          <HomeFilled className="home_img"/> 
+          <span id="back">돌아가기</span>
+          </Link>
       </div>
         {/* <div> */}
       {currentStep === 'main' && (
         <section
           id="main"
-          className={`mx-auto my-5 py-5 px-3 ${currentStep === 'main' ? fadeIn : fadeOut}`}
+          className={`mx-auto mt-2 mb-5 pt-4 pb-5 px-3 ${currentStep === 'main' ? fadeIn : fadeOut}`}
         >
           <h2 className="pp"><i className="red">I</i><i className="blue">T</i><i className="green">A</i><i className="purple">P</i></h2>
           <p>IT Aptitude Profile ; IT 직무 적성검사</p>
           <div>
             <img src="/images/sub/main.png" className="mainImg"/>
           </div>
-          <br /><br />
+          <br />
           <p>
             나와 어울리는 IT 직무 찾기! <br />
             아래 시작하기 버튼을 눌러 시작해 주십시오.
@@ -153,7 +158,7 @@ const Itap = () => {
           <div className="statusBar">
             {/* 상태 바 내용 */}
           </div>
-          <div className="qBox my-5 py-3 mx-auto">
+          <div className="qBox my-3 py-3 mx-auto">
             <p>{qnaList[qIdx].q}</p>
             <div className="answerBox">
               {answers.map((answerObj, index) => (
@@ -173,7 +178,7 @@ const Itap = () => {
       {currentStep === 'result' && (
         <section
           id="result"
-          className={`mx-auto my-5 py-5 px-3 ${currentStep === 'result' ? fadeIn : fadeOut}`}
+          className={`mx-auto mt-2 mb-5 py-5 px-3 ${currentStep === 'result' ? fadeIn : fadeOut}`}
         >
         <h2 className="resultTitle"></h2>
         <div className="resultImg" id="resultImg"></div>
