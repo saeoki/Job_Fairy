@@ -1,25 +1,18 @@
 import requests
 import json
-from datetime import datetime
-from dotenv import load_dotenv
 import os
 import time
 from google.cloud import storage
 from google.cloud import bigquery
 from google.cloud.bigquery import SourceFormat
 
+from airflow import DAG
+from airflow.decorators import task
+from datetime import datetime, timedelta
 
-load_dotenv('/')
-access_key=os.getenv('SARAMIN_API_KEY')
 
+access_key='my_saramin_api'
 
-def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
-
-    blob.upload_from_filename(source_file_name)
-    print(f"File {source_file_name} uploaded to {destination_blob_name} in bucket {bucket_name}.")
 
 # 재귀적으로 딕셔너리의 키에서 '-'를 '_'로 바꾸는 함수
 def replace_hyphens(obj):
@@ -35,7 +28,7 @@ def replace_hyphens(obj):
         return obj
 
 # fetch만을 위한 함수객체
-def fetch_jobs(start, count, bbs_gb=None) :
+def fetch(start, count, bbs_gb=None) :
     url = 'https://oapi.saramin.co.kr/job-search'
     params = {
         'access-key' : access_key,
@@ -57,9 +50,10 @@ def fetch_jobs(start, count, bbs_gb=None) :
     else :
         print(f"Error : {response.status_code}, {response.text}")
         return None
-    
-# 위의 fetch_jobs를 사용하는 메인급 호출함수
-def fetch_and_save_jobs(public_total_results, non_public_total_results, local_file, max_count) :
+
+# 위의 fetch를 사용하는 메인급 호출함수
+@task
+def extract_jobs(public_total_results, non_public_total_results, local_file, max_count) :
     first_batch = True
     job_ids_set = set() # 중복 방지 체크를 위한 id set
 
@@ -68,7 +62,7 @@ def fetch_and_save_jobs(public_total_results, non_public_total_results, local_fi
 
     # 공채 데이터 fetch
     for start in range(0, public_total_results, 1) :
-        public_data = fetch_jobs(start = start, count = max_count, bbs_gb = 1)
+        public_data = fetch(start = start, count = max_count, bbs_gb = 1)
         if public_data and 'jobs' in public_data and 'job' in public_data['jobs'] :
             jobs = public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
             if not jobs:
@@ -106,7 +100,7 @@ def fetch_and_save_jobs(public_total_results, non_public_total_results, local_fi
         
     # 비공채 데이터 fetch
     for start in range(0, non_public_total_results, 1) :
-        non_public_data = fetch_jobs(start = start, count = max_count, bbs_gb = None)
+        non_public_data = fetch(start = start, count = max_count, bbs_gb = None)
         if non_public_data and 'jobs' in non_public_data and 'job' in non_public_data['jobs'] :
             jobs = non_public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
             if not jobs :
@@ -145,10 +139,97 @@ def fetch_and_save_jobs(public_total_results, non_public_total_results, local_fi
         f.write(']')
 
 
-public_initial_data = fetch_jobs(start=0, count=1, bbs_gb=1)
-non_public_initial_data = fetch_jobs(start=0, count=1)
+# JSON to NDJSON
+@task
+def transform_json(local_file) :
+    with open(local_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
-if public_initial_data and non_public_initial_data :
+    with open(local_file, 'w', encoding='utf-8') as f:
+        for entry in data:
+            json.dump(entry, f, ensure_ascii=False) # ensure_ascii옵션 설정을 안하면 한글이 다른 문자열로 변환됨
+            f.write('\n')
+
+
+
+# Upload file to GCS and remove os file
+@task
+def load_to_gcs(local_file) :
+    storage_client = storage.Client()
+    bucket_name = 'jobfairy-gcs'
+    destination_blob_name = local_file
+    
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(local_file)
+    
+    print(f"File {local_file} uploaded to {destination_blob_name} in bucket {bucket_name}.")
+    
+    os.remove(local_file)
+    print(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
+    
+    return (bucket_name, destination_blob_name)
+
+
+# GCS to BigQuery
+@task
+def bulkload_to_bigquery(bucket_info) :
+    project_id = 'eloquent-vector-423514-s2'
+    dataset_id = 'raw_data'
+    table_id = 'all_job_posting' # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
+    gcs_bucket_name, gcs_file_name = bucket_info
+    gcs_uri = f"gs://{gcs_bucket_name}/{gcs_file_name}"
+
+    # BigQuery 클라이언트 생성
+    bigquery_client = bigquery.Client(project=project_id)
+
+    # LoadJobConfig 생성
+    job_config = bigquery.LoadJobConfig(
+        source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
+        autodetect=True,  # 자동으로 스키마 감지 (옵션)
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+    )
+
+    # 데이터셋과 테이블 참조 생성
+    table_ref = f"{project_id}.{dataset_id}.{table_id}"
+
+    # GCS에서 BigQuery로 데이터 로드
+    load_job = bigquery_client.load_table_from_uri(
+        gcs_uri,
+        table_ref,
+        job_config=job_config,
+    )  # API 요청
+
+    print(f"Loading data from {gcs_uri} into {table_ref}")
+
+    # 작업 완료 대기를 위함
+    load_job.result()
+
+    # 로드된 테이블 정보 확인
+    destination_table = bigquery_client.get_table(table_ref)
+    print(f"Loaded {destination_table.num_rows} rows into {table_ref}.")
+
+
+default_args = {
+    'owner': 'sewook',
+    'start_date': datetime(2024, 10, 1),
+    'email': ['dnrtp9256@gmail.com'],
+    'email_on_failure': True,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    dag_id='jobpostings_ETL',
+    tags=['saramin_api'],
+    default_args=default_args,
+    schedule_interval='0 0 * * *',
+    catchup=False,
+) as dag: 
+
+    public_initial_data = fetch(start=0, count=1, bbs_gb=1)
+    non_public_initial_data = fetch(start=0, count=1)
+
     public_total_results = int(public_initial_data['jobs']['total'])
     non_public_total_results = int(non_public_initial_data['jobs']['total'])
     print(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
@@ -156,68 +237,7 @@ if public_initial_data and non_public_initial_data :
     today_date = datetime.now().strftime("%Y%m%d")
     local_file = f'all_jobs_saramin_{today_date}.json'
 
-    fetch_and_save_jobs(public_total_results, non_public_total_results, local_file, max_count=110)
-
-else : 
-    print('Failed to fetch initial data')
-
-
-
-# JSON to NDJSON
-with open(local_file, 'r', encoding='utf-8') as f:
-    data = json.load(f)
-
-with open(local_file, 'w', encoding='utf-8') as f:
-    for entry in data:
-        json.dump(entry, f, ensure_ascii=False) # ensure_ascii옵션 설정을 안하면 한글이 다른 문자열로 변환됨
-        f.write('\n')
-
-
-# Upload file to GCS
-bucket_name = 'jobfairy-gcs'
-destination_blob_name = local_file
-upload_to_gcs(bucket_name, local_file, destination_blob_name)
-os.remove(local_file)
-print(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
-
-
-
-
-# GCS to BigQuery
-# 설정 변수
-project_id = os.getenv('BIGQUERY_PROJECT_ID')
-dataset_id = os.getenv('BIGQUERY_DATASET_ID')
-table_id = os.getenv('BIGQUERY_TABLE_ID') # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
-gcs_bucket_name = bucket_name
-gcs_file_name = destination_blob_name
-gcs_uri = f"gs://{gcs_bucket_name}/{gcs_file_name}"
-
-# BigQuery 클라이언트 생성
-bigquery_client = bigquery.Client(project=project_id)
-
-# LoadJobConfig 생성
-job_config = bigquery.LoadJobConfig(
-    source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
-    autodetect=True,  # 자동으로 스키마 감지 (옵션)
-    write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
-)
-
-# 데이터셋과 테이블 참조 생성
-table_ref = f"{project_id}.{dataset_id}.{table_id}"
-
-# GCS에서 BigQuery로 데이터 로드
-load_job = bigquery_client.load_table_from_uri(
-    gcs_uri,
-    table_ref,
-    job_config=job_config,
-)  # API 요청
-
-print(f"Loading data from {gcs_uri} into {table_ref}")
-
-# 작업 완료 대기
-load_job.result()
-
-# 로드된 테이블 정보 확인
-destination_table = bigquery_client.get_table(table_ref)
-print(f"Loaded {destination_table.num_rows} rows into {table_ref}.")
-
+    extract_jobs(public_total_results, non_public_total_results, local_file, max_count=110)
+    transform_json(local_file)
+    bucket_info = load_to_gcs(local_file)
+    bulkload_to_bigquery(bucket_info) # *: 튜플 언패킹, 튜플로 오는 반환값을 언패킹해 bulkload_to_bigquery에 인자로써 온전히 전해지게끔 함
