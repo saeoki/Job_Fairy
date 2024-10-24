@@ -21,8 +21,8 @@ const Jasose = () => {
     const [data, setData] = useState([]);
     const [openAccordion, setOpenAccordion] = useState(null);
     const [isFavorite, setIsFavorite] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-    const [deleteId, setDeleteId] = useState(null); // State to store ID of the item to delete
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [deleteId, setDeleteId] = useState(null);
 
     const toggleAccordion = (index) => {
         setOpenAccordion(openAccordion === index ? null : index);
@@ -38,7 +38,8 @@ const Jasose = () => {
 
     const handleFavoriteAction = async (id, action) => {
         try {
-            await axios.post(`http://localhost:5000/api/favorites/${action}`, { 
+            // await axios.post(`http://localhost:5000/api/favorites/${action}`, { 
+            await axios.post(`${BackendIP}/api/favorites/${action}`, {
                 kakaoId, nickname, id, type: "jasose"
             });
         } catch (error) {
@@ -82,10 +83,11 @@ const Jasose = () => {
         try {
             // const response = await axios.post('http://localhost:5000/api/jasose/remove', { kakaoId, nickname, id });
             const response = await axios.post(`${BackendIP}/api/jasose/remove`, { kakaoId, nickname, id });
+            console.log(response.status)
             if (response.status === 200) {
                 // Remove the deleted item from the state
                 setData(prevData => prevData.filter(item => item._id !== id));
-                RemoveJasoseReportToast(); // Show success toast
+                RemoveJasoseReportToast()
             }
         } catch (error) {
             if (error.response && error.response.status !== 404) {
@@ -126,7 +128,7 @@ const Jasose = () => {
                                         aria-expanded={openAccordion === index}
                                         data-bs-target={`#collapse${index}`} 
                                         aria-controls={`collapse${index}`} >
-                                    <div onClick={() => toggleFavorite(index)}>
+                                    <div onClick={() => toggleFavorite(index)} >
                                         {isFavorite[index] ? (
                                             <FavoriteIcon style={{ color: 'red' }} />
                                         ) : (

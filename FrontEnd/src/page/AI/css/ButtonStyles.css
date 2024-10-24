@@ -1,16 +1,22 @@
 /* 부모 요소 공통 스타일 */
-.camcheck-box, .interview-start-box {
-    width: 100%; /* 부모 요소의 너비를 동일하게 설정 */
+.camcheck-box{
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 30px;
 }
+.interview-start-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /* 버튼 공통 스타일 */
 .custom-button {
-    width: 60%; /* 버튼 너비를 동일하게 설정 */
-    max-width: 300px; /* 최대 너비를 설정하여 너무 커지지 않도록 제한 */
+    width: max-content;
+    max-width: 300px;
     padding: 15px;
     font-size: 18px;
     font-weight: bold;
