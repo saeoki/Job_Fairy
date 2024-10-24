@@ -11,6 +11,11 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config(); // .env 파일 로드
 const { JobPosting } = require("./models/JobPosting")
+const ObjectId = require('mongoose').Types.ObjectId;
+
+const getCreationDateFromId = (id) => {
+  return new Date(new ObjectId(id).getTimestamp());
+};
 
 
 const app = express();
@@ -358,6 +363,12 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    const jobPostingsWithCreationDate = jobPostings.map(job => ({
+      ...job.toObject(),
+      creationDate: getCreationDateFromId(job._id)
+    }));
+
+
     if (jobPostings.length === 0) {
       return res.status(200).json({
         jobPostings: [],
@@ -368,7 +379,7 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     }
 
     res.status(200).json({
-      jobPostings,
+      jobPostings: jobPostingsWithCreationDate,
       currentPage: page,
       totalPages: Math.ceil(total / limit),
       totalItems: total
