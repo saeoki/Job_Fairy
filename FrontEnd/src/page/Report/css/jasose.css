@@ -19,9 +19,12 @@
 }
 
 #empty_img{
-    width: 100%;
+    width: 80%;
     height: auto;
 
+    @media (max-width: 1366px) {
+        width: 100%;
+    }
 }
 
 #createJasose_button{
@@ -54,5 +57,13 @@
         p{
             font-size: 0.7rem;
         }
+    }
+}
+
+#content_delbtn{
+    float: right;
+    margin-bottom: 5px;
+    @media (max-width: 1366px) {
+        margin-bottom: 1%;
     }
 }

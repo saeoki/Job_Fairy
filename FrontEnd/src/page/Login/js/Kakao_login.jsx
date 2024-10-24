@@ -3,9 +3,9 @@ import React, { useEffect, useContext } from 'react';
 
 import { AuthContext } from "../../../context/AuthContext"
 import { LoginToast, ErrorToast } from '../../../components/ToastMessage';
-
 import "../css/Body.css"
 
+const BackendIP = process.env.REACT_APP_EC2_IP
 
 // 엑세스 토큰을 발급받고, 아래 함수를 호출시켜서 사용자 정보를 받아옴.
 function getInfo(login) {
@@ -15,7 +15,8 @@ function getInfo(login) {
         success: function (res) {
             // console.log(res);
 
-            fetch('http://localhost:5000/api/auth/kakao', {
+            // fetch('http://localhost:5000/api/auth/kakao', {
+            fetch(`${BackendIP}/api/auth/kakao`, {
                 method: 'POST',
                 credentials: 'include', // 필요 시 추가
                 headers: {
@@ -32,22 +33,21 @@ function getInfo(login) {
                 
                 if (data.token) {
                     LoginToast();
-                    setTimeout( async () => {
-                        await login(data.token); // 로그인 상태 업데이트
-                        window.location.reload(); // 페이지 리로드 (로그인 상태 반영)
-                      }, 500); 
-                    
+                    login(data.token); // 로그인 상태 업데이트
+                    // 서버에서 redirectUrl을 받아서 리다이렉션 처리
+                    if (data.redirectUrl) {
+                    // 해당 URL로 리다이렉션
+                        setTimeout(()=>{
+                            window.location.href = data.redirectUrl; 
+                        },1000)
+                    }else{
+                        setTimeout( async () => {  
+                            window.location.reload(); // 페이지 리로드 (로그인 상태 반영)
+                          }, 500); 
+                    }
                 }
 
-                // 서버에서 redirectUrl을 받아서 리다이렉션 처리
-                if (data.redirectUrl) {
-                    // 해당 URL로 리다이렉션
-                    setTimeout(()=>{
-                        window.location.href = data.redirectUrl; 
-                    },1000)
-                } else{
-                    
-                }
+                
             })
             .catch((error) => {
                 console.error('Error:', error);

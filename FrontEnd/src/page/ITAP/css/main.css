@@ -1,9 +1,29 @@
 #main{
     background-color: whitesmoke;
     width: 80%;
+    height: auto;
     text-align: center;
     border-radius: 20px;
   }
+
+.home{
+  width: 100px;
+  height: max-content;
+  margin: 0 auto;
+  background-color: whitesmoke;
+  border-radius: 20px;
+  text-align: center;
+  .home_link{
+    text-decoration-line: none;
+  }
+  .home_img{
+    margin: auto;
+  }
+  #back{
+    margin-left: 10px;
+    font-size: 1.5rem;
+  }
+}
 
   p{
     font-size: 30px;
@@ -23,6 +43,6 @@
   }
 
   .mainImg {
-    max-width: 100%;
+    max-width: 50%;
     height: auto;
   }

@@ -15,22 +15,28 @@
     /* 왼쪽 열 스타일 */
 .header > .left {
     width: 20vw;
-    @media screen and (max-width: 767px){
-        width: 20vw;
-    }
 }
     
+.header > .left > a {
+    display: inline-block; 
+    width: 110px;
+    height: 110px;
+    @media screen and (max-width: 480px){
+        width: 80px;
+        height: 80px;
+        margin-top: 3vh;
+    }
+}
+
     /* 이미지 스타일 */
 .header > .left > * > img {
     display: block;
-    width: 110px; /* 이미지 너비 조정 */
-    height: auto; /* 이미지의 가로 세로 비율 유지 */
+    width: 110px; 
+    height: auto; 
     user-select: none;
-    @media screen and (max-width: 767px){
-        width: 110px;
-        margin-top: 1vh;
+    @media screen and (max-width: 480px){
+        width: 80px;
     }
-    
 }
     
     /* 가운데 열 스타일 */
@@ -61,6 +67,9 @@
 .center > * > img{
     width: 200px;
     user-select: none;
+    @media screen and (max-width: 480px){
+        width: 160px;
+    }
 }
 
   /* 오른쪽 열 스타일 */
@@ -71,10 +80,16 @@
     align-content: center;
     justify-content: center;
     width: 20vw;
+    @media screen and (max-width: 480px){
+        margin-right: 10px;
+    }
 }
 
 .right > .btn_box {
     margin-top: 6vh;
+    @media screen and (max-width: 480px){
+        margin-top: 4vh;
+    }
 }
 
 .right > .btn_box > * {
@@ -98,9 +113,18 @@
         font-size: 0.65rem;
         margin-top: 2px;
     }
+    @media screen and (max-width: 480px){
+        max-width: 90px;
+        font-size: 0.6rem;
+    }
 }
 
 .login_box{
     width: fit-content;
     margin-top: 40px;
+    @media screen and (max-width: 480px){
+        max-width: 90px;
+        font-size: 0.5rem;
+        margin-top: 20px;
+    }
 }

@@ -8,7 +8,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 
-const InputKeywords = ({ isCheck, setInfoList }) => {
+const InputKeywords = ({ setInfoList }) => {
   const [keywordsList, setKeywordsList] = useState(['']);
 
   const handleAddKeyword = () => {
@@ -62,7 +62,6 @@ const InputKeywords = ({ isCheck, setInfoList }) => {
               <OutlinedInput
                 className="input-textarea-box"
                 value={keyword}
-                disabled={isCheck}
                 onChange={(e) => handleKeywordChange(index, e.target.value)}
                 placeholder={"키워드를 입력해주세요." }
               />

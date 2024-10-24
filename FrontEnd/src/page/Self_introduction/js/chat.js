@@ -28,7 +28,7 @@ export const CallGPT = async (prompt) => {
 
     try {
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
+            model: "gpt-4-turbo",
             messages: messages,
             temperature: 1,
             max_tokens: 1000,

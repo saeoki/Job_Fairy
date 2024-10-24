@@ -21,6 +21,8 @@
 }
 #v-pills-tabContent{
     padding-top: 10px;
+    width: 95%;
+    margin: 0 auto;
 }
 @media (max-width: 767.98px) {
     #v-pills-tab {
@@ -37,6 +39,8 @@
     @media (max-width: 767.98px) {
         border-right: 0;
         border-bottom: 1px solid lightgray;
+        margin-bottom: 5px;
+        height: 55px;
     }
 
 }

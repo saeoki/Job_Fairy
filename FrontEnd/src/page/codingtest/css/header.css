@@ -4,7 +4,7 @@
     background-color: transparent;
     list-style: none;
     display: flex;
-    margin-left: 10px;
+    margin-left: 25px;
 }
 
 @media (max-width: 991px) {
@@ -13,7 +13,20 @@
         top: 0.5rem;
         left: 3.375rem;
     }
+    .breadcrumb{
+        margin-top: 10px;
+    }
 }
+@media (max-width: 480px) {
+    .breadcrumb{
+        margin-left: 15px;
+        margin-top: 5px;
+    }
+    .breadcrumb > li {
+        font-size: 10px;
+    }
+}
+
 ol {
     display: block;
     list-style-type: decimal;

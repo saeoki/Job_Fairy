@@ -8,6 +8,8 @@ import Stack from '@mui/material/Stack';
 import {jwtDecode} from 'jwt-decode';
 import { ErrorToast, RegisterSuccessToast } from "../../../components/ToastMessage";
 
+const BackendIP = process.env.REACT_APP_EC2_IP
+
 function Body(){
 
     const token = localStorage.getItem('token');
@@ -34,7 +36,8 @@ function Body(){
 
     const handleRegister = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/auth/kakao/register', {
+            // const response = await fetch('http://localhost:5000/api/auth/kakao/register', {
+            const response = await fetch(`${BackendIP}/api/auth/kakao/register`, {
                 method: 'POST',
                 credentials: 'include', // 필요 시 추가
                 headers: {

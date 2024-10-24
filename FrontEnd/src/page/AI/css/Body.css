@@ -1,5 +1,5 @@
 #AIinterviewbox {
-    width: 80vw;
+    width: 80%;
     height: auto;
     text-align: center;
     justify-self: center;
@@ -21,7 +21,6 @@
   }
   
   .interview-start-box{
-    margin-bottom: 5vh;
     min-width: auto; 
 
   }

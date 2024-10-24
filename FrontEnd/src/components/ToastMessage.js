@@ -101,3 +101,16 @@ export const SaveSuccessToast = () => {
         timerProgressBar: true
     });
 };
+
+export const RemoveJasoseReportToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '삭제 완료!',
+        text: "정상적으로 삭제되었습니다.",
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true
+    });
+}
