@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -11,17 +12,26 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import '../css/interview_end.css'; // CSS 파일 import
 
-// Chart.js 모듈 등록
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function Interview_chart({ accumulatedEmotions }) {
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+function InterviewResults() {
+  const location = useLocation();
+  const { accumulatedEmotions } = location.state || {};
+
   // 막대 그래프 데이터를 생성하는 함수
   const generateChartData = (data) => {
-    const labels = Object.keys(data);
+    const labels = Object.keys(data).map(key => emotionLabelsInKorean[key] || key); // 영어 라벨을 한국어로 변환
     const values = Object.values(data);
-
     return {
       labels,
       datasets: [
@@ -37,11 +47,11 @@ function Interview_chart({ accumulatedEmotions }) {
   };
 
   return (
-    <Box className="interview-results-container">
-      <Card className="interview-results-card">
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <Card sx={{ minWidth: 700 }}>
         <CardContent>
           <Typography variant="h5" component="div" gutterBottom>
-            면접결과
+            Interview Results
           </Typography>
           {accumulatedEmotions && Object.keys(accumulatedEmotions).length > 0 ? (
             <Bar data={generateChartData(accumulatedEmotions)} />
@@ -56,4 +66,4 @@ function Interview_chart({ accumulatedEmotions }) {
   );
 }
 
-export default Interview_chart;
+export default InterviewResults;

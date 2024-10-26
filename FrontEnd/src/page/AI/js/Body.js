@@ -16,7 +16,6 @@ import Camcheck from "./Camcheck";
 function Body() {
     const [isPersonalityInterviewChecked, setIsPersonalityInterviewChecked] = useState(false);
     const [isTechnicalInterviewChecked, setIsTechnicalInterviewChecked] = useState(false);
-    const [isRecordingChecked, setIsRecordingChecked] = useState(false);
     const [selectedJob, setSelectedJob] = useState(""); // 직무 선택 상태 추가
 
     const handlePersonalityInterviewChange = (event) => {
@@ -27,9 +26,6 @@ function Body() {
         setIsTechnicalInterviewChecked(event.target.checked);
     };
 
-    const handleRecordingChange = (event) => {
-        setIsRecordingChecked(event.target.checked);
-    };
 
     const handleJobChange = (event) => {
         setSelectedJob(event.target.value); // 직무 선택 값 업데이트
@@ -74,21 +70,13 @@ function Body() {
                     )}
                 </div>
 
-                <div className="interview-type-box">
-                    <span> <h5>해당 면접에 대하여<br /> 녹화를 하시겠습니까?</h5> </span>
-                    <FormControlLabel
-                        control={<Checkbox checked={isRecordingChecked} onChange={handleRecordingChange} />}
-                        label=" 녹화 여부"
-                        labelPlacement="start"
-                    />
-                </div>
+
 
                 <Camcheck />
 
                 <StartInterview
                     isPersonalityInterviewChecked={isPersonalityInterviewChecked}
                     isTechnicalInterviewChecked={isTechnicalInterviewChecked}
-                    isRecordingChecked={isRecordingChecked}
                     selectedJob={selectedJob}  // 선택한 직무 값 전달
                 />
             </div>
