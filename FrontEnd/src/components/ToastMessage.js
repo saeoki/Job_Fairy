@@ -114,3 +114,16 @@ export const RemoveJasoseReportToast = () => {
         timerProgressBar: true
     });
 }
+
+export const LoginExpErrorToast = () => {
+    Swal.fire({
+        icon: 'warning',
+        title: '로그인 만료!',
+        text: "로그인 시간이 만료되었습니다.\n다시 로그인해주세요",
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true
+    });
+}

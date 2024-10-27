@@ -98,12 +98,12 @@ const Body = () => {
     const isDisableButton = isNameEmpty || isMilitaryEmpty || isPositionListEmpty || isLocationListEmpty;
 
     if (isLoading) {
-        return <div>Loading...</div>; // 로딩 중일 때 로딩 메시지 또는 스피너
+        return <div>Loading...</div>;
     }
 
     return (
         <div className="register_container">
-            <div className={ismodify ? "register_box" : "register_box_modify"}>
+            <div className={ismodify ? "register_box" : "register_box_modify py-4"}>
                 <div className="modify_btn">
                     {ismodify ? 
                     <Button variant="contained" onClick={handleModify} color="warning">수정하기</Button>
