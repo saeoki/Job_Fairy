@@ -101,7 +101,7 @@ const KakaoLogin = () => {
     return (
         <div>
             <button className="kakao-btn btn-xs" onClick={handleKakaoLogin}>
-                <img src="./images/kakao_login.png" className="kakao-icon" alt="Kakao icon"/>
+                <img src="/images/kakao_login.png" className="kakao-icon" alt="Kakao icon"/>
             </button>
         </div>
     );

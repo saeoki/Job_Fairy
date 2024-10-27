@@ -22,6 +22,7 @@ import Itap from './page/ITAP/js/Itap';
 import CondingTest from './page/codingtest/js/CodingTest';
 
 import "./App.css"
+import CustomJobList from './page/Recruitment/js/CustomJobList';
 
 function App() {
 
@@ -48,6 +49,7 @@ function App() {
 
           <Route path='/Recruitment' element={<Recruitment />} />
           <Route path='/Recruitment/JobPostingList' element={<JobPostingList />} />
+          <Route path='/Recruitment/CustomJobList' element={<CustomJobList />} />
         </Routes>
       </AuthProvider>
     </div> 

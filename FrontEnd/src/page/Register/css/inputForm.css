@@ -37,3 +37,16 @@
 .mili_btn > button {
     margin-left: 1vw;
 }
+
+.position_btn{
+  width: 300px;
+  @media screen and (max-width: 480px){
+    width: 230px
+}
+}
+.location_btn{
+  width: 300px;
+  @media screen and (max-width: 480px){
+    width: 230px
+}
+}

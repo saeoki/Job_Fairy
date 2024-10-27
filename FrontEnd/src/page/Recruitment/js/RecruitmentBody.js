@@ -15,6 +15,10 @@ export default function RecruitmentBody() {
         navigate('/Recruitment/JobPostingList')
     };
 
+    const handleCustomJobClick = () => {
+        navigate('/Recruitment/CustomJobList')
+    };
+
     return (
     <div className="recruitment">
         <div className="recruitment__block_section">
@@ -22,11 +26,11 @@ export default function RecruitmentBody() {
                 <img className="recruitment__image" src="/assets/images/Image.png" alt=""/>
                 <span className="recruitment__subheading">채용공고 찾기</span>
             </div>
-            <div className="recruitment__block">
+            <div className="recruitment__block" >
                 <img className="recruitment__vector" src="/assets/vectors/Vector11_x2.svg" alt="dashboard vector" />
                 <span className="recruitment__subheading">채용 대시보드</span>
             </div>
-            <div className="recruitment__block">
+            <div className="recruitment__block" onClick={handleCustomJobClick}>
                 <img className="recruitment__vector" src="/assets/vectors/Vector_x2.svg" alt="thumb up vector" />
                 <span className="recruitment__subheading">맞춤 공고</span>
             </div>

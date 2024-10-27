@@ -390,7 +390,123 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
   }
 });
 
+app.post("/api/Recruitment/Custom", async (req, res) => {
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
+    const { jobs, locations, salary } = req.body;
+  
+    const query = {};
+  
+    // 직무 필터
+    if (jobs && jobs.length > 0) {
+      const jobMappings = {
+      "프론트엔드": "프론트엔드",
+      "백엔드": "백엔드/서버개발",
+      "풀스택": "웹개발, 백엔드/서버개발, 프론트엔드",
+      "데브옵스": "기술지원, 유지보수",
+      "데이터 엔지니어": "데이터엔지니어, 데이터분석가",
+      "데이터 사이언티스트": "데이터 사이언티스트, DBA",
+      "Ai 엔지니어": "AI(인공지능), 데이터엔지니어",
+      "모바일 앱": "앱개발, 게임개발",
+      "시스템 엔지니어": "SE(시스템엔지니어), 개발PM"
+    };
+
+
+    // 변환된 직무 배열 생성
+    const transformedJobs = new Set(); // 중복 제거를 위한 Set 사용
+
+    jobs.forEach(job => {
+      const mappedJob = jobMappings[job] || job; // 매핑된 직무
+      // 매핑된 직무가 쉼표로 구분된 문자열일 경우 분리하여 Set에 추가
+      mappedJob.split(',').forEach(mapped => transformedJobs.add(mapped.trim()));
+    });
+
+    // Set을 배열로 변환하여 정규식 쿼리 생성
+    query["position.job_code.name"] = {
+      $regex: new RegExp(Array.from(transformedJobs).join('|')), // 중복 제거된 직무로 정규식 생성
+      $options: "i"
+    };
+  }
+
+  // 지역 필터
+  if (locations && locations.length > 0) {
+    query["position.location.name"] = {
+      $regex: new RegExp(locations.join('|')),  // locations 배열을 정규식으로 변환
+      $options: "i"  // 대소문자 구분 없이 검색
+    };
+  }
+
+  // 급여 필터
+  if (salary) {
+    if (salary === 2000) {
+      query["salary.code"] = { $in: [0, 9, 10,11,12,13,14,15,16,17,18,19,20,21,22 ,99] };
+    } else if (salary === 3000) {
+      query["salary.code"] = { $in: [0,11,12,13,14,15,16,17,18,19,20,21,22 ,99] };
+    } else if (salary === 4000) {
+      query["salary.code"] = { $in: [0,16,17,18,19,20,21,22 ,99] };
+    } else if (salary === 5000) {
+      query["salary.code"] = { $in: [0,17,18,19,20,21,22 ,99] };
+    } else if (salary === 6000) {
+      query["salary.code"] = { $in: [0,18,19,20,21,22 ,99] };
+    } else if (salary === 7000) {
+      query["salary.code"] = { $in: [0,19,20,21,22 ,99] };
+    } else if (salary === 8000) {
+      query["salary.code"] = { $in: [0,20,21,22 ,99] };
+    } else if (salary === 9000) {
+      query["salary.code"] = { $in: [0,21,22 ,99] };
+    } else if (salary >= 10000) {
+      query["salary.code"] = { $in: [0, 22 ,99] };
+    } else {
+      query["salary.code"] = { $in: [0, 99] };
+    }
+  }
+
+  const total = await JobPosting.countDocuments(query);
+  
+  const jobPostings = await JobPosting.find(query)
+    .select({
+      "bbs_gb": 1,
+      "company.detail.name": 1,
+      "company.detail.href": 1,
+      "position.location.name": 1,
+      "position.experience_level.name": 1,
+      "position.experience_level.min": 1,
+      "position.experience_level.max": 1,
+      "position.job_code.name": 1,
+      "position.job_mid_code.name": 1,
+      "position.title": 1,
+      "posting_timestamp": 1,
+      "expiration_timestamp": 1,
+      "salary": 1,
+      "url": 1
+    })
+    .skip(skip)
+    .limit(limit);
+  
+
+  if (jobPostings.length === 0) {
+    return res.status(200).json({
+      jobPostings: [],
+      currentPage: page,
+      totalPages: 0,
+      totalItems: 0
+    });
+  }
+
+  res.status(200).json({
+    jobPostings,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalItems: total
+  });
+} catch (err) {
+  console.error(err);
+  res.status(500).json({ message: "채용 정보를 가져오는 중 오류가 발생했습니다.", error: err.message });
+}
+});
 
 
 

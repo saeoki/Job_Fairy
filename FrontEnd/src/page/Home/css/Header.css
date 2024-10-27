@@ -14,7 +14,7 @@
 
     /* 왼쪽 열 스타일 */
 .header > .left {
-    width: 20vw;
+    width: 21vw;
 }
     
 .header > .left > a {
@@ -79,7 +79,7 @@
     margin-bottom: 0.5vh;
     align-content: center;
     justify-content: center;
-    width: 20vw;
+    width: 21vw;
     @media screen and (max-width: 480px){
         margin-right: 10px;
     }
