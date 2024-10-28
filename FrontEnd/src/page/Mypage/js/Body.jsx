@@ -83,8 +83,8 @@ const Body = () => {
             });
             ModifySuccessToast();
             setTimeout(() => {
-              window.location.href = '/Mypage';
-            }, 1500); // 2초 후에 마이페이지로 리다이렉션 하여 수정된 정보 확인
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -98,12 +98,12 @@ const Body = () => {
     const isDisableButton = isNameEmpty || isMilitaryEmpty || isPositionListEmpty || isLocationListEmpty;
 
     if (isLoading) {
-        return <div>Loading...</div>; // 로딩 중일 때 로딩 메시지 또는 스피너
+        return <div>Loading...</div>;
     }
 
     return (
         <div className="register_container">
-            <div className={ismodify ? "register_box" : "register_box_modify"}>
+            <div className={ismodify ? "register_box" : "register_box_modify py-4"}>
                 <div className="modify_btn">
                     {ismodify ? 
                     <Button variant="contained" onClick={handleModify} color="warning">수정하기</Button>

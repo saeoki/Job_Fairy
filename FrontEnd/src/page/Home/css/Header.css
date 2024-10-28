@@ -14,25 +14,28 @@
 
     /* 왼쪽 열 스타일 */
 .header > .left {
-    width: 20vw;
-    @media screen and (max-width: 767px){
-        width: 20vw;
-    }
+    width: 21vw;
 }
     
+.header > .left > a {
+    display: inline-block; 
+    width: 110px;
+    height: 110px;
+    @media screen and (max-width: 480px){
+        width: 80px;
+        height: 80px;
+        margin-top: 3vh;
+    }
+}
+
     /* 이미지 스타일 */
 .header > .left > * > img {
     display: block;
-    width: 110px; /* 이미지 너비 조정 */
-    height: auto; /* 이미지의 가로 세로 비율 유지 */
+    width: 110px; 
+    height: auto; 
     user-select: none;
-    @media screen and (max-width: 767px){
-        width: 110px;
-        margin-top: 1vh;
-    }
     @media screen and (max-width: 480px){
         width: 80px;
-        margin-top: 3vh;
     }
 }
     
@@ -76,7 +79,7 @@
     margin-bottom: 0.5vh;
     align-content: center;
     justify-content: center;
-    width: 20vw;
+    width: 21vw;
     @media screen and (max-width: 480px){
         margin-right: 10px;
     }

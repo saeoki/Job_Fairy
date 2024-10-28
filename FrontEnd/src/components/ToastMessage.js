@@ -102,13 +102,28 @@ export const SaveSuccessToast = () => {
     });
 };
 
-export const RemoveJasoseReportToast = ({func}) => {
+export const RemoveJasoseReportToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '삭제 완료!',
+        text: "정상적으로 삭제되었습니다.",
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true
+    });
+}
+
+export const LoginExpErrorToast = () => {
     Swal.fire({
         icon: 'warning',
-        title: `정말 삭제하시겠습니까?`,
+        title: '로그인 만료!',
+        text: "로그인 시간이 만료되었습니다.\n다시 로그인해주세요",
+        toast: true,
         position: 'center-center',
-        showConfirmButton: true, 
-        confirmButtonText: '확인',
-        preConfirm: func
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true
     });
 }

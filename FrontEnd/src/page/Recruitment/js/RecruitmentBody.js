@@ -15,18 +15,22 @@ export default function RecruitmentBody() {
         navigate('/Recruitment/JobPostingList')
     };
 
+    const handleCustomJobClick = () => {
+        navigate('/Recruitment/CustomJobList')
+    };
+
     return (
     <div className="recruitment">
         <div className="recruitment__block_section">
             <div className="recruitment__block" onClick={handleJobPostingClick}>
-                <img className="recruitment__image" style={{ backgroundImage: 'url("/assets/images/Image2.png")' }} alt=""/>
+                <img className="recruitment__image" src="/assets/images/Image.png" alt=""/>
                 <span className="recruitment__subheading">채용공고 찾기</span>
             </div>
-            <div className="recruitment__block">
+            <div className="recruitment__block" >
                 <img className="recruitment__vector" src="/assets/vectors/Vector11_x2.svg" alt="dashboard vector" />
                 <span className="recruitment__subheading">채용 대시보드</span>
             </div>
-            <div className="recruitment__block">
+            <div className="recruitment__block" onClick={handleCustomJobClick}>
                 <img className="recruitment__vector" src="/assets/vectors/Vector_x2.svg" alt="thumb up vector" />
                 <span className="recruitment__subheading">맞춤 공고</span>
             </div>
@@ -36,49 +40,46 @@ export default function RecruitmentBody() {
             </div>
         </div>
 
-
-        <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
-            <div className="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <div className='carousel_section mb-5'>
+            <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
+                <div className="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+                <div className="carousel-inner">
+                    <div className="carousel-item active">
+                        <img src="/assets/images/slider_image1.png" className="d-block w-100" alt="..."/>
+                        <div className="carousel-caption d-none d-md-block">
+                            {/* <h5>취업의 요정과 함께</h5> */}
+                            <p>취업 올인원</p>
+                        </div>
+                    </div>
+                    <div className="carousel-item">
+                        <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
+                        <div className="carousel-caption d-none d-md-block">
+                            <h5>Second slide label</h5>
+                            <p>Some representative placeholder content for the second slide.</p>
+                        </div>
+                    </div>
+                    <div className="carousel-item">
+                        <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
+                        <div className="carousel-caption d-none d-md-block">
+                            <h5>Third slide label</h5>
+                            <p>Some representative placeholder content for the third slide.</p>
+                        </div>
+                    </div>
+                </div>
+                <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span className="visually-hidden">Previous</span>
+                </button>
+                <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span className="visually-hidden">Next</span>
+                </button>
             </div>
-            <div className="carousel-inner">
-                <div className="carousel-item active">
-                    <img src="/assets/images/slider_image1.png" className="d-block w-100" alt="..."/>
-                    <div className="carousel-caption d-none d-md-block">
-                        <h5>First slide label</h5>
-                        <p>Some representative placeholder content for the first slide.</p>
-                    </div>
-                </div>
-                <div className="carousel-item">
-                    <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
-                    <div className="carousel-caption d-none d-md-block">
-                        <h5>Second slide label</h5>
-                        <p>Some representative placeholder content for the second slide.</p>
-                    </div>
-                </div>
-                <div className="carousel-item">
-                    <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
-                    <div className="carousel-caption d-none d-md-block">
-                        <h5>Third slide label</h5>
-                        <p>Some representative placeholder content for the third slide.</p>
-                    </div>
-                </div>
-            </div>
-            <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Previous</span>
-            </button>
-            <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Next</span>
-            </button>
         </div>
-
-        <br></br>
-        <br></br>
-        
 
         <div className="recruitment__rectangle_section">
             <h2 className="recruitment__heading1"># 최근 공채</h2>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, Chip, Box } from '@mui/material';
 
+import "../css/inputForm.css"
+
 const locations = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 
 const LocationSelector = ({registerList, setRegisterList}) => {
@@ -47,7 +49,7 @@ const LocationSelector = ({registerList, setRegisterList}) => {
 
   return (
     <div>
-      <Button variant="outlined" onClick={handleClickOpen} sx={{width:"300px"}}>
+      <Button className='location_btn' variant="outlined" onClick={handleClickOpen}>
         지역 선택
       </Button>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, marginTop: 2 }}>

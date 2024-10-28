@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip, Box } from '@mui/material';
 
+import "../css/inputForm.css"
+
 const positions = [
   '프론트엔드', '백엔드', '풀스택',
   '데브옵스', '데이터 엔지니어', '데이터 사이언티스트',
@@ -50,8 +52,8 @@ const PositionSelector = ({registerList, setRegisterList}) => {
   };
 
   return (
-    <div>
-      <Button variant="outlined" onClick={handleClickOpen} sx={{width:"300px"}}>
+    <div >
+      <Button className='position_btn' variant="outlined" onClick={handleClickOpen}>
         희망 직무 선택
       </Button>
       <div>

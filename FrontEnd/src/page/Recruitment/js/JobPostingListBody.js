@@ -24,6 +24,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
+
 
 export default function JobPostingListBody() {
   const [jobPostings, setJobPostings] = useState([]);  // 서버에서 가져올 데이터 상태
@@ -67,7 +70,7 @@ export default function JobPostingListBody() {
 
   const fetchJobPostings = async (page, filters = {}) => {
     try {
-      // 개발단계에서는 localhost:5000/api~ 로 변화 보면서 진행
+      // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
       // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
       const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
         method: 'POST',
@@ -105,6 +108,16 @@ export default function JobPostingListBody() {
     if (!timestamp) return ''; // timestamp가 없으면 빈 문자열 반환
     const date = new Date(timestamp * 1000); // timestamp는 초 단위이므로 1000을 곱해 밀리초로 변환
     return date.toLocaleDateString(); // YYYY-MM-DD 형식으로 변환
+  };
+
+  // 도큐먼트 생성 타임스탬프 처리
+  const formatCreationDate = (creationDate) => {
+    if (!creationDate) return ''; // creationDate가 없으면 빈 문자열 반환
+    return new Date(creationDate).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   const formatLocation = (location) => {
@@ -376,11 +389,12 @@ export default function JobPostingListBody() {
 
 
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         {jobPostings.length > 0 && (
           <Typography variant="h6" sx={{ color: '#1976d2' }}>
             총 {totalItems} 건
           </Typography>)}
+        
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="sort-select-label">정렬 기준</InputLabel>
           <Select
@@ -397,6 +411,22 @@ export default function JobPostingListBody() {
         </FormControl>
       </Box>
 
+      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+          {/* i 기호와 툴팁 추가 */}
+          <Tooltip title="채용공고 데이터는 매일 00시 00분에 자동으로 업데이트 됩니다." arrow>
+            <IconButton sx={{ padding: 0, marginRight: '5px' }}>
+              <InfoIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Typography variant="body2" sx={{ color: '#888', marginRight: 1 }}>
+            최근 업데이트:
+          </Typography>
+
+          <Typography variant="body2" sx={{ color: '#888', marginRight: 2 }}>
+            {formatCreationDate(jobPostings[0]?.creationDate)}
+          </Typography>
+      </Box>
 
       
       {noDataMessage ? (

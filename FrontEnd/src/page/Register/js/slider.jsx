@@ -16,7 +16,7 @@ const SalarySlider = ({registerList, setRegisterList}) => {
   };
 
   return (
-    <Box sx={{ width: 300 }}>
+    <Box sx={{ maxWidth: 300, minWidth: 200, marginBottom: "20px"}}>
       <Slider
         value={value}
         onChange={handleChange}

@@ -1,9 +1,6 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
 
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
@@ -32,7 +29,7 @@ function Body() {
     };
 
     return (
-        <div className="body">
+        <div className="Ai_container mx-5 my-3 py-2">
             <div id="AIinterviewbox">
                 <div className="interview-type-box">
                     <span> <h5>면접 종류를 선택하세요</h5></span>
@@ -62,9 +59,13 @@ function Body() {
                                 </MenuItem>
                                 <MenuItem value="frontend">프론트엔드</MenuItem>
                                 <MenuItem value="backend">백엔드</MenuItem>
-                                <MenuItem value="ai">인공지능</MenuItem>
-                                <MenuItem value="network">네트워크</MenuItem>
-                                <MenuItem value="firmware">펌웨어</MenuItem>
+                                <MenuItem value="ai">풀스택</MenuItem>
+                                <MenuItem value="network">데브옵스</MenuItem>
+                                <MenuItem value="firmware">데이터 엔지니어</MenuItem>
+                                <MenuItem value="firmware">데이터 사이언티스트</MenuItem>
+                                <MenuItem value="firmware">AI 엔지니어</MenuItem>
+                                <MenuItem value="firmware">모바일 앱</MenuItem>
+                                <MenuItem value="firmware">시스템 엔지니어</MenuItem>
                             </Select>
                         </div>
                     )}
