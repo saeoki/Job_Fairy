@@ -10,9 +10,11 @@ from airflow import DAG
 from airflow.decorators import task
 from datetime import datetime, timedelta
 import logging
+from airflow.models import Variable
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
-access_key='C3fHxrozp8J46Ix6rU6ww1EwuLv19P4ZJDgoQW1zSocEj8DUdDoW'
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/var/lib/airflow/.gcp/eloquent-vector-423514-s2-2e98de315d95.json'
+access_key = Variable.get("saramin_api_key")
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Variable.get("gcp_credentials_path")
 
 # 재귀적으로 딕셔너리의 키에서 '-'를 '_'로 바꾸는 함수
 def replace_hyphens(obj):
@@ -155,10 +157,8 @@ def transform_json(local_file) :
 # Upload file to GCS and remove os file
 @task
 def load_to_gcs(local_file) :
-    logging.info("여기야 여기 나여기있어 여기야 여기 나 여기있엉!!!!!!!!!!!!!")
-    logging.info(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
     storage_client = storage.Client()
-    bucket_name = 'jobfairy-gcs'
+    bucket_name = Variable.get("gcs_bucket_name")
     destination_blob_name = os.path.basename(local_file) # 경로 떼고 파일 이름만 추출
     
     bucket = storage_client.bucket(bucket_name)
@@ -167,8 +167,8 @@ def load_to_gcs(local_file) :
     
     logging.info(f"File {local_file} uploaded to {destination_blob_name} in bucket {bucket_name}.")
     
-    # os.remove(local_file)
-    # logging.info(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
+    os.remove(local_file)
+    logging.info(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
     
     return (bucket_name, destination_blob_name)
 
@@ -176,9 +176,9 @@ def load_to_gcs(local_file) :
 # GCS to BigQuery
 @task
 def bulkload_to_bigquery(bucket_info) :
-    project_id = 'eloquent-vector-423514-s2'
-    dataset_id = 'raw_data'
-    table_id = 'all_job_posting' # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
+    project_id = Variable.get("bigquery_project_id")
+    dataset_id = Variable.get("bigquery_dataset_id")
+    table_id = Variable.get("bigquery_table_id") # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
     gcs_bucket_name, gcs_file_name = bucket_info
     gcs_uri = f"gs://{gcs_bucket_name}/{gcs_file_name}"
 
@@ -217,8 +217,8 @@ default_args = {
     'start_date': datetime(2024, 10, 1),
     #'email': ['dnrtp9256@gmail.com'],
     'execution_timeout': timedelta(minutes=20),
-    # 'retries': 1,
-    # 'retry_delay': timedelta(minutes=5),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
 }
 
 with DAG(
@@ -232,8 +232,8 @@ with DAG(
     public_initial_data = fetch(start=0, count=1, bbs_gb=1)
     non_public_initial_data = fetch(start=0, count=1)
 
-    public_total_results = 3 #int(public_initial_data['jobs']['total'])
-    non_public_total_results = 3 #int(non_public_initial_data['jobs']['total'])
+    public_total_results = int(public_initial_data['jobs']['total'])
+    non_public_total_results = int(non_public_initial_data['jobs']['total'])
     logging.info(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
 
     today_date = datetime.now().strftime("%Y%m%d")
@@ -244,4 +244,10 @@ with DAG(
     load = load_to_gcs(local_file)
     bulkload = bulkload_to_bigquery(load)
 
-    extract >> transform >> load >> bulkload
+    trigger_bq_to_mg = TriggerDagRunOperator(
+        task_id='trigger_bq_to_mg_bulkload',
+        trigger_dag_id='bq_to_mg_bulkload',
+        wait_for_completion=True # True 설정시 트리거된 dag의 완료를 기다림
+    )
+
+    extract >> transform >> load >> bulkload >> trigger_bq_to_mg
