@@ -1,82 +1,240 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const { User } = require("./models/User");
-const { Problem } = require("./models/Problem")
-// const config = require("./config/key");
+const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
+const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
-const { JobPosting } = require("./models/JobPosting")
+const jwt = require('jsonwebtoken');
+
+// MongoDB 모델 임포트
+const { User } = require("./models/User");
+const { Problem } = require("./models/Problem");
+const { Jasose } = require("./models/Jasoses");
+const { Favorite } = require('./models/Favorites');
+const { JobPosting } = require("./models/JobPosting");
 
 const app = express();
-//클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
-// app.use(bodyParser.urlencoded({ extended: true }));
+const port = 5000; // 통합된 포트
 
-app.use(bodyParser.json());
-app.use(cors({
-  origin: 'http://localhost:3000', // 클라이언트 도메인 명시
-  credentials: true // 자격 증명(쿠키 등) 포함 허용
-})); // cors 미들웨어 사용
 
+// MongoDB 연결
 mongoose
-  .connect("mongodb+srv://jobfairy3:hknucapstone1%401@job-fairy.3c684u9.mongodb.net/Job_Fairy?retryWrites=true&w=majority&appName=job-fairy")
-  //.connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-//app.use("/api", test);
-app.get("/api/hello", (req, res) => {
-  res.send("안녕하세요~");
+// Middleware 설정
+app.use(bodyParser.json());
+app.use(cors({
+  origin: ['https://jobfairy.netlify.app', 'http://localhost:3000'], // 클라이언트 도메인 명시
+  credentials: true // 자격 증명(쿠키 등) 포함 허용
+}));
+
+// Google Speech API 클라이언트
+const client = new speech.SpeechClient({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
 
+// 기본 API 라우팅
+app.get('/', (req, res) => {
+  res.send('server root page');
+});
 
-
+// 로그인 API
 app.post('/api/auth/kakao', async (req, res) => {
-  const { kakaoId, nickname } = req.body;
-
+  const { kakaoId, nickname, location, military, position, salary } = req.body;
+  const secretKey = process.env.JWT_SECRET_KEY;
   try {
     let user = await User.findOne({ kakaoId });
-
     if (user) {
-        // 사용자 정보 업데이트
-        // user.nickname = nickname;
-        await user.save();
-        return res.status(200).json({ message: 'User updated successfully' });
+      if (user.isUpdate === false) {
+        const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
+        return res.status(200).json({ message: 'Redirect', redirectUrl: '/Register', token });
+      }
+      const token = jwt.sign({ kakaoId, nickname, location, military, position, salary }, secretKey, { expiresIn: '1h' });
+      return res.status(200).json({ message: 'User login successfully', token });
     } else {
-        // 사용자 정보 저장
-        const newUser = new User({ kakaoId, nickname });
-        await newUser.save();
-        return res.status(201).json({ message: 'User created successfully' });
+      const newUser = new User({ kakaoId, nickname });
+      const userFavorite = new Favorite({ kakaoId, nickname });
+      await newUser.save();
+      await userFavorite.save();
+      const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
+      return res.status(201).json({ message: 'User created successfully', redirectUrl: '/Register', token });
     }
-} catch (err) {
+  } catch (err) {
     return res.status(500).json({ error: 'Database error' });
-}
+  }
 });
 
+// 사용자 등록 API
 app.post('/api/auth/kakao/register', async (req, res) => {
-  const { kakaoId, nickname, location, military, position, salary, isUpdate } = req.body;
-
+  const { kakaoId, nickname, location, military, position, salary } = req.body;
   try {
     let user = await User.findOne({ kakaoId });
+    let userFavorite = await Favorite.findOne({ kakaoId });
 
-    if (user) {
-        // 사용자 정보 업데이트
-        user.nickname = nickname;
-        user.location = location;
-        user.military = military;
-        user.position = position;
-        user.salary = salary;
-        user.isUpdate = isUpdate;
-        await user.save();
-        return res.status(200).json({ message: 'User updated successfully' });
+    if (user && userFavorite) {
+      user.nickname = nickname || user.nickname;
+      user.location = location || user.location;
+      user.military = military || user.military;
+      user.position = position || user.position;
+      user.salary = salary !== undefined ? salary : user.salary;
+      user.isUpdate = true;
+      await user.save();
+      userFavorite.nickname = nickname || userFavorite.nickname;
+      await userFavorite.save();
+      return res.status(200).json({ message: 'User updated successfully' });
     } else {
-        // 오류 반환
-        return res.status(304).json({ error: 'Not Modified' });
+      return res.status(304).json({ error: 'Not Modified' });
     }
-} catch (err) {
+  } catch (err) {
     return res.status(500).json({ error: 'Database error' });
-}
+  }
 });
-// 레벨별 그룹화 반환
+
+// 사용자 정보 조회 API
+app.post('/api/auth/info', async (req, res) => {
+  const { kakaoId } = req.body;
+  try {
+    const user = await User.findOne({ kakaoId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// 즐겨찾기 조회 API
+app.post('/api/favorites/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+  try {
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+    res.json(userFavorite);
+  } catch (error) {
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// 즐겨찾기 추가 API
+app.post('/api/favorites/add', async (req, res) => {
+  const { kakaoId, nickname, id, type } = req.body;
+  try {
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+
+    if (type === 'jasose') {
+      userFavorite.data.jasose.push(id);
+    } else if (type === 'myeonjoeb') {
+      userFavorite.data.myeonjoeb.push(id);
+    } else if (type === 'employment') {
+      userFavorite.data.employment.push(id);
+    }
+
+    await userFavorite.save();
+    return res.status(200).json({ message: 'Favorite added successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// 즐겨찾기 제거 API
+app.post('/api/favorites/remove', async (req, res) => {
+  const { kakaoId, nickname, id, type } = req.body;
+  try {
+    const userFavorite = await Favorite.findOne({ kakaoId, nickname });
+    if (!userFavorite) {
+      return res.status(404).json({ message: 'User data not found' });
+    }
+
+    if (type === 'jasose') {
+      userFavorite.data.jasose.pull(id);
+    } else if (type === 'myeonjoeb') {
+      userFavorite.data.myeonjoeb.pull(id);
+    } else if (type === 'employment') {
+      userFavorite.data.employment.pull(id);
+    }
+
+    await userFavorite.save();
+    return res.status(200).json({ message: 'Favorite removed successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// 자기소개서 저장 API
+app.post('/api/jasose/save', async (req, res) => {
+  const { kakaoId, nickname, jasose, keyJasose, job, keyword } = req.body;
+  try {
+    const newJasose = new Jasose({
+      kakaoId,
+      nickname,
+      data: {
+        jasose,
+        keyJasose,
+        job,
+        keyword
+      },
+      time: Date.now()
+    });
+    await newJasose.save();
+    res.status(200).json({ success: true, message: '자기소개서가 저장되었습니다.' });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 자기소개서 조회 API
+app.post('/api/jasose/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+  try {
+    let query = {};
+    if (kakaoId) query.kakaoId = kakaoId;
+    if (nickname) query.nickname = nickname;
+
+    let jasose = await Jasose.find(query).sort({ time: -1 });
+    if (!jasose) {
+      return res.status(404).json({ success: false, error: "저장된 데이터가 없습니다." });
+    }
+    res.status(200).json({ success: true, data: jasose });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// 자기소개서 삭제 API
+app.post('/api/jasose/remove', async (req, res) => {
+  const { kakaoId, nickname, id } = req.body;
+  try {
+    const objectId = new mongoose.Types.ObjectId(id);
+    const result = await Jasose.findOneAndDelete({
+      kakaoId: kakaoId,
+      nickname: nickname,
+      _id: objectId
+    });
+
+    if (result) {
+      return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: '데이터베이스 오류' });
+  }
+});
+
+// 문제를 레벨별로 그룹화하여 반환 API
 app.get('/api/problem/level', async (req, res) => {
   try {
     const problemsByLevel = await Problem.aggregate([
@@ -94,7 +252,8 @@ app.get('/api/problem/level', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-// 문제와 테스트셋을 가져오는 API
+
+// 특정 문제 번호로 문제와 테스트셋 가져오기 API
 app.get('/api/problem/:no', async (req, res) => {
   try {
     const problem = await Problem.findOne({ no: req.params.no });
@@ -103,51 +262,93 @@ app.get('/api/problem/:no', async (req, res) => {
     }
     res.json(problem);
   } catch (error) {
-    console.error('Error fetching problem:', error);
     res.status(500).json({ message: error.message });
   }
 });
 
-app.post('/api/run', (req, res) => {
-  const { code } = req.body;
-  // 여기에 코드 실행 로직 작성
-  const result = `Running code: ${code}`; // 임시 결과
-  res.json({ result });
-});
-
-
-// 페이지네이션 API
-app.get("/api/Recruitment/JobPostingList", async (req, res) => {
+// 채용 데이터 필터링 API
+app.post("/api/Recruitment/JobPostingList", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;  // 페이지 번호 (기본값 1)
-    const limit = 10;  // 한 페이지에 표시할 데이터 수
-    const skip = (page - 1) * limit;  // 건너뛸 데이터 수
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const { jobs, locations, experiences } = req.body;
 
-    const total = await JobPosting.countDocuments(); // 전체 데이터 수
-    const jobPostings = await JobPosting.find({}, {
-      "bbs_gb": 1,  // 공채 구분
+    const query = {};
 
-      "company.detail.name": 1,  // 기업 이름
-      "company.detail.href": 1,  // 기업 정보 링크
-    
-      "position.location.name": 1,  // 위치
-      "position.required-education-level.name": 1,  // 학력 기준
-      "position.experience-level.name": 1,  // 경력 기준
-      "position.experience-level.max": 1,  // 최대 경력
-      "position.experience-level.min": 1,  // 최소 경력
-      "position.job-mid-code.name": 1,  // 중간 직종
-      "position.job-type.name": 1,  // 직종 유형 (예: 정규직)
-      "position.title": 1,  // 공고 제목
-    
-      "posting-timestamp": 1,  // 게시 날짜
-      "modification-timestamp": 1,  // 수정 날짜
-      "expiration-timestamp": 1,  // 마감 기한
-      "salary": 1,  // 연봉 정보
-      "active": 1,  // 공고 진행 여부
-      "url": 1  // 공고 링크
-    })
+    // 직무 필터
+    if (jobs && jobs.length > 0) {
+      query["position.job_code.name"] = {
+        $regex: new RegExp(jobs.join('|')),
+        $options: "i"
+      };
+    }
+
+    // 지역 필터
+    if (locations && locations.length > 0) {
+      query["position.location.name"] = {
+        $regex: new RegExp(locations.join('|')),
+        $options: "i"
+      };
+    }
+
+    // 경력 필터
+    if (experiences && experiences.length > 0) {
+      const experienceRanges = {
+        "신입": { min: 0, max: 0 },
+        "1~3년": { min: 1, max: 3 },
+        "4~8년": { min: 4, max: 8 },
+        "9년 이상": { min: 9, max: Infinity }
+      };
+
+      const experienceConditions = experiences.map(exp => {
+        const range = experienceRanges[exp];
+        if (range) {
+          return {
+            $and: [
+              { "position.experience_level.min": { $lte: range.max } },
+              { "position.experience_level.max": { $gte: range.min } }
+            ]
+          };
+        }
+        return null;
+      }).filter(condition => condition !== null);
+
+      query.$or = [
+        { "position.experience_level.name": "경력무관" },
+        ...experienceConditions
+      ];
+    }
+
+    const total = await JobPosting.countDocuments(query);
+    const jobPostings = await JobPosting.find(query)
+      .select({
+        "bbs_gb": 1,
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.location.name": 1,
+        "position.experience_level.name": 1,
+        "position.experience_level.min": 1,
+        "position.experience_level.max": 1,
+        "position.job_code.name": 1,
+        "position.job_mid_code.name": 1,
+        "position.title": 1,
+        "posting_timestamp": 1,
+        "expiration_timestamp": 1,
+        "salary": 1,
+        "url": 1
+      })
       .skip(skip)
       .limit(limit);
+
+    if (jobPostings.length === 0) {
+      return res.status(200).json({
+        jobPostings: [],
+        currentPage: page,
+        totalPages: 0,
+        totalItems: 0
+      });
+    }
 
     res.status(200).json({
       jobPostings,
@@ -156,7 +357,60 @@ app.get("/api/Recruitment/JobPostingList", async (req, res) => {
       totalItems: total
     });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching job postings", error: err });
+    console.error("Error in /api/Recruitment/JobPostingList:", err);
+    res.status(500).json({ message: "채용 정보를 가져오는 중 오류가 발생했습니다.", error: err.message });
+  }
+});
+
+
+
+// server.js 파일에 추가
+
+const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
+
+// 면접 결과 저장 API
+app.post('/api/interview/save', async (req, res) => {
+  const { kakaoId, nickname, questionsAndAnswers, accumulatedEmotions, emotionFeedback } = req.body;
+
+  // 필수 데이터 누락 시 에러 반환
+  if (!kakaoId || !nickname || !questionsAndAnswers || !accumulatedEmotions || !emotionFeedback) {
+    return res.status(400).json({ message: "Required data missing." });
+  }
+
+  try {
+    const newInterviewResult = new InterviewResult({
+      kakaoId,
+      nickname,
+      questionsAndAnswers,
+      accumulatedEmotions,
+      emotionFeedback,  // 감정 피드백 추가
+      createdAt: new Date()
+    });
+    await newInterviewResult.save();
+    res.status(200).json({ message: "Interview result saved successfully!" });
+  } catch (error) {
+    console.error("Failed to save interview result:", error.message); // 에러 메시지 출력
+    res.status(500).json({ message: "Failed to save interview result.", error: error.message });
+  }
+});
+
+// 면접 결과 조회 API
+app.post('/api/interview/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+
+  if (!kakaoId || !nickname) {
+    return res.status(400).json({ message: "kakaoId and nickname are required." });
+  }
+
+  try {
+    const interviewResults = await InterviewResult.find({ kakaoId, nickname }).sort({ createdAt: -1 });
+    if (!interviewResults.length) {
+      return res.status(404).json({ message: 'No interview results found' });
+    }
+    res.status(200).json({ success: true, data: interviewResults });
+  } catch (error) {
+    console.error("Failed to retrieve interview results:", error.message); // 에러 메시지 출력
+    res.status(500).json({ message: "Failed to retrieve interview results.", error: error.message });
   }
 });
 
@@ -164,5 +418,49 @@ app.get("/api/Recruitment/JobPostingList", async (req, res) => {
 
 
 
-const port = 5000;
-app.listen(port, () => console.log(`${port}`));
+// WebSocket 설정 (Speech-to-Text 처리)
+const server = app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  let recognizeStream = null;
+
+  ws.on('message', (message) => {
+    if (!recognizeStream) {
+      recognizeStream = client
+        .streamingRecognize({
+          config: {
+            encoding: 'WEBM_OPUS',
+            sampleRateHertz: 48000,
+            languageCode: 'ko-KR',
+          },
+          interimResults: true, // true
+        })
+        .on('error', (err) => {
+          console.error('Error in recognizeStream:', err);
+          ws.send(JSON.stringify({ error: err.message }));
+        })
+        .on('data', (data) => {
+          if (data.results[0] && data.results[0].alternatives[0] && data.results[0]) { // isFinal 조건 추가
+            ws.send(
+              JSON.stringify({ transcription: data.results[0].alternatives[0].transcript })
+            );
+          }
+        });
+      }
+
+    recognizeStream.write(Buffer.from(message));
+  });
+
+  ws.on('close', () => {
+    if (recognizeStream) {
+      recognizeStream.end();
+    }
+    console.log('Client disconnected');
+  });
+});

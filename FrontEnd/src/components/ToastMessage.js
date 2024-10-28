@@ -9,7 +9,7 @@ export const LoginToast = () => {
         toast: true,
         position: 'center-center',
         showConfirmButton: false,
-        timer: 1000,
+        timer: 500,
         timerProgressBar: true
     });
 };
@@ -51,3 +51,64 @@ export const LoginErrorToast = () => {
         }
     });
 };
+
+export const RegisterToast = () => {
+    Swal.fire({
+        icon: 'info',
+        title: '추가정보를 등록해야됩니다.!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+
+    });
+};
+
+export const RegisterSuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '추가정보 등록완료!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+};
+
+export const ModifySuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '내 정보 수정완료!',
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    });
+};
+
+export const SaveSuccessToast = () => {
+    Swal.fire({
+        icon: 'success',
+        title: '저장 완료!',
+        text: "리포트페이지에서 확인하실 수 있습니다.",
+        toast: true,
+        position: 'center-center',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true
+    });
+};
+
+export const RemoveJasoseReportToast = ({func}) => {
+    Swal.fire({
+        icon: 'warning',
+        title: `정말 삭제하시겠습니까?`,
+        position: 'center-center',
+        showConfirmButton: true, 
+        confirmButtonText: '확인',
+        preConfirm: func
+    });
+}

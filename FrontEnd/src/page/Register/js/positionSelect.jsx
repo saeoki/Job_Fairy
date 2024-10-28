@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip, Box } from '@mui/material';
 
 const positions = [
-  '백엔드 개발자', '프론트엔드 개발자', '풀스택 개발자',
-  '데브옵스 엔지니어', '데이터 엔지니어', '데이터 사이언티스트',
-  'AI 엔지니어', '모바일 앱 개발자', '웹 개발자', '시스템 엔지니어'
+  '프론트엔드', '백엔드', '풀스택',
+  '데브옵스', '데이터 엔지니어', '데이터 사이언티스트',
+  'AI 엔지니어', '모바일 앱', '시스템 엔지니어'
 ];
 
 const PositionSelector = ({registerList, setRegisterList}) => {

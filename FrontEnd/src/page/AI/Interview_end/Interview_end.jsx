@@ -6,7 +6,7 @@ import Footer from "../../Home/js/Footer";
 
 
 
-function AIinterview(){
+function Interview_end(){
     return(
         <div> 
             <Header />
@@ -16,4 +16,4 @@ function AIinterview(){
 
     )
 }
-export default AIinterview;
+export default Interview_end;

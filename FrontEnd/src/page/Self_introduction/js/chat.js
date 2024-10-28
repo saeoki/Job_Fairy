@@ -62,7 +62,7 @@ export const GPT_keyword = async (prompt) => {
 
     try {
         const keyCompletion = await openai.chat.completions.create({
-            model: "gpt-4-turbo",
+            model: "gpt-3.5-turbo",
             messages: keyMessages,
             temperature: 1,
             max_tokens: 1000,

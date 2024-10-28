@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Slider, Typography, Box } from '@mui/material';
 
 const SalarySlider = ({registerList, setRegisterList}) => {
-  const [value, setValue] = useState(registerList.salary);
+  const [value, setValue] = useState([2000,12000]);
+  useEffect(()=>{
+    setValue(registerList.salary)
+  },[])
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

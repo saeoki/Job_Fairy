@@ -1,0 +1,63 @@
+.jasose_box{
+    /* border: 2px solid grey; */
+    width: 100%;
+    height: 70vh;
+    overflow-y: auto;
+}
+
+.empty_box{
+    width: 60%;
+    padding: 20px;
+    margin: auto;
+    text-align: center;
+    @media (max-width: 767.98px) {
+        width: 100%;
+    }
+    > p {
+        font-size: 1rem;
+    }
+}
+
+#empty_img{
+    width: 100%;
+    height: auto;
+
+}
+
+#createJasose_button{
+    width: 100%;
+    background-color: rgba(52,147,215,0.694);
+}
+
+#jasose_date{
+    margin-left: 10px;
+    p{
+        font-size: 1.25rem;
+        margin: auto 0;
+        
+    }
+    @media (max-width: 767.98px) {
+        p{
+            font-size: 0.85rem;
+        }
+    }
+}
+#jasose_keyword{
+    margin-left: 20px;
+    p{
+        color: darkgray;
+        font-size: 1.1rem;
+        margin: auto;
+        margin-top: 2px;
+    }
+    @media (max-width: 767.98px) {
+        p{
+            font-size: 0.7rem;
+        }
+    }
+}
+
+#content_delbtn{
+    float: right;
+    margin-bottom: 1%;
+}
