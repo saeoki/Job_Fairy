@@ -1,43 +1,65 @@
-
 // import React, { useState } from "react";
+// import axios from "axios";
 // import { useNavigate, useLocation } from 'react-router-dom';
+
+// import { jwtDecode } from 'jwt-decode'; // 올바른 named import 사용
+
 // import Button from '@mui/material/Button';
 // import Stack from '@mui/material/Stack';
 // import Header from "../../Home/js/Header";
 // import Footer from "../../Home/js/Footer";
 // import Interview_chart from "./Interview_chart";
 // import STTResult from "./STTResult";
+// import { ErrorToast, SaveSuccessToast } from "../../../components/ToastMessage"; 
+
+// const BackendIP = "http://localhost:5000";
 
 // function Interview_result() {
 //   const location = useLocation();
 //   const navigate = useNavigate();
-//   const { accumulatedEmotions, answers, kakaoId, nickname } = location.state || {};
-//   const [evaluations, setEvaluations] = useState([]); // 평가 데이터 상태 추가
+  
+//   // 토큰에서 사용자 정보 추출
+//   const token = localStorage.getItem('token');
+//   const userData = jwtDecode(token); // jwtDecode 사용
+//   const { kakaoId, nickname } = userData;
+
+//   const { accumulatedEmotions, answers } = location.state || {};
+//   const [evaluations, setEvaluations] = useState([]);
 //   const [emotionFeedback, setEmotionFeedback] = useState('');
 
-//   const handleSave = () => {
+//   const handleSave = async () => {
+//     const prepareAnswers = answers.map((answer) => ({
+//       ...answer,
+//       answer: answer.answer || "No answer provided",
+//       evaluation: answer.evaluation || "Not evaluated", // 기본 평가 값 설정
+//     }));
+  
 //     const interviewData = {
 //       kakaoId,
 //       nickname,
-//       questionsAndAnswers: evaluations, // 평가 데이터 포함
+//       questionsAndAnswers: prepareAnswers,
 //       accumulatedEmotions,
-//       emotionFeedback,  
-//       createdAt: new Date().toISOString()
+//       emotionFeedback,
+//       createdAt: new Date().toISOString(),
 //     };
-
-//     const jsonString = JSON.stringify(interviewData, null, 2);
-//     const blob = new Blob([jsonString], { type: 'application/json' });
-//     const url = URL.createObjectURL(blob);
-
-//     const link = document.createElement('a');
-//     link.href = url;
-//     link.download = 'interview_result.json';
-//     link.click();
-
-//     URL.revokeObjectURL(url);
-//     alert("JSON 파일이 저장되었습니다.");
+  
+//     try {
+//       const response = await axios.post(`${BackendIP}/api/interview/save`, interviewData, {
+//         withCredentials: true,
+//       });
+//       console.log("Data saved to DB:", response.data);
+//       SaveSuccessToast();
+//       setTimeout(() => {
+//         navigate('/Report');
+//       }, 1000);
+//     } catch (error) {
+//       console.error("Failed to save data to DB:", error.response?.data || error.message);
+//       console.log("Interview Data:", interviewData);
+//       ErrorToast();
+//     }
 //   };
-
+  
+  
 //   const goToMainPage = () => {
 //     navigate('/');
 //   };
@@ -47,9 +69,7 @@
 //       <Header />
 //       <div style={{ flex: 1 }}>
 //         <STTResult answers={answers} onEvaluations={setEvaluations} />
-        
 //         <Interview_chart accumulatedEmotions={accumulatedEmotions} onEmotionFeedback={setEmotionFeedback} />
-
 //         <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 2 }}>
 //           <Button
 //             variant="contained"
@@ -57,7 +77,7 @@
 //             onClick={handleSave}
 //             sx={{ padding: '20px 20px', fontSize: '16px' }}
 //           >
-//             JSON 파일로 저장하기
+//             데이터베이스에 저장하기
 //           </Button>
 //           <Button
 //             variant="outlined"
@@ -76,51 +96,69 @@
 
 // export default Interview_result;
 
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // named import 사용
+
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Header from "../../Home/js/Header";
 import Footer from "../../Home/js/Footer";
 import Interview_chart from "./Interview_chart";
 import STTResult from "./STTResult";
+import { ErrorToast, SaveSuccessToast } from "../../../components/ToastMessage"; 
+
+const BackendIP = "http://localhost:5000";
 
 function Interview_result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { accumulatedEmotions, answers, kakaoId, nickname } = location.state || {};
+  
+  // 토큰에서 사용자 정보 추출
+  const token = localStorage.getItem('token');
+  const userData = jwtDecode(token); // named import로 가져온 jwtDecode 사용
+  const { kakaoId, nickname } = userData;
+
+  const { accumulatedEmotions, answers } = location.state || {};
   const [evaluations, setEvaluations] = useState([]);
   const [emotionFeedback, setEmotionFeedback] = useState('');
 
+  // 데이터 저장 함수
   const handleSave = async () => {
-    // answer 필드가 비어있는 경우 기본 메시지 설정
     const prepareAnswers = answers.map((answer) => ({
       ...answer,
       answer: answer.answer || "No answer provided",
+      evaluation: answer.evaluation || "Not evaluated",
     }));
   
     const interviewData = {
       kakaoId,
       nickname,
-      questionsAndAnswers: prepareAnswers,  // 업데이트된 answers 배열
+      questionsAndAnswers: prepareAnswers,
       accumulatedEmotions,
       emotionFeedback,
       createdAt: new Date().toISOString(),
     };
+
+    console.log("Sending interviewData:", interviewData);  // 전송 전 데이터 확인
   
     try {
-      const response = await axios.post('http://localhost:5000/api/interview/save', interviewData);
+      const response = await axios.post(`${BackendIP}/api/interview/save`, interviewData, {
+        withCredentials: true,
+      });
       console.log("Data saved to DB:", response.data);
-      alert("결과가 데이터베이스에 저장되었습니다.");
+      SaveSuccessToast();
+      setTimeout(() => {
+        navigate('/Report');
+      }, 1000);
     } catch (error) {
-      console.error("Failed to save data to DB:", error);
-      alert("데이터베이스 저장에 실패했습니다.");
+      console.error("Failed to save data to DB:", error.response?.data || error.message);
+      ErrorToast();
     }
   };
-  
 
+  
   const goToMainPage = () => {
     navigate('/');
   };
@@ -130,9 +168,7 @@ function Interview_result() {
       <Header />
       <div style={{ flex: 1 }}>
         <STTResult answers={answers} onEvaluations={setEvaluations} />
-        
         <Interview_chart accumulatedEmotions={accumulatedEmotions} onEmotionFeedback={setEmotionFeedback} />
-
         <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 2 }}>
           <Button
             variant="contained"
