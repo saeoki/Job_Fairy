@@ -25,7 +25,7 @@ function VolumeMeter({ audioStream }) {
       const average = total / dataArray.length;
 
       // 볼륨 임계값 설정
-      const threshold = 50;
+      const threshold = 20;
       if (average > threshold) {
         setVolume(average);
       } else {
