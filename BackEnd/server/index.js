@@ -6,7 +6,6 @@ const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
 const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-
 const getCreationDateFromId = (id) => {
   return new Date(new ObjectId(id).getTimestamp());
 };
@@ -325,7 +324,7 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     const skip = (page - 1) * limit;
     const { jobs, locations, experiences } = req.body;
 
-    console.log("필터 데이터: ",{jobs, locations, experiences})
+    console.log("필터 데이터: ", {jobs, locations, experiences});
 
     const query = {};
 
