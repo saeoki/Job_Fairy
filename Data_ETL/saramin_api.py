@@ -149,8 +149,8 @@ public_initial_data = fetch_jobs(start=0, count=1, bbs_gb=1)
 non_public_initial_data = fetch_jobs(start=0, count=1)
 
 if public_initial_data and non_public_initial_data :
-    public_total_results = int(public_initial_data['jobs']['total'])
-    non_public_total_results = int(non_public_initial_data['jobs']['total'])
+    public_total_results = 2 # int(public_initial_data['jobs']['total'])
+    non_public_total_results = 2 # int(non_public_initial_data['jobs']['total'])
     print(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
 
     today_date = datetime.now().strftime("%Y%m%d")
