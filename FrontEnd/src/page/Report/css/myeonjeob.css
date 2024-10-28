@@ -1,0 +1,13 @@
+.emotion_feedback, .emotion_detail,
+.qa_q, .qa_a, .qa_s{
+    font-size: 1rem;
+}
+.qa > p{
+    margin-bottom: 4px;
+}
+@media (max-width: 480px) {
+    .emotion_detail, .emotion_feedback,
+    .qa_q, .qa_a, .qa_s{
+        font-size: 0.7rem;
+    }
+}

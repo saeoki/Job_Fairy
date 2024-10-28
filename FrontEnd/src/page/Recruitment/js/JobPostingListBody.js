@@ -24,6 +24,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
+
 
 export default function JobPostingListBody() {
   const [jobPostings, setJobPostings] = useState([]);  // 서버에서 가져올 데이터 상태
@@ -65,10 +68,11 @@ export default function JobPostingListBody() {
   }, [location.search]);
 
 
-  // 페이지 변경 시 API 호출
   const fetchJobPostings = async (page, filters = {}) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+      // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
+      // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
+      const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +110,16 @@ export default function JobPostingListBody() {
     return date.toLocaleDateString(); // YYYY-MM-DD 형식으로 변환
   };
 
+  // 도큐먼트 생성 타임스탬프 처리
+  const formatCreationDate = (creationDate) => {
+    if (!creationDate) return ''; // creationDate가 없으면 빈 문자열 반환
+    return new Date(creationDate).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const formatLocation = (location) => {
     if (!location) return '위치 정보 없음'; 
     // '&gt;'를 '>'로 변환
@@ -136,12 +150,13 @@ export default function JobPostingListBody() {
     if (selectedFilters.experiences.length > 0) params.set('experiences', selectedFilters.experiences.join(','));
     params.set('page', '1'); // Reset to first page when applying filters
     navigate(`?${params.toString()}`);
+    fetchJobPostings(1, selectedFilters);
   };
   
-  // 페이지가 바뀌거나 필터가 적용되면 fetch
+  // 페이지가 바뀌면 fetch, 검색 조건은 그대로
   useEffect(() => {
     fetchJobPostings(currentPage, selectedFilters);
-  }, [currentPage, selectedFilters]);
+  }, [currentPage]);
 
   return (
     <Container maxWidth="lg">
@@ -374,11 +389,12 @@ export default function JobPostingListBody() {
 
 
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         {jobPostings.length > 0 && (
           <Typography variant="h6" sx={{ color: '#1976d2' }}>
             총 {totalItems} 건
           </Typography>)}
+        
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="sort-select-label">정렬 기준</InputLabel>
           <Select
@@ -395,6 +411,22 @@ export default function JobPostingListBody() {
         </FormControl>
       </Box>
 
+      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+          {/* i 기호와 툴팁 추가 */}
+          <Tooltip title="채용공고 데이터는 매일 00시 00분에 자동으로 업데이트 됩니다." arrow>
+            <IconButton sx={{ padding: 0, marginRight: '5px' }}>
+              <InfoIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Typography variant="body2" sx={{ color: '#888', marginRight: 1 }}>
+            최근 업데이트:
+          </Typography>
+
+          <Typography variant="body2" sx={{ color: '#888', marginRight: 2 }}>
+            {formatCreationDate(jobPostings[0]?.creationDate)}
+          </Typography>
+      </Box>
 
       
       {noDataMessage ? (
@@ -428,31 +460,6 @@ export default function JobPostingListBody() {
           </Paper>
         ))
       )}
-      
-      {/* {jobPostings.map((job, index) => (
-        <Paper key={index} elevation={3} sx={{ mb: 2, p: 2 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box>
-              <Typography variant="body1">
-                <a href={job.company.detail.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1E90FF' }}>
-                  {job.company.detail.name}
-                </a>
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                <a href={job.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  {job.position.title}
-                </a>
-              </Typography>
-            </Box>
-            <Box textAlign="right">
-              <Typography variant="body2">{formatLocation(job.position.location.name)}</Typography>
-              <Typography variant="body2">{job.position['experience-level'].name}</Typography>
-              <Typography variant="body2">{formatTimestamp(job['expiration-timestamp'])}</Typography>
-            </Box>
-            <FormControlLabel control={<Checkbox />} label="스크랩" />
-          </Box>
-        </Paper>
-      ))} */}
 
       {/* 페이지네이션 */}
       <Box display="flex" justifyContent="center" mt={4}>

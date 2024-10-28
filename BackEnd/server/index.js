@@ -1,55 +1,70 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const { User } = require("./models/User");
-const { Problem } = require("./models/Problem")
-const { Jasose } = require("./models/Jasoses")
-const { Favorite } = require('./models/Favorites')
-
-// const config = require("./config/key");
+const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
+const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-require('dotenv').config(); // .env 파일 로드
 
+const getCreationDateFromId = (id) => {
+  return new Date(new ObjectId(id).getTimestamp());
+};
+
+// MongoDB 모델 임포트
+const { User } = require("./models/User");
+const { Problem } = require("./models/Problem");
+const { Jasose } = require("./models/Jasoses");
+const { Favorite } = require('./models/Favorites');
+const { JobPosting } = require("./models/JobPosting");
+const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const app = express();
-//클라이언트에서 오는 정보를 서버에서 분석해서 가져올 수 있다.
-// app.use(bodyParser.urlencoded({ extended: true }));
+const port = 5000; // 통합된 포트
 
-app.use(bodyParser.json());
-app.use(cors({
-  origin: ['http://localhost:3000','https://jobfairy.netlify.app/'], // 클라이언트 도메인 명시
-  credentials: true // 자격 증명(쿠키 등) 포함 허용
-})); // cors 미들웨어 사용
 
+// MongoDB 연결
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
+// Middleware 설정
+app.use(bodyParser.json());
+app.use(cors({
+  origin: ['https://jobfairy.netlify.app', 'http://localhost:3000'], // 클라이언트 도메인 명시
+  credentials: true // 자격 증명(쿠키 등) 포함 허용
+}));
 
-// 로그인
+// Google Speech API 클라이언트
+const client = new speech.SpeechClient({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
+
+// 기본 API 라우팅
+app.get('/', (req, res) => {
+  res.send('server root page');
+});
+
+// 로그인 API
 app.post('/api/auth/kakao', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
   const secretKey = process.env.JWT_SECRET_KEY;
   try {
     let user = await User.findOne({ kakaoId });
     if (user) {
-      // isUpdate 상태를 확인하여 로직 처리
       if (user.isUpdate === false) {
         const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
         return res.status(200).json({ message: 'Redirect', redirectUrl: '/Register', token });
       }
-      // 사용자 정보 업데이트
-      // await user.save();
       const token = jwt.sign({ kakaoId, nickname, location, military, position, salary }, secretKey, { expiresIn: '1h' });
       return res.status(200).json({ message: 'User login successfully', token });
     } else {
-      // 사용자 정보 저장
       const newUser = new User({ kakaoId, nickname });
-      const userFavorite = new Favorite({kakaoId, nickname})
+      const userFavorite = new Favorite({ kakaoId, nickname });
       await newUser.save();
-      await userFavorite.save()
+      await userFavorite.save();
       const token = jwt.sign({ kakaoId, nickname }, secretKey, { expiresIn: '1h' });
       return res.status(201).json({ message: 'User created successfully', redirectUrl: '/Register', token });
     }
@@ -58,65 +73,65 @@ app.post('/api/auth/kakao', async (req, res) => {
   }
 });
 
+// 사용자 등록 API
 app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
   try {
     let user = await User.findOne({ kakaoId });
-    let userFavorite = await Favorite.findOne({kakaoId})
+    let userFavorite = await Favorite.findOne({ kakaoId });
 
-    if (user&&userFavorite) {
-        // 사용자 정보 업데이트
-        user.nickname = nickname || user.nickname; // 기존 닉네임 유지;
-        user.location = location || user.location; // 기존 위치 유지
-        user.military = military || user.military; // 기존 군대 정보 유지
-        user.position = position || user.position; // 기존 직위 유지
-        user.salary = salary !== undefined ? salary : user.salary; // salary가 주어지면 업데이트
-        user.isUpdate = true;
-        await user.save();
-        userFavorite.nickname = nickname || userFavorite.nickname;
-        await userFavorite.save()
-        return res.status(200).json({ message: 'User updated successfully' });
+    if (user && userFavorite) {
+      user.nickname = nickname || user.nickname;
+      user.location = location || user.location;
+      user.military = military || user.military;
+      user.position = position || user.position;
+      user.salary = salary !== undefined ? salary : user.salary;
+      user.isUpdate = true;
+      await user.save();
+      userFavorite.nickname = nickname || userFavorite.nickname;
+      await userFavorite.save();
+      return res.status(200).json({ message: 'User updated successfully' });
     } else {
-        // 오류 반환
-        return res.status(304).json({ error: 'Not Modified' });
+      return res.status(304).json({ error: 'Not Modified' });
     }
-} catch (err) {
-    return res.status(500).json({ error: 'Database error' });
-}
-});
-
-app.post('/api/auth/info', async (req,res)=> {
-  const {kakaoId} = req.body
-  try{
-    const user = await User.findOne({ kakaoId });
-    if (!user) {
-      return res.status(404).json({ message: 'user not found' });
-    }
-    res.json(user)
-  } catch(err){
+  } catch (err) {
     return res.status(500).json({ error: 'Database error' });
   }
-})
+});
 
-app.post('/api/favorites/get', async (req,res) => {
-  const { kakaoId, nickname } = req.body; 
-  try{
+// 사용자 정보 조회 API
+app.post('/api/auth/info', async (req, res) => {
+  const { kakaoId } = req.body;
+  try {
+    const user = await User.findOne({ kakaoId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// 즐겨찾기 조회 API
+app.post('/api/favorites/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+  try {
     const userFavorite = await Favorite.findOne({ kakaoId, nickname });
-
     if (!userFavorite) {
       return res.status(404).json({ message: 'User data not found' });
     }
-    res.json(userFavorite)
-  }catch(error){
+    res.json(userFavorite);
+  } catch (error) {
     return res.status(500).json({ error: 'Database error' });
   }
-})
+});
 
+// 즐겨찾기 추가 API
 app.post('/api/favorites/add', async (req, res) => {
-  const { kakaoId, nickname, id, type } = req.body; 
+  const { kakaoId, nickname, id, type } = req.body;
   try {
     const userFavorite = await Favorite.findOne({ kakaoId, nickname });
-
     if (!userFavorite) {
       return res.status(404).json({ message: 'User data not found' });
     }
@@ -138,13 +153,11 @@ app.post('/api/favorites/add', async (req, res) => {
   }
 });
 
-
+// 즐겨찾기 제거 API
 app.post('/api/favorites/remove', async (req, res) => {
-  const { kakaoId, nickname, id, type } = req.body; 
-
+  const { kakaoId, nickname, id, type } = req.body;
   try {
     const userFavorite = await Favorite.findOne({ kakaoId, nickname });
-
     if (!userFavorite) {
       return res.status(404).json({ message: 'User data not found' });
     }
@@ -166,11 +179,9 @@ app.post('/api/favorites/remove', async (req, res) => {
   }
 });
 
-
-
+// 자기소개서 저장 API
 app.post('/api/jasose/save', async (req, res) => {
   const { kakaoId, nickname, jasose, keyJasose, job, keyword } = req.body;
-
   try {
     const newJasose = new Jasose({
       kakaoId,
@@ -181,9 +192,8 @@ app.post('/api/jasose/save', async (req, res) => {
         job,
         keyword
       },
-      time: Date.now() // 전달된 시간이 없을 경우 현재 시간을 기본값으로 사용
+      time: Date.now()
     });
-
     await newJasose.save();
     res.status(200).json({ success: true, message: '자기소개서가 저장되었습니다.' });
   } catch (err) {
@@ -191,21 +201,18 @@ app.post('/api/jasose/save', async (req, res) => {
   }
 });
 
+// 자기소개서 조회 API
 app.post('/api/jasose/get', async (req, res) => {
   const { kakaoId, nickname } = req.body;
-  
-  try {
-    // 조건에 맞는 문서를 검색하고 최신순으로 정렬
-    let query = {};
 
-    // kakaoId와 nickname이 있을 경우에만 조건을 추가
+  try {
+    let query = {};
     if (kakaoId) query.kakaoId = kakaoId;
     if (nickname) query.nickname = nickname;
 
-    let jasose = await Jasose.find(query).sort({ time: -1 }); // time을 기준으로 내림차순 정렬
-
-    if(!jasose){
-      return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+    let jasose = await Jasose.find(query).sort({ time: -1 });
+    if (!jasose) {
+      return res.status(404).json({ success: false, error: "저장된 데이터가 없습니다." });
     }
     res.status(200).json({ success: true, data: jasose });
   } catch (error) {
@@ -213,13 +220,11 @@ app.post('/api/jasose/get', async (req, res) => {
   }
 });
 
+// 자기소개서 삭제 API
 app.post('/api/jasose/remove', async (req, res) => {
   const { kakaoId, nickname, id } = req.body;
-
   try {
     const objectId = new mongoose.Types.ObjectId(id);
-
-    // 해당 조건으로 데이터 삭제
     const result = await Jasose.findOneAndDelete({
       kakaoId: kakaoId,
       nickname: nickname,
@@ -236,53 +241,51 @@ app.post('/api/jasose/remove', async (req, res) => {
   }
 });
 
-// app.post('/api/myeonjoeb/get', async (req, res) => {
-//   const { kakaoId, nickname } = req.body;
+app.post('/api/myeonjeob/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
   
-//   try {
-//     // 조건에 맞는 문서를 검색하고 최신순으로 정렬
-//     let query = {};
+  try {
+    // 조건에 맞는 문서를 검색하고 최신순으로 정렬
+    let query = {};
 
-//     // kakaoId와 nickname이 있을 경우에만 조건을 추가
-//     if (kakaoId) query.kakaoId = kakaoId;
-//     if (nickname) query.nickname = nickname;
+    // kakaoId와 nickname이 있을 경우에만 조건을 추가
+    if (kakaoId) query.kakaoId = kakaoId;
+    if (nickname) query.nickname = nickname;
 
-//     let jasose = await Jasose.find(query).sort({ time: -1 }); 
+    let myeonjoeb = await InterviewResult.find(query).sort({ time: -1 }); 
 
-//     if(!jasose){
-//       return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
-//     }
-//     res.status(200).json({ success: true, data: jasose });
-//   } catch (error) {
-//     res.status(400).json({ success: false, error: error.message });
-//   }
-// });
+    if(!myeonjoeb){
+      return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+    }
+    res.status(200).json({ success: true, data: myeonjoeb });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
 
-// app.post('/api/myeonjoeb/remove', async (req, res) => {
-//   const { kakaoId, nickname, id } = req.body;
+app.post('/api/myeonjeob/remove', async (req, res) => {
+  const { kakaoId, nickname, id } = req.body;
 
-//   try {
-//     const objectId = new mongoose.Types.ObjectId(id);
+  try {
+    const objectId = new mongoose.Types.ObjectId(id);
 
-//     // 해당 조건으로 데이터 삭제
-//     const result = await Jasose.findOneAndDelete({
-//       kakaoId: kakaoId,
-//       nickname: nickname,
-//       _id: objectId
-//     });
+    // 해당 조건으로 데이터 삭제
+    const result = await InterviewResult.findOneAndDelete({
+      kakaoId: kakaoId,
+      nickname: nickname,
+      _id: objectId
+    });
 
-//     if (result) {
-//       return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
-//     } else {
-//       return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
-//     }
-//   } catch (err) {
-//     return res.status(500).json({ error: '데이터베이스 오류' });
-//   }
-// });
+    if (result) {
+      return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: '데이터베이스 오류' });
+  }
+});
 
-
-// 레벨별 그룹화 반환
 app.get('/api/problem/level', async (req, res) => {
   try {
     const problemsByLevel = await Problem.aggregate([
@@ -300,7 +303,8 @@ app.get('/api/problem/level', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-// 문제와 테스트셋을 가져오는 API
+
+// 특정 문제 번호로 문제와 테스트셋 가져오기 API
 app.get('/api/problem/:no', async (req, res) => {
   try {
     const problem = await Problem.findOne({ no: req.params.no });
@@ -309,75 +313,65 @@ app.get('/api/problem/:no', async (req, res) => {
     }
     res.json(problem);
   } catch (error) {
-    // console.error('Error fetching problem:', error);
     res.status(500).json({ message: error.message });
   }
 });
 
-// 채용정보 불러오기 시작
-const JobPostingSchema = new mongoose.Schema({}, { strict: false });
-const JobPosting = mongoose.model('JobPosting', JobPostingSchema, 'all-job-posting');
-
-
-// 채용 데이터 불러오기 API
+// 채용 데이터 필터링 API
 app.post("/api/Recruitment/JobPostingList", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
-
     const { jobs, locations, experiences } = req.body;
+
+    console.log("필터 데이터: ",{jobs, locations, experiences})
 
     const query = {};
 
     // 직무 필터
     if (jobs && jobs.length > 0) {
       query["position.job_code.name"] = {
-        $regex: new RegExp(jobs.join('|')),  // jobs 배열의 값을 정규식으로 연결
-        $options: "i"  // 대소문자 구분 없이 검색 (필요할 경우)
+        $regex: new RegExp(jobs.join('|')),
+        $options: "i"
       };
     }
-
 
     // 지역 필터
     if (locations && locations.length > 0) {
       query["position.location.name"] = {
-        $regex: new RegExp(locations.join('|')),  // locations 배열을 정규식으로 변환
-        $options: "i"  // 대소문자 구분 없이 검색
+        $regex: new RegExp(locations.join('|')),
+        $options: "i"
       };
     }
 
     // 경력 필터
     if (experiences && experiences.length > 0) {
-      // 각 경력 옵션에 따른 min/max 범위를 설정합니다.
       const experienceRanges = {
-        "신입": { min: 0, max: 0 },            // 신입은 경력 0년
-        "1~3년": { min: 1, max: 3 },           // 1~3년 경력
-        "4~8년": { min: 4, max: 8 },           // 4~8년 경력
-        "9년 이상": { min: 9, max: Infinity }  // 9년 이상 경력
+        "신입": { min: 0, max: 0 },
+        "1~3년": { min: 1, max: 3 },
+        "4~8년": { min: 4, max: 8 },
+        "9년 이상": { min: 9, max: Infinity }
       };
 
-      // 각 경력 조건에 맞는 쿼리 생성
       const experienceConditions = experiences.map(exp => {
-        const range = experienceRanges[exp];  // 선택한 경력 범위에 맞는 값
+        const range = experienceRanges[exp];
         if (range) {
           return {
             $and: [
-              { "position.experience_level.min": { $lte: range.max } },  // 최소 경력이 선택한 범위의 최대값 이하
-              { "position.experience_level.max": { $gte: range.min } }   // 최대 경력이 선택한 범위의 최소값 이상
+              { "position.experience_level.min": { $lte: range.max } },
+              { "position.experience_level.max": { $gte: range.min } }
             ]
           };
         }
         return null;
-      }).filter(condition => condition !== null);  // null 값 제거
+      }).filter(condition => condition !== null);
 
-      // 경력무관인 항목은 항상 포함
       query.$or = [
         { "position.experience_level.name": "경력무관" },
         ...experienceConditions
-  ];
-}
-
+      ];
+    }
 
     const total = await JobPosting.countDocuments(query);
     const jobPostings = await JobPosting.find(query)
@@ -400,6 +394,12 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    const jobPostingsWithCreationDate = jobPostings.map(job => ({
+      ...job.toObject(),
+      creationDate: getCreationDateFromId(job._id)
+    }));
+
+
     if (jobPostings.length === 0) {
       return res.status(200).json({
         jobPostings: [],
@@ -410,7 +410,7 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     }
 
     res.status(200).json({
-      jobPostings,
+      jobPostings: jobPostingsWithCreationDate,
       currentPage: page,
       totalPages: Math.ceil(total / limit),
       totalItems: total
@@ -539,10 +539,99 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
 }
 });
 
+// 면접 결과 저장 API
+app.post('/api/interview/save', async (req, res) => {
+  const { kakaoId, nickname, questionsAndAnswers, accumulatedEmotions, emotionFeedback } = req.body;
+
+  // 필수 데이터 누락 시 에러 반환
+  if (!kakaoId || !nickname || !questionsAndAnswers || !accumulatedEmotions || !emotionFeedback) {
+    return res.status(400).json({ message: "Required data missing." });
+  }
+
+  try {
+    const newInterviewResult = new InterviewResult({
+      kakaoId,
+      nickname,
+      questionsAndAnswers,
+      accumulatedEmotions,
+      emotionFeedback,  // 감정 피드백 추가
+      createdAt: new Date()
+    });
+    await newInterviewResult.save();
+    res.status(200).json({ message: "Interview result saved successfully!" });
+  } catch (error) {
+    console.error("Failed to save interview result:", error.message); // 에러 메시지 출력
+    res.status(500).json({ message: "Failed to save interview result.", error: error.message });
+  }
+});
+
+// 면접 결과 조회 API
+app.post('/api/interview/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+
+  if (!kakaoId || !nickname) {
+    return res.status(400).json({ message: "kakaoId and nickname are required." });
+  }
+
+  try {
+    const interviewResults = await InterviewResult.find({ kakaoId, nickname }).sort({ createdAt: -1 });
+    if (!interviewResults.length) {
+      return res.status(404).json({ message: 'No interview results found' });
+    }
+    res.status(200).json({ success: true, data: interviewResults });
+  } catch (error) {
+    console.error("Failed to retrieve interview results:", error.message); // 에러 메시지 출력
+    res.status(500).json({ message: "Failed to retrieve interview results.", error: error.message });
+  }
+});
 
 
 
-const port = 5000;
-app.listen(port, () => {
-  console.log(`${port}`)
+
+
+// WebSocket 설정 (Speech-to-Text 처리)
+const server = app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  let recognizeStream = null;
+
+  ws.on('message', (message) => {
+    if (!recognizeStream) {
+      recognizeStream = client
+        .streamingRecognize({
+          config: {
+            encoding: 'WEBM_OPUS',
+            sampleRateHertz: 48000,
+            languageCode: 'ko-KR',
+          },
+          interimResults: true, // true
+        })
+        .on('error', (err) => {
+          console.error('Error in recognizeStream:', err);
+          ws.send(JSON.stringify({ error: err.message }));
+        })
+        .on('data', (data) => {
+          if (data.results[0] && data.results[0].alternatives[0] && data.results[0]) { // isFinal 조건 추가
+            ws.send(
+              JSON.stringify({ transcription: data.results[0].alternatives[0].transcript })
+            );
+          }
+        });
+      }
+
+    recognizeStream.write(Buffer.from(message));
+  });
+
+  ws.on('close', () => {
+    if (recognizeStream) {
+      recognizeStream.end();
+    }
+    console.log('Client disconnected');
+  });
 });
