@@ -7,7 +7,6 @@ const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
-const { JobPosting } = require("./models/JobPosting")
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const getCreationDateFromId = (id) => {
@@ -19,7 +18,7 @@ const { User } = require("./models/User");
 const { Problem } = require("./models/Problem");
 const { Jasose } = require("./models/Jasoses");
 const { Favorite } = require('./models/Favorites');
-const { JobPosting } = require("./models/JobPosting");
+const { JobPosting } = require("./models/JobPosting")
 
 const app = express();
 const port = 5000; // 통합된 포트
@@ -281,6 +280,8 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
     const { jobs, locations, experiences } = req.body;
+
+    console.log("필터 데이터: ", {jobs, locations, experiences});
 
     const query = {};
 
