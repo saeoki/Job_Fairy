@@ -6,9 +6,6 @@ const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
 const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-
-const ObjectId = require('mongoose').Types.ObjectId;
-
 const getCreationDateFromId = (id) => {
   return new Date(new ObjectId(id).getTimestamp());
 };
@@ -18,7 +15,9 @@ const { User } = require("./models/User");
 const { Problem } = require("./models/Problem");
 const { Jasose } = require("./models/Jasoses");
 const { Favorite } = require('./models/Favorites');
-const { JobPosting } = require("./models/JobPosting")
+const { JobPosting } = require("./models/JobPosting");
+const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const app = express();
 const port = 5000; // 통합된 포트
@@ -241,7 +240,51 @@ app.post('/api/jasose/remove', async (req, res) => {
   }
 });
 
-// 문제를 레벨별로 그룹화하여 반환 API
+app.post('/api/myeonjeob/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+  
+  try {
+    // 조건에 맞는 문서를 검색하고 최신순으로 정렬
+    let query = {};
+
+    // kakaoId와 nickname이 있을 경우에만 조건을 추가
+    if (kakaoId) query.kakaoId = kakaoId;
+    if (nickname) query.nickname = nickname;
+
+    let myeonjoeb = await InterviewResult.find(query).sort({ time: -1 }); 
+
+    if(!myeonjoeb){
+      return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+    }
+    res.status(200).json({ success: true, data: myeonjoeb });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/myeonjeob/remove', async (req, res) => {
+  const { kakaoId, nickname, id } = req.body;
+
+  try {
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    // 해당 조건으로 데이터 삭제
+    const result = await InterviewResult.findOneAndDelete({
+      kakaoId: kakaoId,
+      nickname: nickname,
+      _id: objectId
+    });
+
+    if (result) {
+      return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: '데이터베이스 오류' });
+  }
+});
+
 app.get('/api/problem/level', async (req, res) => {
   try {
     const problemsByLevel = await Problem.aggregate([
@@ -384,7 +427,7 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const { jobs, locations, salary } = req.body;
-  
+
     const query = {};
   
     // 직무 필터
@@ -494,10 +537,6 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
   res.status(500).json({ message: "채용 정보를 가져오는 중 오류가 발생했습니다.", error: err.message });
 }
 });
-
-// server.js 파일에 추가
-
-const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
 
 // 면접 결과 저장 API
 app.post('/api/interview/save', async (req, res) => {
