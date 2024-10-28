@@ -236,6 +236,50 @@ app.post('/api/jasose/remove', async (req, res) => {
   }
 });
 
+// app.post('/api/myeonjoeb/get', async (req, res) => {
+//   const { kakaoId, nickname } = req.body;
+  
+//   try {
+//     // 조건에 맞는 문서를 검색하고 최신순으로 정렬
+//     let query = {};
+
+//     // kakaoId와 nickname이 있을 경우에만 조건을 추가
+//     if (kakaoId) query.kakaoId = kakaoId;
+//     if (nickname) query.nickname = nickname;
+
+//     let jasose = await Jasose.find(query).sort({ time: -1 }); 
+
+//     if(!jasose){
+//       return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+//     }
+//     res.status(200).json({ success: true, data: jasose });
+//   } catch (error) {
+//     res.status(400).json({ success: false, error: error.message });
+//   }
+// });
+
+// app.post('/api/myeonjoeb/remove', async (req, res) => {
+//   const { kakaoId, nickname, id } = req.body;
+
+//   try {
+//     const objectId = new mongoose.Types.ObjectId(id);
+
+//     // 해당 조건으로 데이터 삭제
+//     const result = await Jasose.findOneAndDelete({
+//       kakaoId: kakaoId,
+//       nickname: nickname,
+//       _id: objectId
+//     });
+
+//     if (result) {
+//       return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+//     } else {
+//       return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+//     }
+//   } catch (err) {
+//     return res.status(500).json({ error: '데이터베이스 오류' });
+//   }
+// });
 
 
 // 레벨별 그룹화 반환
@@ -283,8 +327,6 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const { jobs, locations, experiences } = req.body;
-    
-    console.log("필터 데이터: ", {jobs, locations, experiences});
 
     const query = {};
 
@@ -386,7 +428,7 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const { jobs, locations, salary } = req.body;
-  
+
     const query = {};
   
     // 직무 필터
