@@ -85,10 +85,9 @@ const Body = () => {
         }
 
         fetchUserData();
-        setTimeout(() => {
-            fetchCustomData()
-        }, 500);
-    }, [kakaoId]); // kakaoId가 변경될 때만 실행
+        fetchCustomData(currentPage) // 현재 페이지를 전달
+    }, [kakaoId, currentPage, userdata]); // kakaoId와 currentPage, userdata가 변경될 때마다 실행
+
 
     // 해당 JobPosting의 스크랩 상태를 토글
     const handleScrapClick = (index) => {
