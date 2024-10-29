@@ -1,13 +1,86 @@
+
+// import React, { useState, useEffect } from 'react';
+// import { CircularProgress, Box, Typography } from '@mui/material';
+// import './QuestionDisplay.css';
+
+// function QuestionDisplay({ question, isPreparationTime, preparationTime, answerTime, onTimeUp }) {
+//   const [timeLeft, setTimeLeft] = useState(isPreparationTime ? preparationTime : answerTime);
+
+//   // isPreparationTime이 변경될 때마다 타이머 초기화
+//   useEffect(() => {
+//     setTimeLeft(isPreparationTime ? preparationTime : answerTime);
+//   }, [isPreparationTime, preparationTime, answerTime]);
+
+//   useEffect(() => {
+//     // 시간이 다 되면 onTimeUp을 호출하고 타이머 종료
+//     if (timeLeft <= 0) {
+//       onTimeUp();
+//       return;
+//     }
+
+//     const timerId = setInterval(() => {
+//       setTimeLeft((prevTime) => prevTime - 1);
+//     }, 1000);
+
+//     // 타이머 정리
+//     return () => clearInterval(timerId);
+//   }, [timeLeft]);
+
+//   const progress = (timeLeft / (isPreparationTime ? preparationTime : answerTime)) * 100;
+
+//   return (
+//     <div className="timer-box">
+//       <Box position="relative" display="inline-flex">
+//         <CircularProgress
+//           variant="determinate"
+//           value={progress}
+//           size={120}
+//           thickness={5}
+//           sx={{
+//             color: progress > 30 ? 'primary.main' : 'error.main',
+//             transform: 'rotate(-90deg)',
+//           }}
+//         />
+//         <Box
+//           top={0}
+//           left={0}
+//           bottom={0}
+//           right={0}
+//           position="absolute"
+//           display="flex"
+//           alignItems="center"
+//           justifyContent="center"
+//         >
+//           <Typography variant="h6" component="div" color="textSecondary">
+//             {timeLeft}s
+//           </Typography>
+//         </Box>
+//       </Box>
+
+//       <Typography variant="h6" className="question-text">
+//         {isPreparationTime ? "준비 시간입니다." : question || '질문이 없습니다.'}
+//       </Typography>
+//     </div>
+//   );
+// }
+
+// export default QuestionDisplay;
+
+
 import React, { useState, useEffect } from 'react';
-import './QuestionDisplay.css'; // 별도의 CSS 파일에서 스타일을 관리
+import { CircularProgress, Box, Typography } from '@mui/material';
+import './QuestionDisplay.css';
 
-function QuestionDisplay({ question, isPreparationTime, initialTime, onTimeUp }) {
-  const [timeLeft, setTimeLeft] = useState(initialTime); // 남은 시간 상태
+function QuestionDisplay({ question, isPreparationTime, preparationTime, answerTime, onTimeUp }) {
+  const [timeLeft, setTimeLeft] = useState(isPreparationTime ? preparationTime : answerTime);
 
-  // 타이머 로직
+  useEffect(() => {
+    setTimeLeft(isPreparationTime ? preparationTime : answerTime);
+  }, [isPreparationTime, preparationTime, answerTime]);
+
   useEffect(() => {
     if (timeLeft <= 0) {
-      onTimeUp(); // 시간이 다 되면 부모 컴포넌트로 시간 종료 이벤트 전송
+      onTimeUp();
       return;
     }
 
@@ -15,22 +88,44 @@ function QuestionDisplay({ question, isPreparationTime, initialTime, onTimeUp })
       setTimeLeft((prevTime) => prevTime - 1);
     }, 1000);
 
-    return () => clearInterval(timerId); // 컴포넌트가 사라질 때 타이머 정리
-  }, [timeLeft, onTimeUp]);
+    return () => clearInterval(timerId);
+  }, [timeLeft]);
 
-  useEffect(() => {
-    setTimeLeft(initialTime); // 새로운 질문일 때 타이머 초기화
-  }, [initialTime]);
+  const progress = (timeLeft / (isPreparationTime ? preparationTime : answerTime)) * 100;
 
   return (
-    <div className="timer-box">
-      {question ? (
-        <>
-          <h2 className="question-text">{question}</h2>
-        </>
-      ) : (
-        <h2 className="question-text">면접을 시작 버튼을 눌러주세요.</h2>
-      )}
+    <div className="question-timer-container">
+      <Typography variant="h6" className="question-text">
+        {isPreparationTime ? "준비 시간입니다." : question || '질문이 없습니다.'}
+      </Typography>
+      <div className="timer-box">
+        <Box position="relative" display="inline-flex">
+          <CircularProgress
+            variant="determinate"
+            value={progress}
+            size={120}
+            thickness={5}
+            sx={{
+              color: progress > 30 ? 'primary.main' : 'error.main',
+              transform: 'rotate(-90deg)',
+            }}
+          />
+          <Box
+            top={0}
+            left={0}
+            bottom={0}
+            right={0}
+            position="absolute"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Typography variant="h6" component="div" color="textSecondary">
+              {timeLeft}s
+            </Typography>
+          </Box>
+        </Box>
+      </div>
     </div>
   );
 }

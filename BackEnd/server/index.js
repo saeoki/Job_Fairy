@@ -6,6 +6,7 @@ const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
 const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+
 const getCreationDateFromId = (id) => {
   return new Date(new ObjectId(id).getTimestamp());
 };
