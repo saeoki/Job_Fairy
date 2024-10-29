@@ -1,46 +1,65 @@
 #AIinterviewbox {
-    width: 80%;
-    height: auto;
-    text-align: center;
-    justify-self: center;
-    align-self: center;
-    margin: auto;
-  }
-  
-  .interview-type-box {
-    display: flex;  
-    margin-bottom: 5vh;
-    flex-direction: column;
-    align-items: center; /* 가운데 정렬 */
+  width: 80%;
+  height: auto;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+  margin: auto;
+}
 
-  }
-
-  .camcheck-box{
-    margin-bottom: 5vh;
-    min-width: auto; 
-  }
-  
-  .interview-start-box{
-    min-width: auto; 
-
-  }
-  .selected-job-text {
-    font-weight: bold; /* 글씨 굵게 */
-    color: #3f51b5; /* Material UI 기본 파란색 */
-    background-color: #f0f4ff; /* 부드러운 배경색 */
-    padding: 8px; /* 텍스트 주변 여백 */
-    border-radius: 4px; /* 모서리를 둥글게 */
-    margin-top: 10px; /* 위쪽 여백 */
-    font-size: 1.1rem; /* 글씨 크기 조정 */
-  }
-  .interview-start-box {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+.interview-type-box {
+  display: flex;  
+  margin-bottom: 5vh;
+  flex-direction: column;
+  align-items: center;
 }
 
 .camcheck-box {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
+  margin-bottom: 5vh;
+  min-width: auto; 
+}
+
+.interview-start-box {
+  min-width: auto;
+}
+
+.selected-job-text {
+  font-weight: bold;
+  color: #3f51b5;
+  background-color: #f0f4ff;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 1.1rem;
+}
+
+.interview-start-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.camcheck-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+/* 질문과 타이머 중앙 정렬 */
+.question-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.timer-box {
+  margin-top: 15px; /* 질문 아래 여백 추가 */
+}
+
+.question-text {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
 }

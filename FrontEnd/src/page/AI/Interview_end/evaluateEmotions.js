@@ -12,13 +12,13 @@ export const generateEmotionFeedback = async (emotionScores) => {
   const messages = [
     {
       role: "system",
-      content: `당신은 감정 분석 평가관입니다. 주어진 감정 점수를 바탕으로 감정 상태에 대한 평가를 수행하고, 높은 점수를 가진 감정이 있다면 해당 감정에 대한 피드백을 제공해 주세요.`,
+      content: `당신은 면접 진행관 역할을 맡고 있습니다. 응답자의 감정 점수를 분석하여, 면접 과정에서 나타난 태도와 감정 표현에 대한 피드백을 제공해 주세요. 특히 높은 점수를 보이는 감정이 있다면, 그 감정이 면접에 미친 긍정적 혹은 부정적 영향을 구체적으로 평가해 주세요.`,
     },
     {
       role: "user",
-      content: `감정 점수: ${JSON.stringify(
+      content: `응답자의 감정 점수: ${JSON.stringify(
         emotionScores
-      )}\n\n각 감정 점수에 따라 응답자의 전반적인 감정 상태를 평가하고, 특히 점수가 높은 감정이 있다면 그 감정에 대해 구체적으로 설명해 주세요.`,
+      )}\n\n각 감정 점수를 바탕으로 응답자의 전반적인 면접 태도를 평가하고, 주된 감정이 면접 과정에 미친 영향에 대해 상세하게 설명해 주세요.`,
     },
   ];
 
@@ -27,7 +27,7 @@ export const generateEmotionFeedback = async (emotionScores) => {
       model: "gpt-3.5-turbo",
       messages: messages,
       temperature: 1,
-      max_tokens: 300, // 감정 평가 토큰 수
+      max_tokens: 700,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,

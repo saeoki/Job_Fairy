@@ -7,7 +7,6 @@ const speech = require('@google-cloud/speech'); // Google Speech API 모듈
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
-const { JobPosting } = require("./models/JobPosting")
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const getCreationDateFromId = (id) => {
