@@ -10,10 +10,12 @@ from airflow.models import Variable
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Variable.get("gcp_credentials_path")
 
+CHUNK_SIZE = 1000  # 한 번에 삽입할 도큐먼트 수
+
 @task
 def bulkload_to_mongo() :
     # INFO 레벨 이하 로그 비활성화
-    logging.disable(logging.INFO)
+    # logging.disable(logging.INFO)
 
     client = bigquery.Client()
     query = """
@@ -25,34 +27,36 @@ def bulkload_to_mongo() :
 
     mongo_uri = Variable.get("mongo_authorization_uri")
     mongo_client = MongoClient(mongo_uri)
-
     db = mongo_client['Job_Fairy']
     collection = db['all-job-posting']
 
     # 컬렉션 비우기
     collection.delete_many({})
-
     # 'id' 필드에 고유성 인덱스 생성
     collection.create_index("id", unique=True)
 
-    documents = [dict(row) for row in rows]
-    try:
-        # ordered=False : 오류 발생해도 나머지 도큐먼트 삽입
-        collection.insert_many(documents, ordered=False)
-        logging.info(f"{len(documents)}개의 도큐먼트가 성공적으로 MongoDB에 삽입되었습니다.")
+    # 청크로 데이터를 나누어 MongoDB에 삽입(메모리 최적화)
+    for i in range(0, len(rows), CHUNK_SIZE):
+        chunk = [dict(row) for row in rows[i:i + CHUNK_SIZE]]
+        try:
+            collection.insert_many(chunk, ordered=False)
+            logging.info(f"{len(chunk)}개의 도큐먼트를 성공적으로 MongoDB에 삽입했습니다.")
+        except errors.BulkWriteError as bwe:
+            logging.info(f"BulkWriteError 발생: {bwe.details}")
+            n_inserted = bwe.details.get('nInserted', 0)
+            logging.info(f"{len(chunk)}개 중 {n_inserted}개의 도큐먼트가 삽입되었습니다.")
+        except Exception as e:
+            logging.error(f"문서 삽입 실패: {e}")
 
-    except errors.BulkWriteError as bwe:
-        logging.info(f"BulkWriteError 발생: {bwe.details}")
-        n_inserted = bwe.details['nInserted']
-        logging.info(f"총 {len(documents)}개 중 {n_inserted}개의 도큐먼트가 삽입되었습니다.")
-
+    logging.info("Data가 MongoDB에 성공적으로 삽입되었습니다.")
     mongo_client.close()
+
 
 default_args = {
     'owner': 'sewook',
     'start_date': datetime(2024, 10, 1),
     #'email': ['dnrtp9256@gmail.com'],
-    'execution_timeout': timedelta(minutes=15),
+    'execution_timeout': timedelta(minutes=20),
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
