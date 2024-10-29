@@ -5,8 +5,8 @@ import "../css/inputForm.css"
 
 const positions = [
   '프론트엔드', '백엔드', '풀스택',
-  '데브옵스', '데이터 엔지니어', '데이터 사이언티스트',
-  'AI 엔지니어', '모바일 앱', '시스템 엔지니어'
+  '데브옵스', '데이터 엔지니어', '데이터 분석가', '데이터 사이언티스트',
+  '모바일 앱', '게임개발', '시스템 엔지니어', '개발PM'
 ];
 
 const PositionSelector = ({registerList, setRegisterList}) => {
