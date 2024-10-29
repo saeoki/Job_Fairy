@@ -137,7 +137,7 @@ app.post('/api/favorites/add', async (req, res) => {
 
     if (type === 'jasose') {
       userFavorite.data.jasose.push(id);
-    } else if (type === 'myeonjoeb') {
+    } else if (type === 'myeonjeob') {
       userFavorite.data.myeonjoeb.push(id);
     } else if (type === 'employment') {
       userFavorite.data.employment.push(id);
@@ -163,7 +163,7 @@ app.post('/api/favorites/remove', async (req, res) => {
 
     if (type === 'jasose') {
       userFavorite.data.jasose.pull(id);
-    } else if (type === 'myeonjoeb') {
+    } else if (type === 'myeonjeob') {
       userFavorite.data.myeonjoeb.pull(id);
     } else if (type === 'employment') {
       userFavorite.data.employment.pull(id);

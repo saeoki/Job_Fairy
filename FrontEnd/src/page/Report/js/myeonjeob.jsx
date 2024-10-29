@@ -52,7 +52,7 @@ const Myeonjoeb = () => {
         const fetchJasoseData = async () => {
             try {
                 // const myeonjeobResponse = await axios.post('http://localhost:5000/api/myeonjeob/get', 
-                const myeonjeobResponse = await axios.post(`${BackendIP}/api/jasose/get`, 
+                const myeonjeobResponse = await axios.post(`${BackendIP}/api/myeonjeob/get`, 
                     { kakaoId, nickname },
                     { withCredentials: true }
                 );
