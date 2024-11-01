@@ -1,0 +1,13 @@
+.control-buttons {
+  display: flex;
+  justify-content: center; /* 버튼을 가운데 정렬 */
+  gap: 10px; /* 버튼 간의 간격 */
+  margin-top: 20px;
+}
+
+.control-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
