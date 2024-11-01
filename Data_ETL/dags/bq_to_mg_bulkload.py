@@ -56,7 +56,7 @@ default_args = {
     'owner': 'sewook',
     'start_date': datetime(2024, 10, 1),
     #'email': ['dnrtp9256@gmail.com'],
-    'execution_timeout': timedelta(minutes=20),
+    'execution_timeout': timedelta(minutes=15),
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }

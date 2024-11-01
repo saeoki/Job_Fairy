@@ -23,6 +23,7 @@ import CondingTest from './page/codingtest/js/CodingTest';
 
 import "./App.css"
 import CustomJobList from './page/Recruitment/js/CustomJobList';
+import OpenRecruitment from './page/Recruitment/js/OpenRecruitment';
 
 function App() {
 
@@ -50,6 +51,7 @@ function App() {
           <Route path='/Recruitment' element={<Recruitment />} />
           <Route path='/Recruitment/JobPostingList' element={<JobPostingList />} />
           <Route path='/Recruitment/CustomJobList' element={<CustomJobList />} />
+          <Route path='/Recruitment/OpenRecruitment' element={<OpenRecruitment />} />
         </Routes>
       </AuthProvider>
     </div> 

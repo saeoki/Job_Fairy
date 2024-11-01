@@ -18,7 +18,8 @@ import {
   Button,
   Divider,
   Alert,
-  IconButton
+  IconButton,
+  useMediaQuery,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -26,6 +27,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
+import { useTheme } from '@mui/material/styles';
 
 
 export default function JobPostingListBody() {
@@ -37,6 +39,9 @@ export default function JobPostingListBody() {
     locations: [],
     experiences: []
   });  // 체크박스 상태를 관리할 필터 상태
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [noDataMessage, setNoDataMessage] = useState('');
   const navigate = useNavigate();
@@ -429,49 +434,72 @@ export default function JobPostingListBody() {
       </Box>
 
       
+      {/* Job Listings */}
       {noDataMessage ? (
-        <Alert severity="info">{noDataMessage}</Alert>
+        <Alert severity="info" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{noDataMessage}</Alert>
       ) : (
         jobPostings.map((job, index) => (
-          <Paper key={index} elevation={3} sx={{ mb: 2, p: 2 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Box>
-                <Typography variant="body1">
+          <Paper key={index} elevation={3} sx={{
+            mb: 1.5, 
+            p: { xs: 1.5, sm: 2, md: 3 },
+            fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+          }}>
+            <Box 
+              display="flex" 
+              flexDirection={{ xs: 'column', sm: 'row' }} 
+              justifyContent="space-between" 
+              alignItems={isSmallScreen ? 'center' : 'flex-start'}
+              textAlign={isSmallScreen ? 'center' : 'left'}
+            >
+              <Box mb={{ xs: 1, sm: 0 }}>
+                <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '0.95rem' } }}>
                   <a href={job?.company?.detail?.href || '#'} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1E90FF' }}>
                     {job?.company?.detail?.name || '회사 이름 없음'}
                   </a>
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.2rem' } }}>
                   <a href={job?.url || '#'} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                     {job?.position?.title || '제목 없음'}
                   </a>
                 </Typography>
               </Box>
-              <Box textAlign="right">
-                {/* 스크랩 아이콘 버튼 */}
+              <Box textAlign={isSmallScreen ? 'center' : 'right'} sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
                 <IconButton onClick={() => handleScrapClick(index)} color={scrappedJobs[index] ? "primary" : "default"}>
                   {scrappedJobs[index] ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                </IconButton>              
-                <Typography variant="body2">{formatLocation(job?.position?.location?.name)}</Typography>
-                <Typography variant="body2">{job?.position?.experience_level?.name || '경력 정보 없음'}</Typography>
-                <Typography variant="body2">{formatTimestamp(job?.expiration_timestamp)}</Typography>
+                </IconButton>
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {formatLocation(job?.position?.location?.name) || '위치 정보 없음'}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {job?.position?.experience_level?.name || '경력 정보 없음'}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {formatTimestamp(job?.expiration_timestamp)}
+                </Typography>
               </Box>
             </Box>
           </Paper>
         ))
       )}
 
-      {/* 페이지네이션 */}
-      <Box display="flex" justifyContent="center" mt={4}>
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" mt={3}>
         <Pagination
           count={totalPages}
           page={currentPage}
           onChange={(event, value) => {
             const params = new URLSearchParams(location.search);
-            params.set('page', value);  // 페이지 번호를 쿼리 스트링에 설정
+            params.set('page', value);
             navigate(`?${params.toString()}`);
           }}
           color="primary"
+          siblingCount={isSmallScreen ? 0 : 1} // 화면 크기에 따라 페이지네이션의 인접 페이지 수를 조정
+          boundaryCount={isSmallScreen ? 1 : 2} // 화면 크기에 따라 페이지네이션의 시작과 끝 페이지 수를 조정
+          sx={{
+            '.MuiPaginationItem-root': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            },
+          }}
         />
       </Box>
     </Container>
