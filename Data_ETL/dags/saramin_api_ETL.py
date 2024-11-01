@@ -16,6 +16,10 @@ from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 access_key = Variable.get("saramin_api_key")
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Variable.get("gcp_credentials_path")
 
+# 오늘 날짜 기준 파일명 정의
+today_date = datetime.now().strftime("%Y%m%d")
+local_file = f'/var/lib/airflow/dags/all_jobs_saramin_{today_date}.json'
+
 # 재귀적으로 딕셔너리의 키에서 '-'를 '_'로 바꾸는 함수
 def replace_hyphens(obj):
     if isinstance(obj, dict):
@@ -53,9 +57,25 @@ def fetch(start, count, bbs_gb=None) :
         logging.info(f"Error : {response.status_code}, {response.text}")
         return None
 
-# 위의 fetch를 사용하는 메인급 호출함수
 @task
-def extract_jobs(public_total_results, non_public_total_results, local_file, max_count) :
+def fetch_initial_data() :
+    public_initial_data = fetch(start=0, count=1, bbs_gb=1)
+    non_public_initial_data = fetch(start=0, count=1)
+
+    if public_initial_data and non_public_initial_data :
+        public_total_results = int(public_initial_data['jobs']['total'])
+        non_public_total_results = int(non_public_initial_data['jobs']['total'])
+        logging.info(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
+        return (public_total_results, non_public_total_results)
+    else :
+        raise ValueError("API 호출 실패: 초기 데이터 가져오기 실패")
+
+
+# fetch함수를 사용하는 메인급 호출함수
+@task
+def extract_jobs(total_results) :
+    public_total_results, non_public_total_results = total_results
+    max_count = 110
     first_batch = True
     job_ids_set = set() # 중복 방지 체크를 위한 id set
 
@@ -229,17 +249,8 @@ with DAG(
     catchup=False,
 ) as dag: 
 
-    public_initial_data = fetch(start=0, count=1, bbs_gb=1)
-    non_public_initial_data = fetch(start=0, count=1)
-
-    public_total_results = int(public_initial_data['jobs']['total'])
-    non_public_total_results = int(non_public_initial_data['jobs']['total'])
-    logging.info(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
-
-    today_date = datetime.now().strftime("%Y%m%d")
-    local_file = f'/var/lib/airflow/dags/all_jobs_saramin_{today_date}.json'
-
-    extract = extract_jobs(public_total_results, non_public_total_results, local_file, max_count=110)
+    initial_data = fetch_initial_data()
+    extract = extract_jobs(initial_data)
     transform = transform_json(local_file)
     load = load_to_gcs(local_file)
     bulkload = bulkload_to_bigquery(load)
@@ -247,7 +258,7 @@ with DAG(
     trigger_bq_to_mg = TriggerDagRunOperator(
         task_id='trigger_bq_to_mg_bulkload',
         trigger_dag_id='bq_to_mg_bulkload',
-        wait_for_completion=True # True 설정시 트리거된 dag의 완료를 기다림
+        wait_for_completion=False # True 설정시 트리거된 dag의 완료를 기다림
     )
 
-    extract >> transform >> load >> bulkload >> trigger_bq_to_mg
+    initial_data >> extract >> transform >> load >> bulkload >> trigger_bq_to_mg

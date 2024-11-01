@@ -475,6 +475,10 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
     .skip(skip)
     .limit(limit);
   
+  const jobPostingsWithCreationDate = jobPostings.map(job => ({
+    ...job.toObject(),
+    creationDate: getCreationDateFromId(job._id)
+  }));
 
   if (jobPostings.length === 0) {
     return res.status(200).json({
@@ -486,7 +490,7 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
   }
 
   res.status(200).json({
-    jobPostings,
+    jobPostings: jobPostingsWithCreationDate,
     currentPage: page,
     totalPages: Math.ceil(total / limit),
     totalItems: total
@@ -496,6 +500,73 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
   res.status(500).json({ message: "채용 정보를 가져오는 중 오류가 발생했습니다.", error: err.message });
 }
 });
+
+
+// Recruitment 메인 페이지의 최근 공채데이터 API
+app.get("/api/recruitment/latest", async (req, res) => {
+  try {
+    const latestOpenRecruitments = await JobPosting.find({ bbs_gb: 1})
+      .sort({ posting_timestamp: -1})
+      .limit(8)
+      .select({
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.title": 1,
+        "position.location.name": 1,
+        "expiration_timestamp": 1,
+        "url": 1
+      });
+
+    res.status(200).json({ openRecruitments: latestOpenRecruitments });
+  } catch (err) {
+    console.error("/api/recruitment/latest 에서 에러 발생:", err);
+    res.status(500).json({ message: "최근 공채 정보 8개를 가져오는 중 오류가 발생했습니다.", error: err.message });
+  }
+});
+
+
+// 공개 채용 정보 API
+app.post('/api/Recruitment/OpenRecruitment', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // 페이지당 항목 수
+    const skip = (page - 1) * limit;
+
+    // bbs_gb가 1인 데이터만 필터링
+    const query = { bbs_gb: 1 };
+    
+    const totalItems = await JobPosting.countDocuments(query);
+    const jobPostings = await JobPosting.find(query)
+      .skip(skip)
+      .limit(limit)
+      .select({
+        "bbs_gb": 1,
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.title": 1,
+        "position.location.name": 1,
+        "position.experience_level.name": 1,
+        "expiration_timestamp": 1,
+        "url": 1
+      });
+
+    const jobPostingsWithCreationDate = jobPostings.map(job => ({
+      ...job.toObject(),
+      creationDate: getCreationDateFromId(job._id)
+    }));
+
+
+    res.status(200).json({
+      jobPostings: jobPostingsWithCreationDate,
+      totalPages: Math.ceil(totalItems / limit),
+      totalItems,
+    });
+  } catch (err) {
+    console.error("Error in fetching open recruitment data:", err);
+    res.status(500).json({ message: "오류 발생", error: err.message });
+  }
+});
+
 
 // server.js 파일에 추가
 
