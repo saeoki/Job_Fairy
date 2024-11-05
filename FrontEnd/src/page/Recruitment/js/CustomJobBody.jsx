@@ -17,8 +17,8 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
-
 import "../css/Custom.css";
+import ScrapButton from "../../../components/ScrapButton";
 
 const BackendIP = process.env.REACT_APP_EC2_IP;
 
@@ -87,7 +87,7 @@ const Body = () => {
             if (kakaoId && userdata) {
                 try {
                     const response = await axios.post(`${BackendIP}/api/Recruitment/Custom?page=${page}`, { 
-                    //const response = await axios.post(`http://localhost:5000/api/Recruitment/Custom?page=${page}`, { 
+                    // const response = await axios.post(`http://localhost:5000/api/Recruitment/Custom?page=${page}`, { 
                         jobs: userdata.position,
                         locations: userdata.location,
                         salary: userdata.salary[0]
@@ -105,13 +105,6 @@ const Body = () => {
         fetchCustomData(currentPage);
     }, [kakaoId, currentPage, userdata]);
 
-
-    // 해당 JobPosting의 스크랩 상태를 토글
-    const handleScrapClick = (index) => {
-        const updatedScraps = [...scrappedJobs];
-        updatedScraps[index] = !updatedScraps[index]; // 해당 잡포스팅의 스크랩 상태 토글
-        setScrappedJobs(updatedScraps);
-    };
 
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return ''; // timestamp가 없으면 빈 문자열 반환
@@ -214,9 +207,8 @@ const Body = () => {
                             </Typography>
                         </Box>
                         <Box textAlign={isSmallScreen ? 'center' : 'right'} sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
-                            <IconButton onClick={() => handleScrapClick(index)} color={scrappedJobs[index] ? "primary" : "default"}>
-                            {scrappedJobs[index] ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                            </IconButton>
+                            <ScrapButton kakaoId={kakaoId} jobId={job.id} jobPosting={job} />
+
                             <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
                             {formatLocation(job?.position?.location?.name) || '위치 정보 없음'}
                             </Typography>

@@ -11,15 +11,16 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
-import Tooltip from '@mui/material/Tooltip';
-import InfoIcon from '@mui/icons-material/Info';
+
 import ScrapButton from '../../../components/ScrapButton';
 import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import { LoginExpErrorToast } from "../../../components/ToastMessage";
 
 const BackendIP = process.env.REACT_APP_EC2_IP;
 
 
-export default function OpenRecruitmentBody() {
+export default function ScrappedPostingList() {
   const [jobPostings, setJobPostings] = useState([]); 
   const [kakaoId, setKakaoId] = useState("");
   const [totalPages, setTotalPages] = useState(1); 
@@ -35,50 +36,41 @@ export default function OpenRecruitmentBody() {
   const query = new URLSearchParams(location.search);
   const currentPage = parseInt(query.get('page')) || 1; 
 
-  // 로그인 상태 확인
   useEffect(() => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const userData = jwtDecode(token);
-        setKakaoId(userData.kakaoId);
-      }
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("Token not found");
+        } else {
+            const userData = jwtDecode(token);
+            setKakaoId(userData.kakaoId);
+        }
     } catch (error) {
-      console.warn("로그인 상태를 확인하는 중 오류 발생:", error);
+        LoginExpErrorToast();
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1000);
     }
-  }, []);
-
-  const fetchJobPostings = async (page) => {
-    try {
-        const response = await fetch(`${BackendIP}/api/Recruitment/OpenRecruitment?page=${page}`, {
-        // const response = await fetch(`http://localhost:5000/api/Recruitment/OpenRecruitment?page=${page}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ bbs_gb: 1 }),
-      });
-      const data = await response.json();
-
-      if (data.jobPostings.length === 0) {
-        setNoDataMessage("일치하는 데이터가 없습니다");
-      } else {
-        setNoDataMessage('');
-      }
-
-      setJobPostings(data.jobPostings);
-      setTotalPages(data.totalPages);
-      setTotalItems(data.totalItems);
-      setScrappedJobs(data.jobPostings.map(() => false));
-    } catch (error) {
-      console.error("Error fetching job postings:", error);
-    }
-  };
-
+  }, []); // 빈 배열로 한 번만 실행
 
   useEffect(() => {
-    fetchJobPostings(currentPage);
-  }, [currentPage]);
+    const fetchScrappedJobs = async (page) => {
+        if (kakaoId) {
+            try {
+                const response = await axios.get(`${BackendIP}/api/Recruitment/ScrappedPostingList/${kakaoId}?page=${page}`);
+                // const response = await axios.get(`http://localhost:5000/api/Recruitment/ScrappedPostingList/${kakaoId}?page=${page}`);
+                const data = await response.data; 
+                setScrappedJobs(data.scrappedJobs);
+                setTotalPages(data.totalPages);
+                setTotalItems(data.totalItems);
+            } catch (err) {
+                alert("오류 발생: " + err.message);
+            }
+        }
+    };
+
+    fetchScrappedJobs(currentPage);
+}, [kakaoId, currentPage]);
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
@@ -93,15 +85,6 @@ export default function OpenRecruitmentBody() {
     return firstPart.replace(/>/g, ' ');
   };
 
-    // 도큐먼트 생성 타임스탬프 처리
-  const formatCreationDate = (creationDate) => {
-    if (!creationDate) return ''; // creationDate가 없으면 빈 문자열 반환
-    return new Date(creationDate).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-  };
 
   return (
     <Container maxWidth="lg" sx={{ my: { xs: 2, sm: 4 } }}>
@@ -122,45 +105,22 @@ export default function OpenRecruitmentBody() {
             display: 'inline-block',
           }}
         >
-          공개채용 정보 모아보기
-        </Typography>
-        <Typography 
-          variant="body1" 
-          color="textSecondary"
-          sx={{
-            marginTop: '8px', 
-            fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
-            color: '#6C757D', 
-            fontFamily: 'Inter, sans-serif',
-          }}
-        >
-          IT개발·데이터 분야의 공개채용 정보를 모두 모아놓았습니다.
+          스크랩 공고 모아보기
         </Typography>
       </Box>
 
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
-          {/* i 기호와 툴팁 추가 */}
-          <Tooltip title="채용공고 데이터는 매일 00시 00분에 자동으로 업데이트 됩니다." arrow>
-            <IconButton sx={{ padding: 0, marginRight: '5px' }}>
-              <InfoIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Typography variant="body2" sx={{ color: '#888', marginRight: 1 }}>
-            최근 업데이트:
-          </Typography>
-
-          <Typography variant="body2" sx={{ color: '#888', marginRight: 2 }}>
-            {formatCreationDate(jobPostings[0]?.creationDate)}
-          </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        {scrappedJobs.length > 0 && (
+          <Typography variant="h6" sx={{ color: '#1976d2' }}>
+            총 {totalItems} 건
+          </Typography>)}
       </Box>
-
 
       {/* Job Listings */}
       {noDataMessage ? (
         <Alert severity="info" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{noDataMessage}</Alert>
       ) : (
-        jobPostings.map((job, index) => (
+        scrappedJobs.map((job, index) => (
           <Paper key={index} elevation={3} sx={{
             mb: 1.5, 
             p: { xs: 1.5, sm: 2, md: 3 },
@@ -187,7 +147,7 @@ export default function OpenRecruitmentBody() {
               </Box>
               <Box textAlign={isSmallScreen ? 'center' : 'right'} sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
                 {/* ScrapButton에 kakaoId 전달 */}
-                <ScrapButton kakaoId={kakaoId} jobId={job.id} jobPosting={job} />
+                <ScrapButton kakaoId={kakaoId} jobId={job.jobId} jobPosting={job} />
 
                 <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
                   {formatLocation(job?.position?.location?.name) || '위치 정보 없음'}
