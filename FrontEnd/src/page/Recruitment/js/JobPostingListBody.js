@@ -411,7 +411,6 @@ export default function JobPostingListBody() {
           >
             <MenuItem value="recent">최신순</MenuItem>
             <MenuItem value="popular">마감일순</MenuItem>
-            <MenuItem value="salary">연봉순</MenuItem>
           </Select>
         </FormControl>
       </Box>
