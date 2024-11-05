@@ -23,15 +23,15 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
 import { useTheme } from '@mui/material/styles';
-
+import ScrapButton from '../../../components/ScrapButton';
+import { jwtDecode } from 'jwt-decode';
 
 export default function JobPostingListBody() {
   const [jobPostings, setJobPostings] = useState([]);  // 서버에서 가져올 데이터 상태
+  const [kakaoId, setKakaoId] = useState("");
   const [totalPages, setTotalPages] = useState(1);      // 전체 페이지 수
   const [totalItems, setTotalItems] = useState(0);      // 전체 공고 개수
   const [selectedFilters, setSelectedFilters] = useState({
@@ -49,16 +49,6 @@ export default function JobPostingListBody() {
   const [sortBy, setSortBy] = useState('');
 
 
-  // 각 JobPosting의 스크랩 상태를 관리하는 배열
-  const [scrappedJobs, setScrappedJobs] = useState(jobPostings.map(() => false));
-
-  // 해당 JobPosting의 스크랩 상태를 토글
-  const handleScrapClick = (index) => {
-    const updatedScraps = [...scrappedJobs];
-    updatedScraps[index] = !updatedScraps[index]; // 해당 잡포스팅의 스크랩 상태 토글
-    setScrappedJobs(updatedScraps);
-  };
-
   // 쿼리 파라미터에서 페이지 번호 추출
   const query = new URLSearchParams(location.search);
   const currentPage = parseInt(query.get('page')) || 1;  // 쿼리 파라미터가 없으면 1로 설정
@@ -72,12 +62,26 @@ export default function JobPostingListBody() {
     setSelectedFilters({ jobs, locations, experiences });
   }, [location.search]);
 
+  // 로그인 상태 확인
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userData = jwtDecode(token);
+        setKakaoId(userData.kakaoId);
+      }
+    } catch (error) {
+      console.warn("로그인 상태를 확인하는 중 오류 발생:", error);
+    }
+  }, []);
 
   const fetchJobPostings = async (page, filters = {}) => {
     try {
       // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
       // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
       const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
+      // const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,10 +108,6 @@ export default function JobPostingListBody() {
     // 정렬 기준 변경 시 처리 (필요에 따라 구현)
   };
 
-  const handlePageChange = (event, value) => {
-    // 페이지 변경 시 URL 업데이트
-    navigate(`?page=${value}`);
-  };
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return ''; // timestamp가 없으면 빈 문자열 반환
@@ -464,9 +464,9 @@ export default function JobPostingListBody() {
                 </Typography>
               </Box>
               <Box textAlign={isSmallScreen ? 'center' : 'right'} sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
-                <IconButton onClick={() => handleScrapClick(index)} color={scrappedJobs[index] ? "primary" : "default"}>
-                  {scrappedJobs[index] ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                </IconButton>
+                {/* ScrapButton에 kakaoId 전달 */}
+                <ScrapButton kakaoId={kakaoId} jobId={job.id} jobPosting={job} />
+
                 <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
                   {formatLocation(job?.position?.location?.name) || '위치 정보 없음'}
                 </Typography>

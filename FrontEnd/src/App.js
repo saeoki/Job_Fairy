@@ -24,6 +24,7 @@ import CondingTest from './page/codingtest/js/CodingTest';
 import "./App.css"
 import CustomJobList from './page/Recruitment/js/CustomJobList';
 import OpenRecruitment from './page/Recruitment/js/OpenRecruitment';
+import ScrappedPostingList from './page/Recruitment/js/ScrappedPostingList';
 
 function App() {
 
@@ -52,6 +53,7 @@ function App() {
           <Route path='/Recruitment/JobPostingList' element={<JobPostingList />} />
           <Route path='/Recruitment/CustomJobList' element={<CustomJobList />} />
           <Route path='/Recruitment/OpenRecruitment' element={<OpenRecruitment />} />
+          <Route path='/Recruitment/ScrappedPostingList' element={<ScrappedPostingList />} />
         </Routes>
       </AuthProvider>
     </div> 

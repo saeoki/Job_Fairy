@@ -58,7 +58,8 @@ const jobPostingSchema = new mongoose.Schema({
     expiration_timestamp: Number, // 마감 기한 (Unix timestamp)
     salary: String, // 연봉 정보
     active: Number, // 공고 진행 여부 (1:진행중, 0:마감)
-    url: String  // 공고 링크
+    url: String,  // 공고 링크
+    id: Number
 }, { collection: 'all-job-posting' });
 
 
