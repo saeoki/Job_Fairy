@@ -8,6 +8,10 @@ import {
   Pagination,
   Alert,
   useMediaQuery,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
@@ -28,6 +32,8 @@ export default function OpenRecruitmentBody() {
   const [scrappedJobs, setScrappedJobs] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState('');
+
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -79,6 +85,11 @@ export default function OpenRecruitmentBody() {
   useEffect(() => {
     fetchJobPostings(currentPage);
   }, [currentPage]);
+
+  const handleSortChange = (event) => {
+    // 정렬 기준 변경 시 처리 (필요에 따라 구현)
+  };
+
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
@@ -136,6 +147,27 @@ export default function OpenRecruitmentBody() {
         >
           IT개발·데이터 분야의 공개채용 정보를 모두 모아놓았습니다.
         </Typography>
+      </Box>
+
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        {jobPostings.length > 0 && (
+          <Typography variant="h6" sx={{ color: '#1976d2' }}>
+            총 {totalItems} 건
+          </Typography>)}
+        
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel id="sort-select-label">정렬 기준</InputLabel>
+          <Select
+            labelId="sort-select-label"
+            id="sort-select"
+            value={sortBy}
+            label="정렬 기준"
+            onChange={handleSortChange}
+          >
+            <MenuItem value="recent">최신순</MenuItem>
+            <MenuItem value="popular">마감일순</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
       <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
