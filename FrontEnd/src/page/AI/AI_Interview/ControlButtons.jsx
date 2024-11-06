@@ -18,6 +18,7 @@ function ControlButtons({ isInterviewStarted, isAnsweringTime, onStartInterview,
         <Button variant="contained" color="primary" onClick={onCompleteAnswering} className="control-button">
           답변 완료
         </Button>
+        
       ) : (
         <Button variant="contained" color="primary" onClick={onStartAnswering} className="control-button">
           답변 시작

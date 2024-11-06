@@ -1,64 +1,78 @@
 
+// import React, { useEffect, useRef } from 'react';
+
+// function AudioRecorder({ isRecording, audioStream, onSaveRecording }) {
+//   const mediaRecorderRef = useRef(null);
+
+//   useEffect(() => {
+//     if (isRecording) {
+//       if (!audioStream) return;
+
+//       // MediaRecorder 초기화
+//       mediaRecorderRef.current = new MediaRecorder(audioStream);
+//       const chunks = [];
+
+//       // 녹음 시작
+//       mediaRecorderRef.current.ondataavailable = (event) => {
+//         if (event.data.size > 0) {
+//           chunks.push(event.data);
+//         }
+//       };
+
+//       mediaRecorderRef.current.onstop = async () => {
+//         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+//         onSaveRecording(audioBlob);
+//       };
+
+//       mediaRecorderRef.current.start();
+//       console.log("Recording started");
+
+//       // 녹음 중지 시 정리
+//       return () => {
+//         if (mediaRecorderRef.current.state !== 'inactive') {
+//           mediaRecorderRef.current.stop();
+//           console.log("Recording stopped");
+//         }
+//       };
+//     }
+//   }, [isRecording, audioStream, onSaveRecording]);
+
+//   return null;
+// }
+
+// export default AudioRecorder;
 import React, { useEffect, useRef } from 'react';
 
-function AudioRecorder({ isRecording, socketRef, audioStream }) {
+function AudioRecorder({ isRecording, audioStream, onSaveRecording }) {
   const mediaRecorderRef = useRef(null);
 
   useEffect(() => {
-    if (!audioStream) return;
+    if (isRecording && audioStream) {
+      mediaRecorderRef.current = new MediaRecorder(audioStream);
+      const chunks = [];
 
-    const startRecording = () => {
-      try {
-        // 지원되는 MIME 타입 확인 및 설정
-        let options = { mimeType: 'audio/webm; codecs=opus' };
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-          options = { mimeType: 'audio/ogg; codecs=opus' };
-          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = { mimeType: 'audio/wav' };
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-              options = {}; // 기본 설정 사용
-            }
-          }
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
         }
+      };
 
-        mediaRecorderRef.current = new MediaRecorder(audioStream, options);
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        onSaveRecording(audioBlob);
+      };
 
-        mediaRecorderRef.current.ondataavailable = (event) => {
-          if (
-            event.data.size > 0 &&
-            socketRef.current &&
-            socketRef.current.readyState === WebSocket.OPEN
-          ) {
-            // 데이터를 ArrayBuffer로 변환하여 전송
-            event.data.arrayBuffer().then((arrayBuffer) => {
-              socketRef.current.send(arrayBuffer);
-            });
-          }
-        };
+      mediaRecorderRef.current.start();
+      console.log("Recording started");
 
-        mediaRecorderRef.current.start(250); // 0.25초마다 데이터 전송
-      } catch (e) {
-        console.error('Failed to start MediaRecorder:', e);
-        alert('녹음을 시작할 수 없습니다. 브라우저가 MediaRecorder를 지원하는지 확인하세요.');
-      }
-    };
-
-    const stopRecording = () => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-      }
-    };
-
-    if (isRecording) {
-      startRecording();
-    } else {
-      stopRecording();
+      return () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+          mediaRecorderRef.current.stop();
+          console.log("Recording stopped");
+        }
+      };
     }
-
-    return () => {
-      stopRecording();
-    };
-  }, [isRecording, audioStream, socketRef]);
+  }, [isRecording, audioStream, onSaveRecording]);
 
   return null;
 }

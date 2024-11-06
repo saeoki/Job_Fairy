@@ -89,7 +89,7 @@
 //         .on('error', (err) => {
 //           console.error('Error in recognizeStream:', err);
 //           ws.send(JSON.stringify({ error: err.message }));
-//         })
+//         })cd
 //         .on('data', (data) => {
 //           if (data.results[0] && data.results[0].alternatives[0]) {
 //             ws.send(
