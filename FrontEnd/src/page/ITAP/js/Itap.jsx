@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { qnaList, infoList } from "./data"; 
-import {HomeFilled} from '@ant-design/icons'
+import { HomeFilled } from '@ant-design/icons'
 import { Link } from "react-router-dom";
 import "../css/main.css";
 import "../css/default.css";

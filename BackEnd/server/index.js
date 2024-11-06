@@ -11,7 +11,6 @@ const multer = require('multer');
 
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const getCreationDateFromId = (id) => {
@@ -24,6 +23,8 @@ const { Problem } = require("./models/Problem");
 const { Jasose } = require("./models/Jasoses");
 const { Favorite } = require('./models/Favorites');
 const { JobPosting } = require("./models/JobPosting");
+const { InterviewResult } = require('./models/InterviewResult');
+const ScrappedJob = require("./models/ScrappedJob");
 
 const app = express();
 const port = 5000; // 통합된 포트
@@ -80,7 +81,7 @@ app.post('/api/auth/kakao', async (req, res) => {
   }
 });
 
-// 사용자 등록 API
+// 사용자 정보 추가 API
 app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
   try {
@@ -145,7 +146,7 @@ app.post('/api/favorites/add', async (req, res) => {
 
     if (type === 'jasose') {
       userFavorite.data.jasose.push(id);
-    } else if (type === 'myeonjoeb') {
+    } else if (type === 'myeonjeob') {
       userFavorite.data.myeonjoeb.push(id);
     } else if (type === 'employment') {
       userFavorite.data.employment.push(id);
@@ -171,7 +172,7 @@ app.post('/api/favorites/remove', async (req, res) => {
 
     if (type === 'jasose') {
       userFavorite.data.jasose.pull(id);
-    } else if (type === 'myeonjoeb') {
+    } else if (type === 'myeonjeob') {
       userFavorite.data.myeonjoeb.pull(id);
     } else if (type === 'employment') {
       userFavorite.data.employment.pull(id);
@@ -248,7 +249,54 @@ app.post('/api/jasose/remove', async (req, res) => {
   }
 });
 
-// 문제를 레벨별로 그룹화하여 반환 API
+// 면접 리포트 가져오기 API
+app.post('/api/myeonjeob/get', async (req, res) => {
+  const { kakaoId, nickname } = req.body;
+  
+  try {
+    // 조건에 맞는 문서를 검색하고 최신순으로 정렬
+    let query = {};
+
+    // kakaoId와 nickname이 있을 경우에만 조건을 추가
+    if (kakaoId) query.kakaoId = kakaoId;
+    if (nickname) query.nickname = nickname;
+
+    let myeonjoeb = await InterviewResult.find(query).sort({ time: -1 }); 
+
+    if(!myeonjoeb){
+      return res.status(404).json({success: false, error:"저장된 데이터가 없습니다."})
+    }
+    res.status(200).json({ success: true, data: myeonjoeb });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// 면접 리포트 삭제하기 API
+app.post('/api/myeonjeob/remove', async (req, res) => {
+  const { kakaoId, nickname, id } = req.body;
+
+  try {
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    // 해당 조건으로 데이터 삭제
+    const result = await InterviewResult.findOneAndDelete({
+      kakaoId: kakaoId,
+      nickname: nickname,
+      _id: objectId
+    });
+
+    if (result) {
+      return res.status(200).json({ message: '성공적으로 삭제되었습니다.' });
+    } else {
+      return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: '데이터베이스 오류' });
+  }
+});
+
+// 코딩테스트 레벨별 필터링 된 데이터 가져오기 API
 app.get('/api/problem/level', async (req, res) => {
   try {
     const problemsByLevel = await Problem.aggregate([
@@ -287,6 +335,8 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
     const { jobs, locations, experiences } = req.body;
+
+    console.log("필터 데이터: ", {jobs, locations, experiences});
 
     const query = {};
 
@@ -350,7 +400,8 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
         "posting_timestamp": 1,
         "expiration_timestamp": 1,
         "salary": 1,
-        "url": 1
+        "url": 1,
+        "id": 1
       })
       .skip(skip)
       .limit(limit);
@@ -389,7 +440,7 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const { jobs, locations, salary } = req.body;
-  
+
     const query = {};
   
     // 직무 필터
@@ -399,11 +450,13 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
       "백엔드": "백엔드/서버개발",
       "풀스택": "웹개발, 백엔드/서버개발, 프론트엔드",
       "데브옵스": "기술지원, 유지보수",
-      "데이터 엔지니어": "데이터엔지니어, 데이터분석가",
-      "데이터 사이언티스트": "데이터 사이언티스트, DBA",
-      "Ai 엔지니어": "AI(인공지능), 데이터엔지니어",
-      "모바일 앱": "앱개발, 게임개발",
-      "시스템 엔지니어": "SE(시스템엔지니어), 개발PM"
+      "데이터 엔지니어": "데이터엔지니어, DBA",
+      "데이터 분석가": "데이터분석가",
+      "데이터 사이언티스트": "데이터 사이언티스트",
+      "모바일 앱": "앱개발",
+      "게임개발": "게임개발",
+      "시스템 엔지니어": "SE(시스템엔지니어)",
+      "개발PM": "개발PM"
     };
 
 
@@ -473,11 +526,16 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
       "posting_timestamp": 1,
       "expiration_timestamp": 1,
       "salary": 1,
-      "url": 1
+      "url": 1,
+      "id": 1
     })
     .skip(skip)
     .limit(limit);
   
+  const jobPostingsWithCreationDate = jobPostings.map(job => ({
+    ...job.toObject(),
+    creationDate: getCreationDateFromId(job._id)
+  }));
 
   if (jobPostings.length === 0) {
     return res.status(200).json({
@@ -489,7 +547,7 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
   }
 
   res.status(200).json({
-    jobPostings,
+    jobPostings: jobPostingsWithCreationDate,
     currentPage: page,
     totalPages: Math.ceil(total / limit),
     totalItems: total
@@ -500,9 +558,126 @@ app.post("/api/Recruitment/Custom", async (req, res) => {
 }
 });
 
-// server.js 파일에 추가
 
-const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
+// Recruitment 메인 페이지의 최근 공채데이터 API
+app.get("/api/recruitment/latest", async (req, res) => {
+  try {
+    const latestOpenRecruitments = await JobPosting.find({ bbs_gb: 1})
+      .sort({ posting_timestamp: -1})
+      .limit(8)
+      .select({
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.title": 1,
+        "position.location.name": 1,
+        "expiration_timestamp": 1,
+        "url": 1,
+        "id": 1
+      });
+
+    res.status(200).json({ openRecruitments: latestOpenRecruitments });
+  } catch (err) {
+    console.error("/api/recruitment/latest 에서 에러 발생:", err);
+    res.status(500).json({ message: "최근 공채 정보 8개를 가져오는 중 오류가 발생했습니다.", error: err.message });
+  }
+});
+
+
+// 공개 채용 정보 API
+app.post('/api/Recruitment/OpenRecruitment', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // 페이지당 항목 수
+    const skip = (page - 1) * limit;
+
+    // bbs_gb가 1인 데이터만 필터링
+    const query = { bbs_gb: 1 };
+    
+    const totalItems = await JobPosting.countDocuments(query);
+    const jobPostings = await JobPosting.find(query)
+      .skip(skip)
+      .limit(limit)
+      .select({
+        "bbs_gb": 1,
+        "company.detail.name": 1,
+        "company.detail.href": 1,
+        "position.title": 1,
+        "position.location.name": 1,
+        "position.experience_level.name": 1,
+        "expiration_timestamp": 1,
+        "url": 1,
+        "id": 1
+      });
+
+    const jobPostingsWithCreationDate = jobPostings.map(job => ({
+      ...job.toObject(),
+      creationDate: getCreationDateFromId(job._id)
+    }));
+
+
+    res.status(200).json({
+      jobPostings: jobPostingsWithCreationDate,
+      totalPages: Math.ceil(totalItems / limit),
+      totalItems,
+    });
+  } catch (err) {
+    console.error("Error in fetching open recruitment data:", err);
+    res.status(500).json({ message: "오류 발생", error: err.message });
+  }
+});
+
+// 사용자 스크랩정보 읽어들이기 API
+app.get('/api/scrapped-jobs/:kakaoId', async (req, res) => {
+  const { kakaoId } = req.params;
+  try {
+    const scrappedJobs = await ScrappedJob.find({ kakaoId });
+    res.json(scrappedJobs);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching scrapped jobs' });
+  }
+});
+
+// 스크랩 토글 API
+app.post('/api/scrapped-jobs/toggle', async (req, res) => {
+  const { kakaoId, jobId, jobPosting } = req.body;
+  try {
+    const existingScrap = await ScrappedJob.findOne({ kakaoId, jobId });
+    if (existingScrap) {
+      await ScrappedJob.deleteOne({ kakaoId, jobId });
+      return res.status(200).json({ message: 'Scrapped job removed' });
+    } else {
+      const newScrappedJob = new ScrappedJob({ kakaoId, jobId, ...jobPosting });
+      await newScrappedJob.save();
+      return res.status(201).json(newScrappedJob);
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error toggling scrap state' });
+  }
+});
+
+// 스크랩 공고만 불러오기 API
+app.get('/api/Recruitment/ScrappedPostingList/:kakaoId', async (req, res) => {
+    try {
+    const { kakaoId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // 페이지당 항목 수
+    const skip = (page - 1) * limit;
+    
+    const totalItems = await ScrappedJob.countDocuments({ kakaoId });
+    const scrappedJobs = await ScrappedJob.find({ kakaoId })
+      .skip(skip)
+      .limit(limit)
+
+    res.status(200).json({
+      scrappedJobs,
+      totalPages: Math.ceil(totalItems / limit),
+      totalItems,
+    });
+  } catch (err) {
+    console.error("Error in fetching open recruitment data:", err);
+    res.status(500).json({ message: "오류 발생", error: err.message });
+  }
+});
 
 // 면접 결과 저장 API
 app.post('/api/interview/save', async (req, res) => {

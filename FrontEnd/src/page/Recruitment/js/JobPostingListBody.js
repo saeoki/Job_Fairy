@@ -1,35 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Paper,
-  Pagination,
-  Container,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  Divider,
-  Alert,
-  IconButton
-} from '@mui/material';
+import { Box, Grid, Typography, Select, MenuItem, FormControl, InputLabel, Paper,
+  Pagination, Container, Accordion, AccordionSummary, AccordionDetails, Checkbox, 
+  FormControlLabel, Button, Divider, Alert, IconButton, useMediaQuery } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
-
+import { useTheme } from '@mui/material/styles';
+import ScrapButton from '../../../components/ScrapButton';
+import { jwtDecode } from 'jwt-decode';
 
 export default function JobPostingListBody() {
   const [jobPostings, setJobPostings] = useState([]);  // 서버에서 가져올 데이터 상태
+  const [kakaoId, setKakaoId] = useState("");
   const [totalPages, setTotalPages] = useState(1);      // 전체 페이지 수
   const [totalItems, setTotalItems] = useState(0);      // 전체 공고 개수
   const [selectedFilters, setSelectedFilters] = useState({
@@ -38,21 +21,14 @@ export default function JobPostingListBody() {
     experiences: []
   });  // 체크박스 상태를 관리할 필터 상태
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [noDataMessage, setNoDataMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const [sortBy, setSortBy] = useState('');
 
-
-  // 각 JobPosting의 스크랩 상태를 관리하는 배열
-  const [scrappedJobs, setScrappedJobs] = useState(jobPostings.map(() => false));
-
-  // 해당 JobPosting의 스크랩 상태를 토글
-  const handleScrapClick = (index) => {
-    const updatedScraps = [...scrappedJobs];
-    updatedScraps[index] = !updatedScraps[index]; // 해당 잡포스팅의 스크랩 상태 토글
-    setScrappedJobs(updatedScraps);
-  };
 
   // 쿼리 파라미터에서 페이지 번호 추출
   const query = new URLSearchParams(location.search);
@@ -67,12 +43,26 @@ export default function JobPostingListBody() {
     setSelectedFilters({ jobs, locations, experiences });
   }, [location.search]);
 
+  // 로그인 상태 확인
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userData = jwtDecode(token);
+        setKakaoId(userData.kakaoId);
+      }
+    } catch (error) {
+      console.warn("로그인 상태를 확인하는 중 오류 발생:", error);
+    }
+  }, []);
 
   const fetchJobPostings = async (page, filters = {}) => {
     try {
       // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
       // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
       const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
+      // const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,10 +89,6 @@ export default function JobPostingListBody() {
     // 정렬 기준 변경 시 처리 (필요에 따라 구현)
   };
 
-  const handlePageChange = (event, value) => {
-    // 페이지 변경 시 URL 업데이트
-    navigate(`?page=${value}`);
-  };
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return ''; // timestamp가 없으면 빈 문자열 반환
@@ -406,7 +392,6 @@ export default function JobPostingListBody() {
           >
             <MenuItem value="recent">최신순</MenuItem>
             <MenuItem value="popular">마감일순</MenuItem>
-            <MenuItem value="salary">연봉순</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -429,49 +414,72 @@ export default function JobPostingListBody() {
       </Box>
 
       
+      {/* Job Listings */}
       {noDataMessage ? (
-        <Alert severity="info">{noDataMessage}</Alert>
+        <Alert severity="info" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{noDataMessage}</Alert>
       ) : (
         jobPostings.map((job, index) => (
-          <Paper key={index} elevation={3} sx={{ mb: 2, p: 2 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Box>
-                <Typography variant="body1">
+          <Paper key={index} elevation={3} sx={{
+            mb: 1.5, 
+            p: { xs: 1.5, sm: 2, md: 3 },
+            fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+          }}>
+            <Box 
+              display="flex" 
+              flexDirection={{ xs: 'column', sm: 'row' }} 
+              justifyContent="space-between" 
+              alignItems={isSmallScreen ? 'center' : 'flex-start'}
+              textAlign={isSmallScreen ? 'center' : 'left'}
+            >
+              <Box mb={{ xs: 1, sm: 0 }}>
+                <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '0.95rem' } }}>
                   <a href={job?.company?.detail?.href || '#'} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1E90FF' }}>
                     {job?.company?.detail?.name || '회사 이름 없음'}
                   </a>
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.2rem' } }}>
                   <a href={job?.url || '#'} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                     {job?.position?.title || '제목 없음'}
                   </a>
                 </Typography>
               </Box>
-              <Box textAlign="right">
-                {/* 스크랩 아이콘 버튼 */}
-                <IconButton onClick={() => handleScrapClick(index)} color={scrappedJobs[index] ? "primary" : "default"}>
-                  {scrappedJobs[index] ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                </IconButton>              
-                <Typography variant="body2">{formatLocation(job?.position?.location?.name)}</Typography>
-                <Typography variant="body2">{job?.position?.experience_level?.name || '경력 정보 없음'}</Typography>
-                <Typography variant="body2">{formatTimestamp(job?.expiration_timestamp)}</Typography>
+              <Box textAlign={isSmallScreen ? 'center' : 'right'} sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                {/* ScrapButton에 kakaoId 전달 */}
+                <ScrapButton kakaoId={kakaoId} jobId={job.id} jobPosting={job} />
+
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {formatLocation(job?.position?.location?.name) || '위치 정보 없음'}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {job?.position?.experience_level?.name || '경력 정보 없음'}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  {formatTimestamp(job?.expiration_timestamp)}
+                </Typography>
               </Box>
             </Box>
           </Paper>
         ))
       )}
 
-      {/* 페이지네이션 */}
-      <Box display="flex" justifyContent="center" mt={4}>
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" mt={3} mb={3}>
         <Pagination
           count={totalPages}
           page={currentPage}
           onChange={(event, value) => {
             const params = new URLSearchParams(location.search);
-            params.set('page', value);  // 페이지 번호를 쿼리 스트링에 설정
+            params.set('page', value);
             navigate(`?${params.toString()}`);
           }}
           color="primary"
+          siblingCount={isSmallScreen ? 0 : 1} // 화면 크기에 따라 페이지네이션의 인접 페이지 수를 조정
+          boundaryCount={isSmallScreen ? 1 : 2} // 화면 크기에 따라 페이지네이션의 시작과 끝 페이지 수를 조정
+          sx={{
+            '.MuiPaginationItem-root': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            },
+          }}
         />
       </Box>
     </Container>

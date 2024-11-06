@@ -9,7 +9,7 @@ import * as React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
-const InputBox = ({isCheck, setInfoList}) => {
+const InputBox = ({setInfoList}) => {
   
   const programmerList = [
     { title: '프론트엔드'},
@@ -40,7 +40,7 @@ const InputBox = ({isCheck, setInfoList}) => {
             getOptionLabel={(option) => option.title}
             isOptionEqualToValue={(option, value) => option.title === value.title}
             // defaultValue={[programmerList[0]]}
-            disabled={isCheck}
+            // disabled={isCheck}
             onChange={(e,value) => jobInputHandler(value)}
             renderInput={(params) => (
                 <TextField 

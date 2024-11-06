@@ -1,22 +1,19 @@
 // Body.js
 import "../../Self_introduction/css/Self_Body.css"
 
-import React, {useState} from 'react';
+import React from 'react';
 import Inputwords from './Inputwords';
-// import SettingsApply from './SettingsApply';
 import AdditionalContent from './AdditionalContent';
 import StartIntroduction from "./StartIntroduction";
 import InputBox from "./InputBox";
 
-const Body = ({isInput, setIsInput, infoList, setInfoList}) => {
-
-  const [isCheck, setIsCheck] = useState(false);
+const Body = ({ setIsInput, infoList, setInfoList}) => {
 
   return (
     <div className="body">
       <div id = "Self_introductionBox" >
         <div className="jobinput-box">
-            <InputBox  isCheck={isCheck} setInfoList={setInfoList}/>
+            <InputBox setInfoList={setInfoList}/>
         </div>
 
         <div className="inputkeywords-box">

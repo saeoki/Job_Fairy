@@ -9,10 +9,16 @@ from google.cloud.bigquery import SourceFormat
 from airflow import DAG
 from airflow.decorators import task
 from datetime import datetime, timedelta
+import logging
+from airflow.models import Variable
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
+access_key = Variable.get("saramin_api_key")
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = Variable.get("gcp_credentials_path")
 
-access_key='my_saramin_api'
-
+# 오늘 날짜 기준 파일명 정의
+today_date = datetime.now().strftime("%Y%m%d")
+local_file = f'/var/lib/airflow/dags/all_jobs_saramin_{today_date}.json'
 
 # 재귀적으로 딕셔너리의 키에서 '-'를 '_'로 바꾸는 함수
 def replace_hyphens(obj):
@@ -48,12 +54,28 @@ def fetch(start, count, bbs_gb=None) :
         data = response.json() #JSON 형식의 응답 데이터를 파이썬 구조 객체로
         return replace_hyphens(data) # 필드명을 '-'에서 '_'로 변경
     else :
-        print(f"Error : {response.status_code}, {response.text}")
+        logging.info(f"Error : {response.status_code}, {response.text}")
         return None
 
-# 위의 fetch를 사용하는 메인급 호출함수
 @task
-def extract_jobs(public_total_results, non_public_total_results, local_file, max_count) :
+def fetch_initial_data() :
+    public_initial_data = fetch(start=0, count=1, bbs_gb=1)
+    non_public_initial_data = fetch(start=0, count=1)
+
+    if public_initial_data and non_public_initial_data :
+        public_total_results = int(public_initial_data['jobs']['total'])
+        non_public_total_results = int(non_public_initial_data['jobs']['total'])
+        logging.info(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
+        return (public_total_results, non_public_total_results)
+    else :
+        raise ValueError("API 호출 실패: 초기 데이터 가져오기 실패")
+
+
+# fetch함수를 사용하는 메인급 호출함수
+@task
+def extract_jobs(total_results) :
+    public_total_results, non_public_total_results = total_results
+    max_count = 110
     first_batch = True
     job_ids_set = set() # 중복 방지 체크를 위한 id set
 
@@ -66,7 +88,7 @@ def extract_jobs(public_total_results, non_public_total_results, local_file, max
         if public_data and 'jobs' in public_data and 'job' in public_data['jobs'] :
             jobs = public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
             if not jobs:
-                print(f"Warning: 공채 데이터 job 리스트에 데이터가 없습니다.")
+                logging.info(f"Warning: 공채 데이터 job 리스트에 데이터가 없습니다.")
                 break
             
             received_count = len(jobs)
@@ -85,17 +107,17 @@ def extract_jobs(public_total_results, non_public_total_results, local_file, max
                     first_batch = False
                 f.write(json.dumps(jobs, ensure_ascii=False)[1:-1])
 
-            print(f"공채 데이터 중 {public_total_results}개의 {start}번째 실행 완료.")
+            logging.info(f"공채 데이터 중 {public_total_results}개의 {start}번째 실행 완료.")
 
             if received_count < max_count :
-                print(f"Warning: 예상보다 적은 공채 데이터 {received_count}개를 받았습니다. 종료합니다.")
+                logging.info(f"Warning: 예상보다 적은 공채 데이터 {received_count}개를 받았습니다. 종료합니다.")
                 break
         
         else :
-            print(f"Warning: 공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
+            logging.info(f"Warning: 공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
             break
 
-        time.sleep(2.5)
+        time.sleep(1)
         
         
     # 비공채 데이터 fetch
@@ -104,7 +126,7 @@ def extract_jobs(public_total_results, non_public_total_results, local_file, max
         if non_public_data and 'jobs' in non_public_data and 'job' in non_public_data['jobs'] :
             jobs = non_public_data['jobs']['job'] # data['jobs]['job]은 JSON 객체 리스트
             if not jobs :
-                print(f"Warning: 비공채 데이터 job 리스트에 데이터가 없습니다.")
+                logging.info(f"Warning: 비공채 데이터 job 리스트에 데이터가 없습니다.")
                 break
 
             received_count = len(jobs)
@@ -123,17 +145,17 @@ def extract_jobs(public_total_results, non_public_total_results, local_file, max
                     first_batch = False
                 f.write(json.dumps(jobs, ensure_ascii=False)[1:-1])
 
-            print(f"비공채 데이터 중 {non_public_total_results}개의 {start}번 째 실행 완료.")
+            logging.info(f"비공채 데이터 중 {non_public_total_results}개의 {start}번 째 실행 완료.")
 
             if received_count < max_count :
-                print(f"Warning: 예상보다 적은 비공채 데이터({received_count}개)를 받았습니다. 종료합니다.")
+                logging.info(f"Warning: 예상보다 적은 비공채 데이터({received_count}개)를 받았습니다. 종료합니다.")
                 break
 
         else :
-            print(f"Warning: 비공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
+            logging.info(f"Warning: 비공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
             break
 
-        time.sleep(2.5)
+        time.sleep(1)
 
     with open(local_file, 'a', encoding='utf-8') as f:
         f.write(']')
@@ -156,17 +178,17 @@ def transform_json(local_file) :
 @task
 def load_to_gcs(local_file) :
     storage_client = storage.Client()
-    bucket_name = 'jobfairy-gcs'
-    destination_blob_name = local_file
+    bucket_name = Variable.get("gcs_bucket_name")
+    destination_blob_name = os.path.basename(local_file) # 경로 떼고 파일 이름만 추출
     
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(local_file)
     
-    print(f"File {local_file} uploaded to {destination_blob_name} in bucket {bucket_name}.")
+    logging.info(f"File {local_file} uploaded to {destination_blob_name} in bucket {bucket_name}.")
     
     os.remove(local_file)
-    print(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
+    logging.info(f"\n{local_file}이 내 환경에서 삭제되었습니다.")
     
     return (bucket_name, destination_blob_name)
 
@@ -174,9 +196,9 @@ def load_to_gcs(local_file) :
 # GCS to BigQuery
 @task
 def bulkload_to_bigquery(bucket_info) :
-    project_id = 'eloquent-vector-423514-s2'
-    dataset_id = 'raw_data'
-    table_id = 'all_job_posting' # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
+    project_id = Variable.get("bigquery_project_id")
+    dataset_id = Variable.get("bigquery_dataset_id")
+    table_id = Variable.get("bigquery_table_id") # 테이블이 존재하지 않으면 해당 이름으로 자동 생성
     gcs_bucket_name, gcs_file_name = bucket_info
     gcs_uri = f"gs://{gcs_bucket_name}/{gcs_file_name}"
 
@@ -200,21 +222,21 @@ def bulkload_to_bigquery(bucket_info) :
         job_config=job_config,
     )  # API 요청
 
-    print(f"Loading data from {gcs_uri} into {table_ref}")
+    logging.info(f"Loading data from {gcs_uri} into {table_ref}")
 
     # 작업 완료 대기를 위함
     load_job.result()
 
     # 로드된 테이블 정보 확인
     destination_table = bigquery_client.get_table(table_ref)
-    print(f"Loaded {destination_table.num_rows} rows into {table_ref}.")
+    logging.info(f"Loaded {destination_table.num_rows} rows into {table_ref}.")
 
 
 default_args = {
     'owner': 'sewook',
     'start_date': datetime(2024, 10, 1),
-    'email': ['dnrtp9256@gmail.com'],
-    'email_on_failure': True,
+    #'email': ['dnrtp9256@gmail.com'],
+    'execution_timeout': timedelta(minutes=20),
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
@@ -223,21 +245,20 @@ with DAG(
     dag_id='jobpostings_ETL',
     tags=['saramin_api'],
     default_args=default_args,
-    schedule_interval='0 0 * * *',
+    schedule_interval='0 15 * * *',
     catchup=False,
 ) as dag: 
 
-    public_initial_data = fetch(start=0, count=1, bbs_gb=1)
-    non_public_initial_data = fetch(start=0, count=1)
+    initial_data = fetch_initial_data()
+    extract = extract_jobs(initial_data)
+    transform = transform_json(local_file)
+    load = load_to_gcs(local_file)
+    bulkload = bulkload_to_bigquery(load)
 
-    public_total_results = int(public_initial_data['jobs']['total'])
-    non_public_total_results = int(non_public_initial_data['jobs']['total'])
-    print(f"public_total : {public_total_results} & non_public_total : {non_public_total_results}")
+    trigger_bq_to_mg = TriggerDagRunOperator(
+        task_id='trigger_bq_to_mg_bulkload',
+        trigger_dag_id='bq_to_mg_bulkload',
+        wait_for_completion=False # True 설정시 트리거된 dag의 완료를 기다림
+    )
 
-    today_date = datetime.now().strftime("%Y%m%d")
-    local_file = f'all_jobs_saramin_{today_date}.json'
-
-    extract_jobs(public_total_results, non_public_total_results, local_file, max_count=110)
-    transform_json(local_file)
-    bucket_info = load_to_gcs(local_file)
-    bulkload_to_bigquery(bucket_info) # *: 튜플 언패킹, 튜플로 오는 반환값을 언패킹해 bulkload_to_bigquery에 인자로써 온전히 전해지게끔 함
+    initial_data >> extract >> transform >> load >> bulkload >> trigger_bq_to_mg

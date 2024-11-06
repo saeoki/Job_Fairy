@@ -8,12 +8,16 @@ import Footer from "../../Home/js/Footer";
 import Output_Body from "./Output_Body"
 
 import { AuthContext } from "../../../context/AuthContext"
-import { LoginErrorToast } from "../../../components/ToastMessage";
+import { LoginErrorToast, LoginExpErrorToast } from "../../../components/ToastMessage";
 
 function Self_introduction(){
 
   const token = localStorage.getItem('token');
+  const { isLoggedIn } = useContext(AuthContext);
 
+  if(!token&&!isLoggedIn){
+    LoginExpErrorToast();
+  }
   if(!token){
     LoginErrorToast()
   }

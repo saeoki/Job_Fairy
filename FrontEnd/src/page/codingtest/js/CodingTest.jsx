@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
 
@@ -16,9 +16,22 @@ import { javascript } from '@codemirror/lang-javascript';
 import { Theme } from "./Theme";
 import Sidebar from "./Sidebar";
 
+import { AuthContext } from "../../../context/AuthContext"
+import { LoginErrorToast, LoginExpErrorToast } from "../../../components/ToastMessage";
+
 const BackendIP = process.env.REACT_APP_EC2_IP
 
 const CondingTest = () => {
+
+  const token = localStorage.getItem('token');
+  const { isLoggedIn } = useContext(AuthContext);
+
+  if(!token&&!isLoggedIn){
+    LoginExpErrorToast();
+  }
+  if(!token){
+    LoginErrorToast()
+  }
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -105,6 +118,9 @@ const CondingTest = () => {
           ☰
         </button>
         <div className="current-problem-title">{problem?.title}</div>
+        <div className="header_name">
+          <strong></strong>님
+        </div>
       </div>
 
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
