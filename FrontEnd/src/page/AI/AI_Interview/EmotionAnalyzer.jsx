@@ -1,4 +1,4 @@
-// EmotionAnalyzer.js
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -40,15 +40,14 @@ function EmotionAnalyzer({ videoRef, isActive, onEmotionData }) {
   };
 
   useEffect(() => {
-    if (isActive) {
+    if (isActive && !intervalId) {
       const id = setInterval(sendImageToServer, 500);
       setIntervalId(id);
-    } else {
-      if (intervalId) {
-        clearInterval(intervalId);
-        setIntervalId(null);
-      }
+    } else if (!isActive && intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
     }
+  
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
