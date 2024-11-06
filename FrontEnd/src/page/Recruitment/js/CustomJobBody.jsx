@@ -1,28 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
 import {jwtDecode} from 'jwt-decode';
-import { LoginExpErrorToast } from "../../../components/ToastMessage";
-import {
-  Box,
-  Typography,
-  Paper,
-  IconButton,
-  Pagination,
-  useMediaQuery,
-  Alert
-} from "@mui/material";
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import { AuthContext } from "../../../context/AuthContext"
+import { LoginErrorToast, LoginExpErrorToast } from "../../../components/ToastMessage";
+import { Box, Typography, Paper, IconButton, Pagination, useMediaQuery } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
-import "../css/Custom.css";
 import ScrapButton from "../../../components/ScrapButton";
+
+import "../css/Custom.css";
 
 const BackendIP = process.env.REACT_APP_EC2_IP;
 
 const Body = () => {
+    const { isLoggedIn } = useContext(AuthContext);
+
     const [kakaoId, setKakaoId] = useState("");
     const [userdata, setUserData] = useState({
         kakaoId: kakaoId,
@@ -50,14 +44,19 @@ const Body = () => {
     useEffect(() => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
+            
+
+            if(!token&&!isLoggedIn){
+                LoginExpErrorToast();
+                throw new Error("Token Exp Error");
+            } else if(!token){
+                LoginErrorToast()
                 throw new Error("Token not found");
-            } else {
+            }else {
                 const userData = jwtDecode(token);
                 setKakaoId(userData.kakaoId);
             }
         } catch (error) {
-            LoginExpErrorToast();
             setTimeout(() => {
                 window.location.href = '/';
             }, 1000);

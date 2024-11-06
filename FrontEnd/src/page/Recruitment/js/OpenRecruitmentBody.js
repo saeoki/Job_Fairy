@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  IconButton,
-  Pagination,
-  Alert,
-  useMediaQuery,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material';
+import { Box, Container, Typography, Paper, IconButton, Pagination,
+  Alert, useMediaQuery, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';

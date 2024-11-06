@@ -1,26 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Paper,
-  Pagination,
-  Container,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  Divider,
-  Alert,
-  IconButton,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Grid, Typography, Select, MenuItem, FormControl, InputLabel, Paper,
+  Pagination, Container, Accordion, AccordionSummary, AccordionDetails, Checkbox, 
+  FormControlLabel, Button, Divider, Alert, IconButton, useMediaQuery } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Tooltip from '@mui/material/Tooltip';
@@ -482,7 +463,7 @@ export default function JobPostingListBody() {
       )}
 
       {/* Pagination */}
-      <Box display="flex" justifyContent="center" mt={3}>
+      <Box display="flex" justifyContent="center" mt={3} mb={3}>
         <Pagination
           count={totalPages}
           page={currentPage}

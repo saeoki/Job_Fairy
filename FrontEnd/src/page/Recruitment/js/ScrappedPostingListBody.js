@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  IconButton,
-  Pagination,
-  Alert,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Container, Typography, Paper, Pagination, Alert, useMediaQuery } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 
