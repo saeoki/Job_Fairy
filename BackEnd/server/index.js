@@ -18,7 +18,7 @@ const { Problem } = require("./models/Problem");
 const { Jasose } = require("./models/Jasoses");
 const { Favorite } = require('./models/Favorites');
 const { JobPosting } = require("./models/JobPosting");
-const { InterviewResult } = require('./models/InterviewResult'); // 모델 추가
+const { InterviewResult } = require('./models/InterviewResult');
 const ScrappedJob = require("./models/ScrappedJob");
 
 const app = express();
@@ -74,7 +74,7 @@ app.post('/api/auth/kakao', async (req, res) => {
   }
 });
 
-// 사용자 등록 API
+// 사용자 정보 추가 API
 app.post('/api/auth/kakao/register', async (req, res) => {
   const { kakaoId, nickname, location, military, position, salary } = req.body;
   try {
@@ -242,6 +242,7 @@ app.post('/api/jasose/remove', async (req, res) => {
   }
 });
 
+// 면접 리포트 가져오기 API
 app.post('/api/myeonjeob/get', async (req, res) => {
   const { kakaoId, nickname } = req.body;
   
@@ -264,6 +265,7 @@ app.post('/api/myeonjeob/get', async (req, res) => {
   }
 });
 
+// 면접 리포트 삭제하기 API
 app.post('/api/myeonjeob/remove', async (req, res) => {
   const { kakaoId, nickname, id } = req.body;
 
@@ -287,6 +289,7 @@ app.post('/api/myeonjeob/remove', async (req, res) => {
   }
 });
 
+// 코딩테스트 레벨별 필터링 된 데이터 가져오기 API
 app.get('/api/problem/level', async (req, res) => {
   try {
     const problemsByLevel = await Problem.aggregate([

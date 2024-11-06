@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 
-import { Button as Antd_btn, Modal }  from "antd"; // Import Modal
+import { Button as Antd_btn, Modal }  from "antd";
 import { EditOutlined } from "@ant-design/icons"
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -215,9 +215,9 @@ const Myeonjoeb = () => {
                 title="삭제 확인"
                 open={isModalOpen}
                 centered
-                onOk={confirmDelete}  // Confirm deletion
+                onOk={confirmDelete} 
                 okType='danger'
-                onCancel={() => setIsModalOpen(false)}  // Close modal
+                onCancel={() => setIsModalOpen(false)} 
                 okText="삭제"
                 cancelText="취소"
             >

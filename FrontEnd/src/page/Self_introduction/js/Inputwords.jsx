@@ -38,8 +38,6 @@ const InputKeywords = ({ setInfoList }) => {
       ...prevState,
       keywordList : updatedKeywordsList,
     }))
-
-    // console.log(keywordsList)
   };
 
   return (

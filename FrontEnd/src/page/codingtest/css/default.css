@@ -40,7 +40,16 @@ body {
     border-bottom: 1px solid #000;
     z-index: 1; /* 사이드바가 문제 구역 위에 오도록 설정 */
   }
-  
+  .current-problem-title {
+    font-size: 18px;
+    margin-left: 10px;
+    color: #ffffff;
+  }
+  .header_name{
+    color: #ffffff;
+    font-size: 18px;
+    margin-left: auto;
+  }
   .sidebar-toggle {
     font-size: 20px;
     background: none;
@@ -48,13 +57,6 @@ body {
     color: #ffffff;
     cursor: pointer;
   }
-  
-  .current-problem-title {
-    font-size: 18px;
-    margin-left: 10px;
-    color: #ffffff;
-  }
-  
   .sidebar {
     width: 300px;
     background-color: #4F6B81; /* 어두운 파란색 계열 */
@@ -207,10 +209,11 @@ body {
   
   @media (max-width: 480px) {
   
-    .current-problem-title {
+    .current-problem-title, .header_name {
       margin-top: 5px;
       font-size: 16px;
     }
+    
   
     .run-code-button {
       font-size: 14px;
