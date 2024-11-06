@@ -19,21 +19,24 @@ function Body() {
   const [videoStream, setVideoStream] = useState(null);
   const [audioStream, setAudioStream] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-
   const [isEmotionAnalyzing, setIsEmotionAnalyzing] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [answers, setAnswers] = useState([]);
   const [accumulatedEmotions, setAccumulatedEmotions] = useState({});
-
   const [questions, setQuestions] = useState([]);
   const [questionIndex, setQuestionIndex] = useState(-1);
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [isPreparationTime, setIsPreparationTime] = useState(false);
   const [timeKey, setTimeKey] = useState(0);
+  const [isSTTProcessing, setIsSTTProcessing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInterviewFinished, setIsInterviewFinished] = useState(false);
+  
   const navigate = useNavigate();
 
-  const [isSTTProcessing, setIsSTTProcessing] = useState(false); // STT 처리 상태
-  const [isSubmitting, setIsSubmitting] = useState(false); // 마지막 답변 전송 중 상태
+  useEffect(() => {
+    setIsEmotionAnalyzing(isRecording);
+  }, [isRecording]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -108,7 +111,77 @@ function Body() {
     };
   }, []);
 
-  // 면접 시작 함수
+  const handleSaveRecording = async (audioBlob = null) => {
+    if (isSTTProcessing) {
+      console.warn("STT is already processing");
+      return;
+    }
+    
+    setIsSTTProcessing(true);
+    
+    const formData = new FormData();
+    if (audioBlob instanceof Blob) {
+      formData.append('audio', audioBlob, 'answer.webm');
+    } else {
+      formData.append('audio', new Blob(), 'answer.webm');
+    }
+    formData.append('question', questions[questionIndex]);
+    
+    try {
+      const response = await fetch('http://localhost:5000/upload', {
+        method: 'POST',
+        body: formData,
+      });
+    
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+    
+      const result = await response.json();
+      console.log("STT response:", result);
+    
+      const newAnswer = { 
+        question: questions[questionIndex], 
+        answer: result.transcription || ''  
+      };
+    
+      setAnswers((prev) => {
+        const updatedAnswers = [...prev, newAnswer];
+        if (updatedAnswers.length === questions.length) {
+          setIsInterviewFinished(true);
+        } else {
+          setIsPreparationTime(true);
+          setTimeKey((prev) => prev + 1);
+        }
+        return updatedAnswers;
+      });
+  
+      setQuestionIndex((prevIndex) => prevIndex + 1);
+    } catch (error) {
+      console.error('Error uploading audio file:', error);
+    } finally {
+      setIsSTTProcessing(false);
+    }
+  };
+  const onCompleteAnswering = () => {
+    setIsRecording(false);
+    setIsEmotionAnalyzing(false);
+  
+    if (audioStream) {
+      const audioBlob = new Blob(audioStream.getAudioTracks(), { type: 'audio/webm' });
+      handleSaveRecording(audioBlob);
+    } else {
+      handleSaveRecording();
+    }
+  
+    // 질문이 마지막이 아닐 때만 questionIndex를 증가시키도록 조건 추가
+    setQuestionIndex((prevIndex) => {
+      if (prevIndex < questions.length - 1) {
+        return prevIndex + 1;
+      }
+      return prevIndex;
+    });
+  };
   const startInterview = () => {
     if (questions.length === 0) {
       alert('선택한 옵션에 해당하는 질문이 없습니다.');
@@ -116,54 +189,12 @@ function Body() {
     }
     setIsInterviewStarted(true);
     setQuestionIndex(0);
-    setIsPreparationTime(true); // 준비 시간으로 설정
+    setIsPreparationTime(true);
     setTimeKey((prev) => prev + 1);
-    console.log("Interview started, isPreparationTime set to true");
   };
 
-  const handleSaveRecording = async (audioBlob) => {
-    if (!(audioBlob instanceof Blob)) {
-      console.error("audioBlob is not a Blob instance");
-      return;
-    }
-
-    if (isSTTProcessing) return;
-    setIsSTTProcessing(true);
-
-    const formData = new FormData();
-    formData.append('audio', audioBlob, 'answer.webm');
-    formData.append('question', questions[questionIndex]);
-
-    try {
-      const response = await fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-
-      console.log("STT response:", result);
-
-      if (result.transcription) {
-        const newAnswer = { question: questions[questionIndex], answer: result.transcription };
-        setAnswers((prev) => [...prev, newAnswer]);
-        setTranscription(result.transcription);
-
-        if (questionIndex < questions.length - 1) {
-          setQuestionIndex((prevIndex) => prevIndex + 1);
-          setIsPreparationTime(true);
-          setTimeKey((prev) => prev + 1);
-        } else {
-          setIsSubmitting(true); // 마지막 답변 처리 중
-          await stopInterview();
-        }
-      } else {
-        console.warn("No transcription received");
-      }
-    } catch (error) {
-      console.error('Error uploading audio file:', error);
-    } finally {
-      setIsSTTProcessing(false);
-    }
+  const goToResult = () => {
+    navigate('/Interview_result', { state: { accumulatedEmotions, answers } });
   };
 
   const stopInterview = async () => {
@@ -180,10 +211,8 @@ function Body() {
       console.error("Error resetting emotion totals on server:", error);
     }
 
-    setAccumulatedEmotions({});
-    setAnswers([]);
-    setIsSubmitting(false); // 제출 완료 후 로딩 종료
-    navigate('/Interview_result', { state: { accumulatedEmotions, answers } });
+    setIsSubmitting(false);
+    setIsInterviewFinished(true); 
   };
 
   const handleEmotionData = (data) => {
@@ -192,6 +221,31 @@ function Body() {
       ...data,
     }));
   };
+
+  useEffect(() => {
+    let preparationTimer;
+    let answerTimer;
+  
+    if (isInterviewStarted && questionIndex < questions.length) {
+      if (isPreparationTime) {
+        preparationTimer = setTimeout(() => {
+          setIsPreparationTime(false);
+          setIsRecording(true);
+        }, 20000); // 준비 시간 (20초)
+      } else if (isRecording && !isSTTProcessing) {
+        answerTimer = setTimeout(() => {
+          onCompleteAnswering();
+        }, 50000); // 답변 시간 (50초)
+      }
+    }
+  
+    return () => {
+      clearTimeout(preparationTimer);
+      clearTimeout(answerTimer);
+    };
+  }, [isInterviewStarted, isPreparationTime, isRecording, questionIndex, isSTTProcessing]);
+
+  const isLastQuestion = questionIndex === questions.length - 1;
 
   return (
     <div className="CheckCamMic-box">
@@ -214,29 +268,26 @@ function Body() {
       {isInterviewStarted && (
         <QuestionDisplay
           key={timeKey}
-          question={questions[questionIndex]}
-          isPreparationTime={isPreparationTime}
-          preparationTime={20}
-          answerTime={50}
+          question={isLastQuestion ? "면접이 종료되었습니다." : questions[questionIndex]}
+          isPreparationTime={!isLastQuestion && isPreparationTime}
+          preparationTime={isLastQuestion ? 0 : 20}  // 마지막 질문에는 준비 시간 타이머 생략
+          answerTime={isLastQuestion ? 0 : 50}       // 마지막 질문에는 답변 시간 타이머 생략
         />
       )}
       <ControlButtons
         isInterviewStarted={isInterviewStarted}
         isAnsweringTime={!isPreparationTime}
+        isInterviewFinished={isInterviewFinished}
         onStartInterview={startInterview}
         onStopInterview={stopInterview}
         onStartAnswering={() => {
           setIsPreparationTime(false);
           setIsRecording(true);
-          setIsEmotionAnalyzing(true);
         }}
-        onCompleteAnswering={() => {
-          setIsRecording(false);
-          setIsEmotionAnalyzing(false);
-        }}
+        onCompleteAnswering={onCompleteAnswering}
+        onGoToResult={goToResult}
       />
 
-      {/* 답변 처리 중 로딩 화면 */}
       <Backdrop open={isSTTProcessing || isSubmitting} style={{ zIndex: 1300 }}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <CircularProgress color="inherit" />
