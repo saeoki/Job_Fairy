@@ -3,7 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
-const speech = require('@google-cloud/speech'); // Google Speech API 모듈
+
+
+
+const speech = require('@google-cloud/speech');
+const multer = require('multer');
+
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -39,9 +44,11 @@ app.use(cors({
 }));
 
 // Google Speech API 클라이언트
-const client = new speech.SpeechClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
+// const client = new speech.SpeechClient({
+//   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+// });
+
+
 
 // 기본 API 라우팅
 app.get('/', (req, res) => {
@@ -720,51 +727,103 @@ app.post('/api/interview/get', async (req, res) => {
 
 
 
+// stt code
 
-
-// WebSocket 설정 (Speech-to-Text 처리)
-const server = app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+const client = new speech.SpeechClient({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
 
-const wss = new WebSocketServer({ server });
+const upload = multer();
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-
-  let recognizeStream = null;
-
-  ws.on('message', (message) => {
-    if (!recognizeStream) {
-      recognizeStream = client
-        .streamingRecognize({
-          config: {
-            encoding: 'WEBM_OPUS',
-            sampleRateHertz: 48000,
-            languageCode: 'ko-KR',
-          },
-          interimResults: true, // true
-        })
-        .on('error', (err) => {
-          console.error('Error in recognizeStream:', err);
-          ws.send(JSON.stringify({ error: err.message }));
-        })
-        .on('data', (data) => {
-          if (data.results[0] && data.results[0].alternatives[0] && data.results[0]) { // isFinal 조건 추가
-            ws.send(
-              JSON.stringify({ transcription: data.results[0].alternatives[0].transcript })
-            );
-          }
-        });
-      }
-
-    recognizeStream.write(Buffer.from(message));
-  });
-
-  ws.on('close', () => {
-    if (recognizeStream) {
-      recognizeStream.end();
+app.post('/upload', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
     }
-    console.log('Client disconnected');
-  });
+
+    // 오디오 데이터를 Base64로 인코딩
+    const audioBytes = req.file.buffer.toString('base64');
+
+    const audio = {
+      content: audioBytes,
+    };
+
+    const config = {
+      encoding: 'WEBM_OPUS',  // WEBM_OPUS가 지원되지 않으면 다른 인코딩을 사용
+      sampleRateHertz: 48000,
+      languageCode: 'ko-KR',
+    };
+
+    const request = {
+      config: config,
+      audio: audio,
+    };
+
+    const [response] = await client.recognize(request);
+
+    const transcription = response.results
+      .map(result => result.alternatives[0].transcript)
+      .join('\n');
+
+    console.log("===== transcription: ", transcription);
+    res.send({ transcription });
+  } catch (error) {
+    console.error('Error during speech recognition:', error);
+    res.status(500).send('Error during speech recognition.');
+  }
 });
+
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
+
+// const client = new speech.SpeechClient({
+//   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+// });
+
+
+// const upload = multer();
+
+
+// app.post('/upload', upload.single('audio'), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).send('No file uploaded.');
+//     }
+
+//     const audioBytes = req.file.buffer;
+
+//     const audio = {
+//       content: audioBytes,
+//     };
+
+//     const config = {
+//       encoding: 'WEBM_OPUS',
+//       sampleRateHertz: 48000,
+//       languageCode: 'ko-KR',
+//     };
+
+//     const request = {
+//       config: config,
+//       audio: audio,
+//     };
+
+//     const [response] = await client.recognize(request);
+
+//     const transcription = response.results
+//       .map(result => result.alternatives[0].transcript)
+//       .join('\n');
+
+//     console.log("===== transcription: ", transcription);
+//     res.send({ transcription });
+//   } catch (error) {
+//     console.error('Error during speech recognition:', error);
+//     res.status(500).send('Error during speech recognition.');
+//   }
+// });
+
+// app.listen(port, () => {
+//   console.log(`Server listening at http://localhost:${port}`);
+// });
+
+

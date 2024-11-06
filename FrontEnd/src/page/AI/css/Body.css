@@ -63,3 +63,8 @@
   text-align: center;
   margin-bottom: 10px;
 }
+.control-buttons-wrapper {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  margin-top: 20px;
+}
