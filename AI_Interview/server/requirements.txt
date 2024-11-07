@@ -39,8 +39,8 @@ jedi==0.19.1  # <- 버전명 추가
 Jinja2==3.1.4
 joblib==1.4.2
 jupyter_client==8.3.0  # <- 버전명 추가
-jupyter_core==6.3.0  # <- 버전명 추가
-keras==3.4.1
+# jupyter_core==6.3.0  # 주석 처리 또는 제거
+jupyter_core==5.7.2  # 또는 가능한 버전으로 수정keras==3.4.1
 kiwisolver==1.4.5
 libclang==18.1.1
 Markdown==3.6
