@@ -1,9 +1,7 @@
-
-
-// export default ControlButtons;
 import React from 'react';
 import Button from '@mui/material/Button';
 import './ControlButtons.css';
+
 
 function ControlButtons({ 
   isInterviewStarted, 
@@ -13,7 +11,8 @@ function ControlButtons({
   onStopInterview, 
   onStartAnswering, 
   onCompleteAnswering,
-  onGoToResult 
+  onGoToResult,
+  isAnsweringComplete // 추가된 부분
 }) {
   return (
     <div className="control-buttons">
@@ -33,7 +32,14 @@ function ControlButtons({
               면접 시작
             </Button>
           ) : isAnsweringTime ? (
-            <Button variant="contained" color="primary" onClick={onCompleteAnswering} className="control-button">
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                if (!isAnsweringComplete) onCompleteAnswering();
+              }} 
+              className="control-button"
+            >
               답변 완료
             </Button>
           ) : (
@@ -48,3 +54,4 @@ function ControlButtons({
 }
 
 export default ControlButtons;
+
