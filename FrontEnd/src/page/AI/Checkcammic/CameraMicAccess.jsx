@@ -1,3 +1,4 @@
+
 import Button from '@mui/material/Button';
 import { Link } from "react-router-dom";
 import React, { useRef, useEffect, useState } from 'react';
@@ -10,7 +11,11 @@ function CameraMicAccess() {
   const videoRef = useRef(null);
   const constraints = {
     video: true,
-    audio: true
+    audio: {
+      echoCancellation: true, // 에코 캔슬레이션 활성화
+      noiseSuppression: true, // 노이즈 억제 활성화
+      autoGainControl: true,  // 자동 이득 제어 활성화
+    }
   };
   const [volume, setVolume] = useState(0); // 마이크 음량 상태
 
@@ -36,7 +41,7 @@ function CameraMicAccess() {
   };
 
   const setupAudioAnalyzer = stream => {
-    const audioContext = new AudioContext();
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const audioStream = audioContext.createMediaStreamSource(stream);
     const analyzer = audioContext.createAnalyser();
     analyzer.fftSize = 32;
@@ -56,9 +61,17 @@ function CameraMicAccess() {
   };
 
   return (
-    <div className="CheckCamMic-box"> 
-      <video ref={videoRef} autoPlay playsInline className="video-box" /> 
-      <div className="gauge-box"> 
+    <div className="CheckCamMic-box"> {/* CSS 클래스 적용 */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted // 비디오 음소거 설정
+        className="video-box"
+        style={{ transform: 'scaleX(-1)' }} // 좌우 반전 인라인 스타일 추가
+      /> {/* CSS 클래스 적용 */}
+      <div className="gauge-box"> {/* CSS 클래스 적용 */}
+
         <div className="icon-progress-container">
           <MicIcon /> 
           <LinearProgress variant="determinate" value={volume} className="gauge-progress" />          
@@ -66,7 +79,7 @@ function CameraMicAccess() {
       </div>
       <div className="button-box">
         <Link to="/AIinterview">
-          <Button className="return-button" variant="contained" href="#contained-buttons">
+          <Button className="return-button" variant="contained">
             점검 완료
           </Button>
         </Link>

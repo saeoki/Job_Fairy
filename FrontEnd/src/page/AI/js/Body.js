@@ -59,15 +59,9 @@ function Body() {
                                 </MenuItem>
                                 <MenuItem value="frontend">프론트엔드</MenuItem>
                                 <MenuItem value="backend">백엔드</MenuItem>
-                                <MenuItem value="ai">풀스택</MenuItem>
-                                <MenuItem value="network">데브옵스</MenuItem>
-                                <MenuItem value="firmware">데이터 엔지니어</MenuItem>
-                                <MenuItem value="firmware">데이터 사이언티스트</MenuItem>
-                                <MenuItem value="firmware">데이터 분석가</MenuItem>
-                                <MenuItem value="firmware">모바일 앱</MenuItem>
-                                <MenuItem value="firmware">게임개발</MenuItem>
-                                <MenuItem value="firmware">시스템 엔지니어</MenuItem>
-                                <MenuItem value="firmware">개발PM</MenuItem>
+                                <MenuItem value="ai">AI 개발자</MenuItem>
+                                <MenuItem value="network">네트워크 엔지니어</MenuItem>
+                                <MenuItem value="firmware">firmware 개발자</MenuItem>
                             </Select>
                         </div>
                     )}

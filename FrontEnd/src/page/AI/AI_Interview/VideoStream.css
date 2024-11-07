@@ -1,0 +1,5 @@
+/* VideoStream.css */
+.video-box.flipped {
+    transform: scaleX(-1);
+  }
+  
