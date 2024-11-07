@@ -116,3 +116,4 @@ wrapt==1.16.0
 xxhash==3.4.1
 yarl==1.9.4
 zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1718013267051/work
+asttokens==2.0.5
