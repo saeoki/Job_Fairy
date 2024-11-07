@@ -29,7 +29,7 @@ function Body() {
     };
 
     return (
-        <div className="Ai_container mx-5 my-3 py-2">
+        <div className="Ai_container">
             <div id="AIinterviewbox">
                 <div className="interview-type-box">
                     <span> <h5>면접 종류를 선택하세요</h5></span>

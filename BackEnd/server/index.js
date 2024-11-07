@@ -2,9 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const { WebSocketServer } = require('ws'); // WebSocket 서버를 위한 모듈
-
-
 
 const speech = require('@google-cloud/speech');
 const multer = require('multer');
@@ -42,13 +39,6 @@ app.use(cors({
   origin: ['https://jobfairy.netlify.app', 'http://localhost:3000'], // 클라이언트 도메인 명시
   credentials: true // 자격 증명(쿠키 등) 포함 허용
 }));
-
-// Google Speech API 클라이언트
-// const client = new speech.SpeechClient({
-//   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-// });
-
-
 
 // 기본 API 라우팅
 app.get('/', (req, res) => {
@@ -776,14 +766,6 @@ app.post('/upload', upload.single('audio'), async (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
-
-// const client = new speech.SpeechClient({
-//   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-// });
-
-
-// const upload = multer();
-
 
 // app.post('/upload', upload.single('audio'), async (req, res) => {
 //   try {
