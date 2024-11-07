@@ -1,13 +1,16 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cv2
+import os
 import numpy as np
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 CORS(app)
 
-model = load_model(r'C:\Users\wyzmq\OneDrive\바탕 화면\Job_Fairy\AI_Interview\Face_Recognition\model_name.h5')
+current_dir = os.path.dirname(__file__)  # 현재 파일의 디렉토리 경로
+model_path = os.path.join(current_dir, '..', 'Face_Recognition', 'model_name.h5')
+model = load_model(model_path)
 shape_x, shape_y = 48, 48
 
 emotion_labels = {
