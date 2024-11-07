@@ -25,6 +25,7 @@ import "./App.css"
 import CustomJobList from './page/Recruitment/js/CustomJobList';
 import OpenRecruitment from './page/Recruitment/js/OpenRecruitment';
 import ScrappedPostingList from './page/Recruitment/js/ScrappedPostingList';
+import DashBoard from './page/Recruitment/js/DashBoard';
 
 function App() {
 
@@ -54,6 +55,7 @@ function App() {
           <Route path='/Recruitment/CustomJobList' element={<CustomJobList />} />
           <Route path='/Recruitment/OpenRecruitment' element={<OpenRecruitment />} />
           <Route path='/Recruitment/ScrappedPostingList' element={<ScrappedPostingList />} />
+          <Route path='/Recruitment/DashBoard' element={<DashBoard />} />
         </Routes>
       </AuthProvider>
     </div> 

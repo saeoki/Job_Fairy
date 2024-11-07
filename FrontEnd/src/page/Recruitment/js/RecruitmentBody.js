@@ -26,6 +26,9 @@ export default function RecruitmentBody() {
     const handleOpenRecruitmentClick = () => {
         navigate('/Recruitment/OpenRecruitment')
     };
+    const handleDashBoardClick = () => {
+        navigate('/Recruitment/DashBoard')
+    };
 
     const [openRecruitments, setOpenRecruitments] = useState([]);
     const [kakaoId, setKakaoId] = useState("");
@@ -70,7 +73,7 @@ export default function RecruitmentBody() {
                 <img className="recruitment__image" src="/assets/images/Image.png" alt=""/>
                 <span className="recruitment__subheading">채용공고 찾기</span>
             </div>
-            <div className="recruitment__block" >
+            <div className="recruitment__block" onClick={handleDashBoardClick}>
                 <img className="recruitment__vector" src="/assets/vectors/Vector11_x2.svg" alt="dashboard vector" />
                 <span className="recruitment__subheading">채용 대시보드</span>
             </div>
