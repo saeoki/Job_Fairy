@@ -7,9 +7,7 @@ import "../css/Body.css"
 function Body(){
     return(
         <div className="body">
-            <div id = "checkcammic-box">
-                <CameraMicAccess /> 
-            </div>
+            <CameraMicAccess /> 
         </div>
     )
 }

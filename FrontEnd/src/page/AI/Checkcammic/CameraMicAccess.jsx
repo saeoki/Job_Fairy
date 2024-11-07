@@ -1,10 +1,10 @@
 import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import { Link } from "react-router-dom";
 import React, { useRef, useEffect, useState } from 'react';
-import '../css/checkcammic.css'; // CSS 파일 import
-import LinearProgress from '@mui/material/LinearProgress'; // Progress Bar 컴포넌트 import
-import MicIcon from '@mui/icons-material/Mic'; // 마이크 아이콘 import
+import LinearProgress from '@mui/material/LinearProgress'; 
+import MicIcon from '@mui/icons-material/Mic'; 
+
+import '../css/checkcammic.css'; 
 
 function CameraMicAccess() {
   const videoRef = useRef(null);
@@ -56,15 +56,15 @@ function CameraMicAccess() {
   };
 
   return (
-    <div className="CheckCamMic-box"> {/* CSS 클래스 적용 */}
-      <video ref={videoRef} autoPlay playsInline className="video-box" /> {/* CSS 클래스 적용 */}
-      <div className="gauge-box"> {/* CSS 클래스 적용 */}
+    <div className="CheckCamMic-box"> 
+      <video ref={videoRef} autoPlay playsInline className="video-box" /> 
+      <div className="gauge-box"> 
         <div className="icon-progress-container">
-        <MicIcon /> 
+          <MicIcon /> 
           <LinearProgress variant="determinate" value={volume} className="gauge-progress" />          
         </div>
       </div>
-      <div className="button-box"> {/* CSS 클래스 적용 */}
+      <div className="button-box">
         <Link to="/AIinterview">
           <Button className="return-button" variant="contained" href="#contained-buttons">
             점검 완료

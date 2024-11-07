@@ -248,7 +248,7 @@ function Body() {
   const isLastQuestion = questionIndex === questions.length - 1;
 
   return (
-    <div className="CheckCamMic-box">
+    <div className="CheckCamMic-box pt-3 pb-4">
       <VideoStream videoRef={videoRef} />
       {audioStream && <VolumeMeter audioStream={audioStream} />}
       {videoRef.current && (
