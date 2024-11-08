@@ -718,13 +718,9 @@ app.post('/api/interview/get', async (req, res) => {
 
 
 // stt code
-
 const client = new speech.SpeechClient({
   keyFilename: process.env.GOOGLE_STT_KEY,
 });
-
-//그냥 테스트용
-console.log('구글 키값은 : ', process.env.GOOGLE_STT_KEY);
 
 const upload = multer();
 
