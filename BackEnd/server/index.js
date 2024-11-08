@@ -718,9 +718,8 @@ app.post('/api/interview/get', async (req, res) => {
 
 
 // stt code
-
 const client = new speech.SpeechClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  keyFilename: process.env.GOOGLE_STT_KEY,
 });
 
 const upload = multer();
