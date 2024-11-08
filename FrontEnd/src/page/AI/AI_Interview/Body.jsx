@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import VideoStream from './VideoStream';
 import AudioRecorder from './AudioRecorder';
@@ -221,16 +222,26 @@ function Body() {
     setIsRecording(false);
     setIsEmotionAnalyzing(false);
 
-    try {
-      await fetch('http://localhost:5003/reset_emotions', { method: 'POST' });
-      console.log("Emotion totals reset on server");
-    } catch (error) {
-      console.error("Error resetting emotion totals on server:", error);
-    }
+  //   try {
+  //     await fetch('http://localhost:5003/reset_emotions', { method: 'POST' });
+  //     console.log("Emotion totals reset on server");
+  //   } catch (error) {
+  //     console.error("Error resetting emotion totals on server:", error);
+  //   }
 
-    setIsSubmitting(false);
-    setIsInterviewFinished(true);
-  };
+  //   setIsSubmitting(false);
+  //   setIsInterviewFinished(true);
+  // };
+      try {
+        await fetch('https://port-0-job-fairy-m37kcdp5e06b15b4.sel4.cloudtype.app/reset_emotions', { method: 'POST' });
+        console.log("Emotion totals reset on server");
+      } catch (error) {
+        console.error("Error resetting emotion totals on server:", error);
+      }
+
+      setIsSubmitting(false);
+      setIsInterviewFinished(true);
+    };
 
   // 면접의 준비 시간과 답변 시간 관리
   useEffect(() => {

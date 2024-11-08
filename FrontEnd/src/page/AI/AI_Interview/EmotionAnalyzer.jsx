@@ -26,7 +26,12 @@ function EmotionAnalyzer({ videoRef, isActive, onEmotionData }) {
     formData.append('image', blob, 'image.jpg');
 
     try {
-      const response = await axios.post('http://localhost:5003/predict', formData, {
+      // const response = await axios.post('http://localhost:5003/predict', formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // });
+      const response = await axios.post('https://port-0-job-fairy-m37kcdp5e06b15b4.sel4.cloudtype.app/predict', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
