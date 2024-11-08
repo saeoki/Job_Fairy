@@ -110,14 +110,16 @@ const Sidebar = () => {
                         <option value="정렬">정렬</option>
                         <option value="탐색">탐색</option>
                         <option value="그래프">그래프</option>
+                        <option value="해시">해시</option>
                     </select>
                 </div>
             )}
 
-            {/* 필터링된 문제 목록 */}
-            {filteredProblems.length === 0 ? (
-                <p>검색된 문제가 없습니다.</p>
-            ) : (
+            <div className='problem_box'>
+                {/* 필터링된 문제 목록 */}
+                {filteredProblems.length === 0 ? (
+                    <p id='empty_problem'>검색된 문제가 없습니다.</p>
+                ) : (
                 filteredProblems.map((levelData) => (
                     <div className="level-section">
                         <h4>레벨 {levelData._id}</h4>
@@ -132,8 +134,10 @@ const Sidebar = () => {
                             ))}
                         </ul>
                     </div>
-                ))
-            )}
+                    ))
+                )}
+            </div>
+            
         </div>
     );
 };
