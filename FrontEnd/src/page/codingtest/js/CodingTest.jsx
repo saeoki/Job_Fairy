@@ -18,6 +18,7 @@ import Sidebar from "./Sidebar";
 
 import { AuthContext } from "../../../context/AuthContext"
 import { LoginErrorToast, LoginExpErrorToast } from "../../../components/ToastMessage";
+import {jwtDecode} from 'jwt-decode';
 
 const BackendIP = process.env.REACT_APP_EC2_IP
 
@@ -32,6 +33,8 @@ const CondingTest = () => {
   if(!token){
     LoginErrorToast()
   }
+  const userData = jwtDecode(token);
+  const { nickname } = userData;
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -119,7 +122,7 @@ const CondingTest = () => {
         </button>
         <div className="current-problem-title">{problem?.title}</div>
         <div className="header_name">
-          <strong></strong>님
+          <strong>{nickname}</strong> 님
         </div>
       </div>
 
