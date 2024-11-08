@@ -724,7 +724,7 @@ const client = new speech.SpeechClient({
 
 const upload = multer();
 
-app.post('/upload', upload.single('audio'), async (req, res) => {
+app.post('/api/upload', upload.single('audio'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).send('No file uploaded.');
