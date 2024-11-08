@@ -12,7 +12,7 @@ import Interview_chart from "./Interview_chart";
 import STTResult from "./STTResult";
 import { ErrorToast, SaveSuccessToast } from "../../../components/ToastMessage"; 
 
-const BackendIP = "http://localhost:5000";
+const BackendIP = process.env.REACT_APP_EC2_IP;
 
 function Interview_result() {
   const location = useLocation();

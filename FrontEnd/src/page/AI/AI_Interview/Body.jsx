@@ -12,6 +12,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
+const BackendIP = process.env.REACT_APP_EC2_IP;
+
 function Body() {
   // 면접 설정 정보를 가져오는 데 사용되는 상태
   const location = useLocation();
@@ -147,7 +149,9 @@ function Body() {
     formData.append('question', questions[questionIndex]);
 
     try {
-      const response = await fetch('http://localhost:5000/upload', {
+      // const response = await fetch('http://localhost:5000/upload', {
+      const response = await fetch(`${BackendIP}/api/upload`, {
+
         method: 'POST',
         body: formData,
       });
