@@ -8,9 +8,15 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 CORS(app)
 
-current_dir = os.path.dirname(__file__)  # 현재 파일의 디렉토리 경로
-model_path = os.path.join(current_dir, '..', 'Face_Recognition', 'model_name.h5')
+# current_dir = os.path.dirname(__file__)  # 현재 파일의 디렉토리 경로
+# model_path = os.path.join(current_dir, '..', 'Face_Recognition', 'model_name.h5')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'Face_Recognition', 'model_name.h5')
+
+# 모델 로드
 model = load_model(model_path)
+print("Model loaded from:", model_path)
+# model = load_model(model_path)
 shape_x, shape_y = 48, 48
 
 emotion_labels = {
