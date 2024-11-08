@@ -56,6 +56,11 @@ def extract_face_features(gray, detected_faces, coord, offset_coefficients=(0.07
         new_face.append(new_extracted_face)
     return new_face
 
+@app.route('/')
+def home():
+    return "Emotion Recognition API is running!"
+
+
 @app.route('/reset_emotions', methods=['POST'])
 def reset_emotions():
     global emotion_totals
