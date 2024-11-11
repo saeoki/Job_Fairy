@@ -60,8 +60,8 @@ export default function JobPostingListBody() {
     try {
       // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
       // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
-      // const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
-      const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+      const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
+      // const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
 
         method: 'POST',
         headers: {
