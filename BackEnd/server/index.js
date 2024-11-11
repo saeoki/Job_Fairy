@@ -324,7 +324,7 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
-    const { jobs, locations, experiences } = req.body;
+    const { jobs, locations, experiences, sortBy } = req.body;
 
     console.log("필터 데이터: ", {jobs, locations, experiences});
 
@@ -374,8 +374,17 @@ app.post("/api/Recruitment/JobPostingList", async (req, res) => {
       ];
     }
 
+    // 정렬 옵션 적용
+    let sortOption = {};
+    if (sortBy === 'recent' || !sortBy) {
+      sortOption = { posting_timestamp: -1 }; // 최신순 정렬
+    } else if (sortBy === 'old') {
+      sortOption = { expiration_timestamp: 1 }; // 마감일순 정렬
+    }
+
     const total = await JobPosting.countDocuments(query);
     const jobPostings = await JobPosting.find(query)
+      .sort(sortOption)
       .select({
         "bbs_gb": 1,
         "company.detail.name": 1,

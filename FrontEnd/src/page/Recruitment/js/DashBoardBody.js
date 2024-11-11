@@ -16,19 +16,18 @@ export default function DashBoardBody() {
         style={{
           marginBottom: "20px",
           textAlign: "center",
-          fontSize: "2em",
-          color: "#ff6b6b", // 밝은 핑크 색상
+          fontSize: "clamp(1.2em, 4vw, 2em)", // 반응형 글자 크기
+          color: "#ff6b6b",
           fontWeight: "bold",
-          backgroundColor: "#ffe9e9", // 타이틀 배경 색상으로 부드러운 핑크
+          backgroundColor: "#ffe9e9",
           padding: "10px 20px",
-          borderRadius: "15px", // 둥근 모서리
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // 살짝 음영 효과
+          borderRadius: "15px",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
         😊 요즘 채용 한눈에 알아보기 😊
       </h2>
 
-      {/* iframe */}
       <div
         style={{
           position: "relative",
