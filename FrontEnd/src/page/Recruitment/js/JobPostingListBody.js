@@ -56,18 +56,18 @@ export default function JobPostingListBody() {
     }
   }, []);
 
-  const fetchJobPostings = async (page, filters = {}) => {
+  const fetchJobPostings = async (page, filters = {}, sortBy = '') => {
     try {
       // 백엔드 개발 필요하면 http://localhost:5000/api로 요청해서 변화 보면서 진행
       // 개발 완료 후 배포할때는 반드시 서버 주소로 변경 후 git에 push할것
-      const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
-      // const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
+      // const response = await fetch(`${process.env.REACT_APP_EC2_IP}/api/Recruitment/JobPostingList?page=${page}`, {
+      const response = await fetch(`http://localhost:5000/api/Recruitment/JobPostingList?page=${page}`, {
 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(filters),
+        body: JSON.stringify({ ...filters, sortBy }),
       });
       const data = await response.json();
 
@@ -86,8 +86,17 @@ export default function JobPostingListBody() {
   };
 
   const handleSortChange = (event) => {
-    // 정렬 기준 변경 시 처리 (필요에 따라 구현)
+    const selectedSort = event.target.value;
+    setSortBy(selectedSort);
+  
+    const params = new URLSearchParams(location.search);
+    params.set('page', '1'); // 페이지를 1로 설정
+    navigate(`?${params.toString()}`);
+  
+    fetchJobPostings(1, selectedFilters, selectedSort); // 첫 페이지로 이동해 새 데이터를 가져옴
   };
+  
+  
 
 
   const formatTimestamp = (timestamp) => {
@@ -141,8 +150,8 @@ export default function JobPostingListBody() {
   
   // 페이지가 바뀌면 fetch, 검색 조건은 그대로
   useEffect(() => {
-    fetchJobPostings(currentPage, selectedFilters);
-  }, [currentPage]);
+    fetchJobPostings(currentPage, selectedFilters, sortBy);
+  }, [currentPage, sortBy]);
 
   return (
     <Container maxWidth="lg">
@@ -391,7 +400,7 @@ export default function JobPostingListBody() {
             onChange={handleSortChange}
           >
             <MenuItem value="recent">최신순</MenuItem>
-            <MenuItem value="popular">마감일순</MenuItem>
+            <MenuItem value="old">마감일순</MenuItem>
           </Select>
         </FormControl>
       </Box>

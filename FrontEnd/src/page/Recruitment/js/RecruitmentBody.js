@@ -96,24 +96,18 @@ export default function RecruitmentBody() {
                 </div>
                 <div className="carousel-inner">
                     <div className="carousel-item active">
-                        <img src="/assets/images/slider_image1.png" className="d-block w-100" alt="..."/>
+                        <img src="/assets/images/main_carousel.png" className="d-block w-100" alt="..."/>
                         <div className="carousel-caption d-none d-md-block">
-                            {/* <h5>취업의 요정과 함께</h5> */}
-                            <p>취업 올인원</p>
                         </div>
                     </div>
                     <div className="carousel-item">
-                        <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
+                        <img src="/assets/images/dashboard_carousel.png" className="d-block w-100" alt="..."/>
                         <div className="carousel-caption d-none d-md-block">
-                            <h5>Second slide label</h5>
-                            <p>Some representative placeholder content for the second slide.</p>
                         </div>
                     </div>
                     <div className="carousel-item">
-                        <img src="https://via.placeholder.com/800x400" className="d-block w-100" alt="..."/>
+                        <img src="/assets/images/custom_carousel.png" className="d-block w-100" alt="..."/>
                         <div className="carousel-caption d-none d-md-block">
-                            <h5>Third slide label</h5>
-                            <p>Some representative placeholder content for the third slide.</p>
                         </div>
                     </div>
                 </div>
