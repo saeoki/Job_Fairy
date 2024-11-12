@@ -73,8 +73,12 @@ const CondingTest = () => {
         ${code}
         const testCases = ${JSON.stringify(problem.testCases)};
         const results = testCases.map(({ input, expectedOutput }) => {
-          const parsedInput = JSON.parse(input);
-          const result = solution(parsedInput);
+          // eval을 사용하여 문자열로 표현된 객체나 배열을 실제 자바스크립트 객체로 변환
+          const parsedInput = Array.isArray(input) 
+            ? input.map(i => eval(\`(\${i})\`)) 
+            : [eval(\`(\${input})\`)];
+
+          const result = solution(...parsedInput);
           return {
             input,
             result,
@@ -89,14 +93,17 @@ const CondingTest = () => {
       const testResults = runFunction();
       
       setResults(testResults);
+      console.log(results)
       setOutput(testResults.map(r => 
-        `입력값: ${r.input}\n출력값: ${r.result}\n예측값: ${r.expectedOutput}\n${r.passed ? '통과' : '실패'}\n`
+        `입력값: ${r.input}\n출력값: ${r.result}\n예측값: ${r.expectedOutput}\n테스트 통과: ${r.passed ? '통과' : '실패'}\n`
       ).join('\n'));
-      setIsClick(true)
+      setIsClick(true);
     } catch (error) {
       setOutput(`Error: ${error.message}`);
     }
   };
+
+  
 
   var level = 1
   return (
@@ -145,11 +152,11 @@ const CondingTest = () => {
             <h5>제한 사항</h5>
             : null}
             <ul>
-            {problem?.inputType.map((inputType)=>(
-              <li dangerouslySetInnerHTML={{__html:inputType}}></li>
+            {problem?.inputType.map((inputType, index)=>(
+              <li key={index} dangerouslySetInnerHTML={{__html:inputType}}></li>
             ))}
-            {problem?.outputType.map((outputType)=>(
-              <li>{outputType}</li>
+            {problem?.outputType.map((outputType, index)=>(
+              <li key={index}>{outputType}</li>
             ))}
             </ul>
             
@@ -157,17 +164,17 @@ const CondingTest = () => {
             <table className="testcase_tb">
               <thead>
                 <tr>
-                  {problem?.params.map((param) => (
-                  <th>{param}</th>
+                  {problem?.params.map((param, index) => (
+                  <th key={index}>{param}</th>
                   ))}
                   <th>result</th>
                 </tr>
               </thead>
               <tbody>
-                {problem?.testCases.slice(0, 3).map((testCase) => (
-                  <tr>
-                    {testCase.input.map((input)=>(
-                      <td>
+                {problem?.testCases.slice(0, 3).map((testCase, Index) => (
+                  <tr key={Index}>
+                    {testCase.input.map((input, index)=>(
+                      <td key={index}>
                         {input}
                       </td>
                     ))}
@@ -181,11 +188,11 @@ const CondingTest = () => {
             <br />
             <h5>입출력 예 설명</h5>
             {problem?.inputDescription.map((inputDes, index)=>(
-              <div className="inputDescription">
+              <div className="inputDescription" key={index}>
                   입출력 예#{index+1}
                   <br />
-                  {inputDes.example.map((example)=>(
-                    <p>{example}</p>
+                  {inputDes.example.map((example, idx)=>(
+                    <p key={idx}>{example}</p>
                 ))}
                 <br />
               </div>
@@ -210,7 +217,12 @@ const CondingTest = () => {
 
           <div className="test-results">
           <pre>결과:<hr /></pre>
-            { isClick ? output : "결과가 여기에 나타납니다."}
+            { isClick ? 
+            output.split('\n').map((line, index) => (
+              <p className="output_result" key={index}>{line}</p>
+          ))
+            
+            : "결과가 여기에 나타납니다."}
           </div>
         </div>
       </main>
