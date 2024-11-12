@@ -54,7 +54,6 @@ function Body() {
 
   // 설정된 면접 질문 불러오기
   useEffect(() => {
-    console.log("Fetching questions");
     const fetchQuestions = async () => {
       let combinedQuestions = [];
       if (isPersonalityInterviewChecked) {
@@ -94,7 +93,6 @@ function Body() {
 
   // 사용자 미디어 요청하여 비디오 및 오디오 스트림을 설정
   useEffect(() => {
-    console.log("Requesting user media");
     const requestUserMedia = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -134,7 +132,6 @@ function Body() {
   // 녹음된 오디오를 서버에 업로드하고 STT 결과를 처리하는 함수
   const handleSaveRecording = async (audioBlob = null) => {
     if (isSTTProcessing || questionIndex >= questions.length) {
-      console.warn("Already processing STT or all questions answered");
       return;
     }
 
@@ -161,13 +158,11 @@ function Body() {
       }
 
       const result = await response.json();
-      console.log("STT response received", result);
 
       const newAnswer = { question: questions[questionIndex], answer: result.transcription || '' };
 
       setAnswers((prev) => {
         const updatedAnswers = [...prev, newAnswer];
-        console.log("Updated answers", updatedAnswers);
 
         if (updatedAnswers.length === questions.length) {
           setIsInterviewFinished(true);
@@ -181,7 +176,6 @@ function Body() {
 
       setQuestionIndex((prevIndex) => {
         const newIndex = prevIndex + 1;
-        console.log("Updated questionIndex", newIndex);
         return newIndex;
       });
 
@@ -193,7 +187,6 @@ function Body() {
   };
 
   const onCompleteAnswering = () => {
-    console.log("onCompleteAnswering called", { isSTTProcessing, questionIndex, isAnsweringComplete });
 
     if (isSTTProcessing || isAnsweringComplete || questionIndex >= questions.length) return;
 
@@ -208,7 +201,6 @@ function Body() {
 
   // 면접 시작 시 호출되는 함수
   const startInterview = () => {
-    console.log("startInterview called");
     if (questions.length === 0) {
       alert('No questions available.');
       return;
@@ -221,7 +213,6 @@ function Body() {
 
   // 면접 종료 시 호출되는 함수
   const stopInterview = async () => {
-    console.log("stopInterview called");
     setIsInterviewStarted(false);
     setIsRecording(false);
     setIsEmotionAnalyzing(false);
@@ -249,7 +240,6 @@ function Body() {
 
   // 면접의 준비 시간과 답변 시간 관리
   useEffect(() => {
-    console.log("useEffect: questionIndex", questionIndex);
 
     if (isInterviewStarted && questionIndex < questions.length) {
       if (isPreparationTime) {
