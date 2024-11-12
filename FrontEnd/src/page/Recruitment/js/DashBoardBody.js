@@ -32,7 +32,7 @@ export default function DashBoardBody() {
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: "800px",
+          maxWidth: "1200px",
           paddingBottom: "56.25%",
           height: 0,
         }}
