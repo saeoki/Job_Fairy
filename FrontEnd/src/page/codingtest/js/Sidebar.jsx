@@ -120,12 +120,12 @@ const Sidebar = () => {
                 {filteredProblems.length === 0 ? (
                     <p id='empty_problem'>검색된 문제가 없습니다.</p>
                 ) : (
-                filteredProblems.map((levelData) => (
-                    <div className="level-section">
+                filteredProblems.map((levelData, index) => (
+                    <div className="level-section" key={index}>
                         <h4>레벨 {levelData._id}</h4>
                         <ul>
-                            {levelData.problems.map((problem) => (
-                                <Link to={`/CodingTest?problemNo=${problem.no}`} style={{ textDecoration: "none", color:"#ffffff"}} >
+                            {levelData.problems.map((problem, idx) => (
+                                <Link key={idx} to={`/CodingTest?problemNo=${problem.no}`} style={{ textDecoration: "none", color:"#ffffff"}} >
                                     <li>
                                         <strong>{problem.title}</strong>
                                         <p>{problem.type}</p>
