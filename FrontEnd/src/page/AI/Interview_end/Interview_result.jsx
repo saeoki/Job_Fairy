@@ -24,21 +24,30 @@ function Interview_result() {
   const { kakaoId, nickname } = userData;
 
   const { accumulatedEmotions, answers } = location.state || {};
+  // console.log(answers)
   const [evaluations, setEvaluations] = useState([]);
   const [emotionFeedback, setEmotionFeedback] = useState('');
 
+  console.log(evaluations)
   // 데이터 저장 함수
   const handleSave = async () => {
-    const prepareAnswers = answers.map((answer) => ({
-      ...answer,
-      answer: answer.answer || "No answer provided",
-      evaluation: answer.evaluation || "Not evaluated",
-    }));
+    // const prepareAnswers = answers.map((answer) => ({
+    //   ...answer,
+    //   answer: evaluations.answer || "No answer provided",
+    //   evaluation: evaluations.evaluation || "Not evaluated",
+    // }));
+    // const prepareAnswers = evaluations.map((evaluation) => ({
+    //   ...evaluation,
+    //   answer: evaluation.answer || "No answer provided",
+    //   evaluation: evaluation.evaluation || "Not evaluated",
+    // }));
+    // console.log(prepareAnswers)
   
     const interviewData = {
       kakaoId,
       nickname,
-      questionsAndAnswers: prepareAnswers,
+      // questionsAndAnswers: prepareAnswers,
+      questionsAndAnswers: evaluations,
       accumulatedEmotions,
       emotionFeedback,
       createdAt: new Date().toISOString(),
