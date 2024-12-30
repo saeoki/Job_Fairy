@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import time
+import ijson
 from google.cloud import storage
 from google.cloud import bigquery
 from google.cloud.bigquery import SourceFormat
@@ -93,19 +94,28 @@ def extract_jobs(total_results) :
             
             received_count = len(jobs)
 
-            # 중복 제거: 중복된 데이터는 리스트에서 제외
-            jobs = [job for job in jobs if job['id'] not in job_ids_set]
+            # # 중복 제거: 중복된 데이터는 리스트에서 제외
+            # jobs = [job for job in jobs if job['id'] not in job_ids_set]
 
-            for job in jobs : # 여기서 job은 JSON 객체 하나
-                job_ids_set.add(job['id'])
-                job['bbs_gb'] = 1 # JSON 객체에 bbs_gb필드 추가, 값은 1
+            # for job in jobs : # 여기서 job은 JSON 객체 하나
+            #     job_ids_set.add(job['id'])
+            #     job['bbs_gb'] = 1 # JSON 객체에 bbs_gb필드 추가, 값은 1
+
+            # 기존에는 리스트의 모든 데이터를 순회해 중복을 제거하고 그대로 리스트로 다시 만들어 불필요한 메모리를 낭비하고 직관적이지 못하지만
+            # 개선된 코드에서는 순회를 하며 중복을 제거함과 동시에 필요한 작업을 처리해 직관성이 증가했고 성능이나 메모리 사용에서 약간의 효율성을 챙겼다.
+            filtered_jobs = []
+            for job in jobs :
+                if job['id'] not in job_ids_set :
+                    job_ids_set.add(job['id'])
+                    job['bbs_gb'] = 1
+                    filtered_jobs.append(job)
 
             with open(local_file, 'a', encoding='utf-8') as f:
                 if not first_batch :
                     f.write(',')
                 else :
                     first_batch = False
-                f.write(json.dumps(jobs, ensure_ascii=False)[1:-1])
+                f.write(json.dumps(filtered_jobs, ensure_ascii=False)[1:-1])
 
             logging.info(f"공채 데이터 중 {public_total_results}개의 {start}번째 실행 완료.")
 
@@ -116,8 +126,6 @@ def extract_jobs(total_results) :
         else :
             logging.info(f"Warning: 공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
             break
-
-        time.sleep(1)
         
         
     # 비공채 데이터 fetch
@@ -131,19 +139,19 @@ def extract_jobs(total_results) :
 
             received_count = len(jobs)
 
-            # 중복 제거: 중복된 데이터는 리스트에서 제외
-            jobs = [job for job in jobs if job['id'] not in job_ids_set]
-
-            for job in jobs : # 여기서 job은 JSON 객체 하나
-                job_ids_set.add(job['id'])
-                job['bbs_gb'] = 0 # JSON 객체에 bbs_gb필드 추가, 값은 0
+            filtered_jobs = []
+            for job in jobs :
+                if job['id'] not in job_ids_set :
+                    job_ids_set.add(job['id'])
+                    job['bbs_gb'] = 0
+                    filtered_jobs.append(job)
 
             with open(local_file, 'a', encoding='utf-8') as f:
                 if not first_batch :
                     f.write(',')
                 else :
                     first_batch = False
-                f.write(json.dumps(jobs, ensure_ascii=False)[1:-1])
+                f.write(json.dumps(filtered_jobs, ensure_ascii=False)[1:-1])
 
             logging.info(f"비공채 데이터 중 {non_public_total_results}개의 {start}번 째 실행 완료.")
 
@@ -155,22 +163,32 @@ def extract_jobs(total_results) :
             logging.info(f"Warning: 비공채 데이터 {start}번째 응답에서 데이터가 없습니다.")
             break
 
-        time.sleep(1)
-
     with open(local_file, 'a', encoding='utf-8') as f:
         f.write(']')
 
 
 # JSON to NDJSON
-@task
-def transform_json(local_file) :
-    with open(local_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+# @task
+# def transform_json(local_file) :
+#     with open(local_file, 'r', encoding='utf-8') as f:
+#         data = json.load(f)
 
-    with open(local_file, 'w', encoding='utf-8') as f:
-        for entry in data:
-            json.dump(entry, f, ensure_ascii=False) # ensure_ascii옵션 설정을 안하면 한글이 다른 문자열로 변환됨
-            f.write('\n')
+#     with open(local_file, 'w', encoding='utf-8') as f:
+#         for entry in data:
+#             json.dump(entry, f, ensure_ascii=False) # ensure_ascii옵션 설정을 안하면 한글이 다른 문자열로 변환됨
+#             f.write('\n')
+
+# ijson 사용으로 json 파일 스트리밍 파싱
+@task
+def transform_json(local_file):
+    temp_file = local_file + '_temp'
+    with open(local_file, 'r', encoding='utf-8') as infile, open(temp_file, 'w', encoding='utf-8') as outfile:
+        for entry in ijson.items(infile, 'item'):
+            # entry는 배열의 각 요소(한 개의 JSON 객체)
+            json.dump(entry, outfile, ensure_ascii=False)
+            outfile.write('\n')
+    os.replace(temp_file, local_file)
+
 
 
 
@@ -209,7 +227,7 @@ def bulkload_to_bigquery(bucket_info) :
     job_config = bigquery.LoadJobConfig(
         source_format=SourceFormat.NEWLINE_DELIMITED_JSON,
         autodetect=True,  # 자동으로 스키마 감지 (옵션)
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE # 기존 테이블을 어떻게 처리할지 지정
     )
 
     # 데이터셋과 테이블 참조 생성
@@ -245,7 +263,7 @@ with DAG(
     dag_id='jobpostings_ETL',
     tags=['saramin_api'],
     default_args=default_args,
-    schedule_interval='0 15 * * *',
+    schedule_interval='0 0 * * *',
     catchup=False
 ) as dag: 
 
